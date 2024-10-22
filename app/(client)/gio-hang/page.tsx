@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import Loading from "@/app/components/Loading";
+import Loading from "@/components/Loading";
 
 interface CartItem {
   id: number;

@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import useFetch from "@/lib/useFetch";
 import {FaCreditCard, FaShoppingCart} from "react-icons/fa";
-import Loading from "@/app/components/Loading";
+import Loading from "@/components/Loading";
 
 interface Specification {
     weight: string;

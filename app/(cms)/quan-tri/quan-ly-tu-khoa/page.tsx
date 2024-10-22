@@ -31,9 +31,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Switch } from "@/components/ui/switch"
-import {CreateTagModal} from "@/app/components/CreateTagModal"
-import {EditTagModal} from "@/app/components/EditTagModal"
-import Loading from "@/app/components/Loading";
+import {CreateTagModal} from "@/components/CreateTagModal"
+import {EditTagModal} from "@/components/EditTagModal"
+import Loading from "@/components/Loading";
 import { debounce } from 'lodash';
 import useSWR from 'swr';
 

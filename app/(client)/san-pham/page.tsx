@@ -6,7 +6,7 @@ import Link from 'next/link';
 import useFetch from "@/lib/useFetch";
 import {FaCreditCard, FaShoppingCart} from "react-icons/fa";
 import ReactPaginate from 'react-paginate';
-import Loading from "@/app/components/Loading";
+import Loading from "@/components/Loading";
 import {notFound, useSearchParams} from "next/navigation";
 
 interface Specification {

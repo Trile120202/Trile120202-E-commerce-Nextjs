@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import useFetch from "@/lib/useFetch";
 import { motion } from 'framer-motion';
-import Loading from "@/app/components/Loading";
+import Loading from "@/components/Loading";
 
 
 interface Specifications {
