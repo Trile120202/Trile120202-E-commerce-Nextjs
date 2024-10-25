@@ -182,7 +182,7 @@ CREATE TABLE categories
     slug       VARCHAR(100) NOT NULL UNIQUE,
     content    TEXT,
     parent_id  INT,
-    image_id   INT,
+    image_id   INT null,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     status     INT       DEFAULT 1,

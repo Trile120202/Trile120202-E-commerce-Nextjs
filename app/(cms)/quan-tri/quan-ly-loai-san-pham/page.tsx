@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import {
     Table,
     TableBody,
@@ -83,10 +84,6 @@ const Page = () => {
         console.log(`Delete product category with id: ${id}`);
     };
 
-    const handleCreate = () => {
-        console.log('Create new product category');
-    };
-
     const getStatusColor = (status: number) => {
         return status === 1 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
     };
@@ -103,10 +100,12 @@ const Page = () => {
             <CardHeader className="bg-gradient-to-r from-blue-500 to-purple-600 text-white">
                 <div className="flex justify-between items-center">
                     <CardTitle className="text-2xl font-bold">Quản lý loại sản phẩm</CardTitle>
-                    <Button onClick={handleCreate} className="bg-green-500 hover:bg-green-600 transition duration-300">
-                        <FaPlus className="mr-2 h-4 w-4" />
-                        Tạo mới
-                    </Button>
+                    <Link href="/quan-tri/quan-ly-loai-san-pham/tao-moi" passHref>
+                        <Button as="a" className="bg-green-500 hover:bg-green-600 transition duration-300">
+                            <FaPlus className="mr-2 h-4 w-4" />
+                            Tạo mới
+                        </Button>
+                    </Link>
                 </div>
             </CardHeader>
             <CardContent className="pt-6">
