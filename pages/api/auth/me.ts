@@ -5,9 +5,15 @@ import knexConfig from '../../../knexfile';
 import { StatusCode } from "@/lib/statusCodes";
 import { transformResponse } from "@/lib/interceptors/transformInterceptor";
 import { StatusApp } from "@/lib/statusApp";
-import {parse} from "cookie";
+// import {parse} from "cookie";
 
 const db = knex(knexConfig);
+
+interface JwtPayload {
+    userId: number;
+    iat: number;
+    exp: number;
+}
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method === 'GET') {
@@ -24,7 +30,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const token = authHeader.split(' ')[1];
 
         try {
-            const decoded: any = jwt.verify(token, process.env.JWT_SECRET || 'xyz');
+            const decoded = jwt.verify(token, process.env.JWT_SECRET || 'xyz') as JwtPayload;
 
             const user = await db('users')
                 .select('users.*', 'roles.name as role_name')

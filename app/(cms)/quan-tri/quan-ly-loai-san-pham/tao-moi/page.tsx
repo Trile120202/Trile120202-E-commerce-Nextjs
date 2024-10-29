@@ -64,7 +64,7 @@ const Page = () => {
             toast({
                 variant: "destructive",
                 title: "Lỗi",
-                description: "Có lỗi xảy ra, vui lòng thử lại",
+                description: "Có lỗi xảy ra, vui lòng thử lại" + (error as Error).message,
             });
         } finally {
             setLoading(false);

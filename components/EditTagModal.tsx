@@ -10,6 +10,8 @@ interface Tag {
   id: number;
   name: string;
   status: number;
+  created_at: string;
+  updated_at: string;
 }
 
 interface EditTagModalProps {
@@ -21,8 +23,10 @@ interface EditTagModalProps {
 export const EditTagModal: React.FC<EditTagModalProps> = ({ tag, onUpdate, onClose }) => {
   const [name, setName] = useState(tag.name);
   const [status, setStatus] = useState(tag.status.toString());
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const { data, loading, error, fetchData } = useApi<Tag>(`/api/tag`, {
+  const { data, fetchData } = useApi<Tag>(`/api/tag`, {
     method: 'PUT',
     body: { id: tag.id, name, status: parseInt(status) }
   });
@@ -30,6 +34,7 @@ export const EditTagModal: React.FC<EditTagModalProps> = ({ tag, onUpdate, onClo
   useEffect(() => {
     setName(tag.name);
     setStatus(tag.status.toString());
+    setError(null); // Clear previous error message
   }, [tag]);
 
   useEffect(() => {
@@ -41,50 +46,60 @@ export const EditTagModal: React.FC<EditTagModalProps> = ({ tag, onUpdate, onClo
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    fetchData();
+    setLoading(true);
+
+    try {
+      await fetchData();
+    } catch (error) {
+      setError('Failed to update the tag. Please try again.'+ error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <Dialog open={true} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Chỉnh sửa từ khóa</DialogTitle>
-        </DialogHeader>
-        <form onSubmit={handleSubmit}>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="name" className="text-right">
-                Tên
-              </Label>
-              <Input
-                id="name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="col-span-3"
-              />
+      <Dialog open={true} onOpenChange={onClose}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Chỉnh sửa từ khóa</DialogTitle>
+          </DialogHeader>
+          {error && <p className="text-red-600">{error}</p>}
+          <form onSubmit={handleSubmit}>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="name" className="text-right">
+                  Tên
+                </Label>
+                <Input
+                    id="name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="col-span-3"
+                    required
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="status" className="text-right">
+                  Trạng thái
+                </Label>
+                <Select onValueChange={setStatus} value={status}>
+                  <SelectTrigger className="w-full col-span-3">
+                    <SelectValue placeholder="Chọn trạng thái" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="1">Hoạt động</SelectItem>
+                    <SelectItem value="0">Không hoạt động</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="status" className="text-right">
-                Trạng thái
-              </Label>
-              <Select onValueChange={setStatus} defaultValue={status}>
-                <SelectTrigger className="w-full col-span-3">
-                  <SelectValue placeholder="Chọn trạng thái" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="1">Hoạt động</SelectItem>
-                  <SelectItem value="0">Không hoạt động</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button type="submit" disabled={loading}>
-              {loading ? 'Đang lưu...' : 'Lưu thay đổi'}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+            <DialogFooter>
+              <Button type="submit" disabled={loading}>
+                {loading ? 'Đang lưu...' : 'Lưu thay đổi'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
   );
 };

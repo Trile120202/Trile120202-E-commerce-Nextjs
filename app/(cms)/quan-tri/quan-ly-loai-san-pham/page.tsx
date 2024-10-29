@@ -1,15 +1,6 @@
 'use client';
-
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table"
 import {
     Pagination,
     PaginationContent,
@@ -20,7 +11,7 @@ import {
     PaginationPrevious,
 } from "@/components/ui/pagination"
 import { Button } from "@/components/ui/button"
-import { FaEdit, FaTrash, FaPlus, FaSearch } from 'react-icons/fa'
+import { FaEdit, FaTrash, FaPlus } from 'react-icons/fa'
 import { BsThreeDots } from 'react-icons/bs'
 import {
     DropdownMenu,
@@ -28,9 +19,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardHeader, CardTitle } from "@/components/ui/card"
 import useApi from '@/lib/useApi';
 import DataTable from "@/components/custom/datatable";
 
@@ -72,7 +61,8 @@ const Page = () => {
 
     useEffect(() => {
         fetchData();
-    }, [currentPage, selectedStatus, searchKeyword, limit]);
+    }, [fetchData, currentPage, selectedStatus, searchKeyword, limit]);
+
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
@@ -130,6 +120,7 @@ const Page = () => {
         },
     ];
 
+    // @ts-ignore
     return (
         <div className="flex flex-col h-full">
             <div className="sticky top-0 z-20 bg-white shadow-sm">
@@ -153,7 +144,7 @@ const Page = () => {
                     data={data?.data || []}
                     columns={columns}
                     loading={loading}
-                    error={error}
+                    error={error ? new Error(error) : null}
                     filters={{
                         status: {
                             value: selectedStatus,

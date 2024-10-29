@@ -10,7 +10,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardHeader, CardTitle } from "@/components/ui/card"
 import { Switch } from "@/components/ui/switch"
 import {CreateTagModal} from "@/components/CreateTagModal"
 import {EditTagModal} from "@/components/EditTagModal"
@@ -54,7 +54,7 @@ interface ApiResponse {
 const Page = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
-    
+
     const [currentPage, setCurrentPage] = useState(Number(searchParams.get('page')) || 1);
     const [selectedStatus, setSelectedStatus] = useState<string>(searchParams.get('status') || 'all');
     const [searchKeyword, setSearchKeyword] = useState<string>(searchParams.get('search') || '');
@@ -149,9 +149,9 @@ const Page = () => {
     const columns = [
         { accessor: 'id', label: 'ID', className: 'font-medium' },
         { accessor: 'name', label: 'Từ khóa', className: 'font-medium' },
-        { 
-            accessor: 'status', 
-            label: 'Trạng thái', 
+        {
+            accessor: 'status',
+            label: 'Trạng thái',
             className: 'text-center hidden md:table-cell',
             render: (row: Tag) => (
                 <div className="flex items-center space-x-2">
@@ -165,9 +165,9 @@ const Page = () => {
                 </div>
             )
         },
-        { 
-            accessor: 'actions', 
-            label: 'Thao tác', 
+        {
+            accessor: 'actions',
+            label: 'Thao tác',
             className: 'text-right',
             render: (row: Tag) => (
                 <DropdownMenu>
@@ -210,7 +210,7 @@ const Page = () => {
                     data={data?.data.tags || []}
                     columns={columns}
                     loading={loading}
-                    error={error}
+                    error={error ? new Error(error) : null}
                     filters={{
                         status: {
                             value: selectedStatus,
@@ -241,16 +241,16 @@ const Page = () => {
                         <Pagination>
                             <PaginationContent>
                                 <PaginationItem>
-                                    <PaginationPrevious 
+                                    <PaginationPrevious
                                         onClick={() => handlePageChange(data.data.pagination.currentPage - 1)}
                                         className={data.data.pagination.currentPage === 1 ? 'pointer-events-none opacity-50' : ''}
                                     />
                                 </PaginationItem>
-                                
+
                                 {[...Array(data.data.pagination.totalPages)].map((_, index) => {
                                     if (index === 0) return (
                                         <PaginationItem key={index}>
-                                            <PaginationLink 
+                                            <PaginationLink
                                                 onClick={() => handlePageChange(index + 1)}
                                                 isActive={data.data.pagination.currentPage === index + 1}
                                             >
@@ -258,14 +258,14 @@ const Page = () => {
                                             </PaginationLink>
                                         </PaginationItem>
                                     )
-                                    
+
                                     if (
                                         index === data.data.pagination.currentPage - 1 ||
                                         index === data.data.pagination.currentPage - 2 ||
                                         index === data.data.pagination.currentPage
                                     ) return (
                                         <PaginationItem key={index}>
-                                            <PaginationLink 
+                                            <PaginationLink
                                                 onClick={() => handlePageChange(index + 1)}
                                                 isActive={data.data.pagination.currentPage === index + 1}
                                             >
@@ -273,10 +273,10 @@ const Page = () => {
                                             </PaginationLink>
                                         </PaginationItem>
                                     )
-                                    
+
                                     if (index === data.data.pagination.totalPages - 1) return (
                                         <PaginationItem key={index}>
-                                            <PaginationLink 
+                                            <PaginationLink
                                                 onClick={() => handlePageChange(index + 1)}
                                                 isActive={data.data.pagination.currentPage === index + 1}
                                             >
@@ -284,7 +284,7 @@ const Page = () => {
                                             </PaginationLink>
                                         </PaginationItem>
                                     )
-                                    
+
                                     if (
                                         index === 1 ||
                                         index === data.data.pagination.totalPages - 2
@@ -293,12 +293,12 @@ const Page = () => {
                                             <PaginationEllipsis />
                                         </PaginationItem>
                                     )
-                                    
+
                                     return null
                                 })}
 
                                 <PaginationItem>
-                                    <PaginationNext 
+                                    <PaginationNext
                                         onClick={() => handlePageChange(data.data.pagination.currentPage + 1)}
                                         className={data.data.pagination.currentPage === data.data.pagination.totalPages ? 'pointer-events-none opacity-50' : ''}
                                     />

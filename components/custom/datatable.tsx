@@ -21,7 +21,7 @@ interface DataTableProps<T> {
         render?: (row: T) => React.ReactNode;
     }[];
     loading?: boolean;
-    error?: any;
+    error?: Error | null;
     filters?: {
         status?: {
             value: string;

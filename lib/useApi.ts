@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 interface FetchOptions extends RequestInit {
     method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
-    body?: any;
+    body?: Record<string, unknown>;
 }
 
 const useApi = <T>(url: string, options?: FetchOptions) => {

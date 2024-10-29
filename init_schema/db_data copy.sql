@@ -15,10 +15,12 @@ DROP TABLE IF EXISTS categories CASCADE;
 DROP TABLE IF EXISTS product_images CASCADE;
 DROP TABLE IF EXISTS products CASCADE;
 DROP TABLE IF EXISTS images CASCADE;
-
+DROP TABLE IF EXISTS ram CASCADE;
+DROP TABLE IF EXISTS hard_drives CASCADE;
+DROP TABLE IF EXISTS product_ram CASCADE;
+DROP TABLE IF EXISTS product_hard_drives CASCADE;
 
 DROP FUNCTION IF EXISTS update_modified_column() CASCADE;
-
 
 CREATE TABLE images
 (
@@ -798,6 +800,74 @@ CREATE INDEX idx_product_specifications_spec_name ON product_specifications (spe
 CREATE INDEX idx_product_specifications_created_at ON product_specifications (created_at);
 CREATE INDEX idx_product_specifications_updated_at ON product_specifications (updated_at);
 CREATE INDEX idx_product_specifications_status ON product_specifications (status);
+
+CREATE TABLE ram
+(
+    id         SERIAL PRIMARY KEY,
+    name       VARCHAR(100) NOT NULL,
+    size       VARCHAR(50) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status     INT DEFAULT 1
+);
+
+CREATE INDEX idx_ram_name ON ram (name);
+CREATE INDEX idx_ram_size ON ram (size);
+CREATE INDEX idx_ram_created_at ON ram (created_at);
+CREATE INDEX idx_ram_updated_at ON ram (updated_at);
+CREATE INDEX idx_ram_status ON ram (status);
+
+CREATE TABLE hard_drives
+(
+    id         SERIAL PRIMARY KEY,
+    name       VARCHAR(100) NOT NULL,
+    capacity   VARCHAR(50) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status     INT DEFAULT 1
+);
+
+CREATE INDEX idx_hard_drives_name ON hard_drives (name);
+CREATE INDEX idx_hard_drives_capacity ON hard_drives (capacity);
+CREATE INDEX idx_hard_drives_created_at ON hard_drives (created_at);
+CREATE INDEX idx_hard_drives_updated_at ON hard_drives (updated_at);
+CREATE INDEX idx_hard_drives_status ON hard_drives (status);
+
+CREATE TABLE product_ram
+(
+    product_id INT,
+    ram_id     INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status     INT DEFAULT 1,
+    PRIMARY KEY (product_id, ram_id),
+    FOREIGN KEY (product_id) REFERENCES products (id) ON DELETE CASCADE,
+    FOREIGN KEY (ram_id) REFERENCES ram (id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_product_ram_product_id ON product_ram (product_id);
+CREATE INDEX idx_product_ram_ram_id ON product_ram (ram_id);
+CREATE INDEX idx_product_ram_created_at ON product_ram (created_at);
+CREATE INDEX idx_product_ram_updated_at ON product_ram (updated_at);
+CREATE INDEX idx_product_ram_status ON product_ram (status);
+
+CREATE TABLE product_hard_drives
+(
+    product_id INT,
+    hard_id    INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status     INT DEFAULT 1,
+    PRIMARY KEY (product_id, hard_id),
+    FOREIGN KEY (product_id) REFERENCES products (id) ON DELETE CASCADE,
+    FOREIGN KEY (hard_id) REFERENCES hard_drives (id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_product_hard_product_id ON product_hard_drives (product_id);
+CREATE INDEX idx_product_hard_hard_id ON product_hard_drives (hard_id);
+CREATE INDEX idx_product_hard_created_at ON product_hard_drives (created_at);
+CREATE INDEX idx_product_hard_updated_at ON product_hard_drives (updated_at);
+CREATE INDEX idx_product_hard_status ON product_hard_drives (status);
 
 CREATE OR REPLACE FUNCTION update_modified_column()
     RETURNS TRIGGER AS

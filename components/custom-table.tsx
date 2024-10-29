@@ -23,7 +23,7 @@ interface Column {
 }
 
 interface DataRow {
-    [key: string]: any;
+    [key: string]: string | number | boolean | null;
 }
 
 interface CustomTableProps {

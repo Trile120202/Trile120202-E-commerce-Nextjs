@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { FaEnvelope, FaPhone, FaMapMarkerAlt, FaClock } from 'react-icons/fa';
-import Image from 'next/image';
 
 const ContactPage: React.FC = () => {
     const [name, setName] = useState('');

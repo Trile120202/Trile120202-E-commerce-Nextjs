@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Button } from "@/components/ui/button"
 import { FaEdit, FaTrash } from 'react-icons/fa'
 import { BsThreeDots } from 'react-icons/bs'
@@ -10,9 +10,8 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardHeader, CardTitle } from "@/components/ui/card"
 import { Switch } from "@/components/ui/switch"
-import useApi from '@/lib/useApi';
 import DataTable from "@/components/custom/datatable";
 import {
     Pagination,
@@ -391,12 +390,19 @@ const Page = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
     
+    // @ts-ignore
     const [currentPage, setCurrentPage] = useState(Number(searchParams.get('page')) || 1);
+    // @ts-ignore
     const [selectedStatus, setSelectedStatus] = useState<string>(searchParams.get('status') || 'all');
+    // @ts-ignore
     const [searchKeyword, setSearchKeyword] = useState<string>(searchParams.get('search') || '');
+    // @ts-ignore
     const [selectedType, setSelectedType] = useState<string>(searchParams.get('type') || 'all');
+    // @ts-ignore
     const [selectedCapacity, setSelectedCapacity] = useState<string>(searchParams.get('capacity') || 'all');
+    // @ts-ignore
     const [selectedBrand, setSelectedBrand] = useState<string>(searchParams.get('brand') || 'all');
+    // @ts-ignore
     const [limit, setLimit] = useState<number>(Number(searchParams.get('limit')) || 10);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [selectedRam, setSelectedRam] = useState<Ram | null>(null);
@@ -558,6 +564,7 @@ const Page = () => {
         }
     };
 
+    // @ts-ignore
     return (
         <div className="flex flex-col h-full">
             <div className="sticky top-0 z-20 bg-white shadow-sm">
