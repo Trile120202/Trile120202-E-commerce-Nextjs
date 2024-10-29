@@ -32,6 +32,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import useApi from '@/lib/useApi';
+import DataTable from "@/components/custom/datatable";
 
 interface Category {
     id: number;
@@ -92,8 +93,41 @@ const Page = () => {
     const columns = [
         { accessor: 'id', label: 'ID', className: 'font-medium' },
         { accessor: 'name', label: 'Tên loại sản phẩm', className: 'font-medium' },
-        { accessor: 'status', label: 'Trạng thái', className: 'text-center hidden md:table-cell' },
-        { accessor: 'actions', label: 'Thao tác', className: 'text-right' },
+        { 
+            accessor: 'status', 
+            label: 'Trạng thái', 
+            className: 'text-center hidden md:table-cell',
+            render: (row: Category) => (
+                <span className={`hidden md:inline-block px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(row.status)}`}>
+                    {row.status === 1 ? 'Hoạt động' : 'Không hoạt động'}
+                </span>
+            )
+        },
+        { 
+            accessor: 'actions', 
+            label: 'Thao tác', 
+            className: 'text-right',
+            render: (row: Category) => (
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                            <span className="sr-only">Open menu</span>
+                            <BsThreeDots className="h-4 w-4" />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => handleEdit(row.id)}>
+                            <FaEdit className="mr-2 h-4 w-4" />
+                            <span>Sửa</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleDelete(row.id)}>
+                            <FaTrash className="mr-2 h-4 w-4" />
+                            <span>Xóa</span>
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            )
+        },
     ];
 
     return (
@@ -111,125 +145,37 @@ const Page = () => {
                             </Link>
                         </div>
                     </CardHeader>
-                    <CardContent className="p-4 md:p-6">
-                        <div className="flex flex-col md:flex-row gap-4">
-                            <div className="w-full md:w-auto">
-                                <Select onValueChange={setSelectedStatus} defaultValue="all">
-                                    <SelectTrigger className="w-full md:w-[200px] border-2 border-gray-300 rounded-lg">
-                                        <SelectValue placeholder="Chọn trạng thái" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="all">Tất cả</SelectItem>
-                                        <SelectItem value="1">Hoạt động</SelectItem>
-                                        <SelectItem value="0">Không hoạt động</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                            <div className="relative w-full md:w-64">
-                                <Input
-                                    placeholder="Tìm kiếm loại sản phẩm"
-                                    value={searchKeyword}
-                                    onChange={(e) => setSearchKeyword(e.target.value)}
-                                    className="w-full pl-10 pr-4 py-2 border-2 border-gray-300 rounded-lg"
-                                />
-                                <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                            </div>
-                            <div className="w-full md:w-auto">
-                                <Select onValueChange={(value) => setLimit(Number(value))} defaultValue={limit.toString()}>
-                                    <SelectTrigger className="w-full md:w-[150px] border-2 border-gray-300 rounded-lg">
-                                        <SelectValue placeholder="Số lượng hiển thị" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="4">4</SelectItem>
-                                        <SelectItem value="10">10</SelectItem>
-                                        <SelectItem value="20">20</SelectItem>
-                                        <SelectItem value="50">50</SelectItem>
-                                        <SelectItem value="100">100</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                        </div>
-                    </CardContent>
                 </Card>
             </div>
-
+            
             <div className="flex-1 overflow-auto">
-                <Card className="rounded-none shadow-none border-0">
-                    <CardContent className="p-4 md:p-6">
-                        <div className="overflow-x-auto">
-                            <Table className="w-full">
-                                <TableHeader className="sticky top-0 bg-white">
-                                    <TableRow>
-                                        {columns.map((col, index) => (
-                                            <TableHead key={index} className={`${col.className} py-3 text-sm md:text-base bg-gray-100`}>
-                                                {col.label}
-                                            </TableHead>
-                                        ))}
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody className="overflow-y-auto">
-                                    {loading ? (
-                                        <TableRow>
-                                            <TableCell colSpan={columns.length} className="text-center py-4">
-                                                Đang tải...
-                                            </TableCell>
-                                        </TableRow>
-                                    ) : error ? (
-                                        <TableRow>
-                                            <TableCell colSpan={columns.length} className="text-center py-4 text-red-500">
-                                                Đã xảy ra lỗi khi tải dữ liệu.
-                                            </TableCell>
-                                        </TableRow>
-                                    ) : data?.data.length === 0 ? (
-                                        <TableRow>
-                                            <TableCell colSpan={columns.length} className="text-center py-4">
-                                                Không có dữ liệu.
-                                            </TableCell>
-                                        </TableRow>
-                                    ) : (
-                                        data?.data.map((row, index) => (
-                                            <TableRow key={index} className="hover:bg-gray-50 transition duration-150">
-                                                {columns.map((col, colIndex) => (
-                                                    <TableCell 
-                                                        key={colIndex} 
-                                                        className={`${col.className} py-4 text-sm md:text-base`}
-                                                    >
-                                                        {col.accessor === 'actions' ? (
-                                                            <DropdownMenu>
-                                                                <DropdownMenuTrigger asChild>
-                                                                    <Button variant="ghost" className="h-8 w-8 p-0">
-                                                                        <span className="sr-only">Open menu</span>
-                                                                        <BsThreeDots className="h-4 w-4" />
-                                                                    </Button>
-                                                                </DropdownMenuTrigger>
-                                                                <DropdownMenuContent align="end">
-                                                                    <DropdownMenuItem onClick={() => handleEdit(row.id)}>
-                                                                        <FaEdit className="mr-2 h-4 w-4" />
-                                                                        <span>Sửa</span>
-                                                                    </DropdownMenuItem>
-                                                                    <DropdownMenuItem onClick={() => handleDelete(row.id)}>
-                                                                        <FaTrash className="mr-2 h-4 w-4" />
-                                                                        <span>Xóa</span>
-                                                                    </DropdownMenuItem>
-                                                                </DropdownMenuContent>
-                                                            </DropdownMenu>
-                                                        ) : col.accessor === 'status' ? (
-                                                            <span className={`hidden md:inline-block px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(row.status)}`}>
-                                                                {row.status === 1 ? 'Hoạt động' : 'Không hoạt động'}
-                                                            </span>
-                                                        ) : (
-                                                            row[col.accessor as keyof typeof row]
-                                                        )}
-                                                    </TableCell>
-                                                ))}
-                                            </TableRow>
-                                        ))
-                                    )}
-                                </TableBody>
-                            </Table>
-                        </div>
-                    </CardContent>
-                </Card>
+                <DataTable
+                    data={data?.data || []}
+                    columns={columns}
+                    loading={loading}
+                    error={error}
+                    filters={{
+                        status: {
+                            value: selectedStatus,
+                            onChange: setSelectedStatus,
+                            options: [
+                                { label: 'Tất cả', value: 'all' },
+                                { label: 'Hoạt động', value: '1' },
+                                { label: 'Không hoạt động', value: '0' },
+                            ]
+                        },
+                        search: {
+                            value: searchKeyword,
+                            onChange: setSearchKeyword,
+                            placeholder: "Tìm kiếm loại sản phẩm"
+                        },
+                        limit: {
+                            value: limit,
+                            onChange: setLimit,
+                            options: [4, 10, 20, 50, 100]
+                        }
+                    }}
+                />
             </div>
 
             <div className="sticky bottom-0 bg-white border-t z-10">
@@ -245,7 +191,6 @@ const Page = () => {
                                 </PaginationItem>
                                 
                                 {[...Array(data.pagination.totalPages)].map((_, index) => {
-                                    // Show first page
                                     if (index === 0) return (
                                         <PaginationItem key={index}>
                                             <PaginationLink 
