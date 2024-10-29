@@ -7,13 +7,12 @@ import { FaPlus } from 'react-icons/fa';
 import useApi from '@/lib/useApi';
 import { useToast } from "@/hooks/use-toast"
 
-// Updated Tag interface with created_at and updated_at
 interface Tag {
     id: number;
     name: string;
     status: number;
-    created_at: string;  // Add these fields
-    updated_at: string;  // Add these fields
+    created_at: string;
+    updated_at: string;
 }
 
 export const CreateTagModal = ({ onCreate }: { onCreate: (newTag: Tag) => void }) => {
