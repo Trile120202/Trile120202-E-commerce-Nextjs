@@ -99,7 +99,10 @@ const Page = () => {
 
     const handleCreate = (newTag: Tag) => {
         console.log('New tag created:', newTag);
-        fetchData();
+    setTimeout(() => {
+    window.location.reload();
+    }, 1200);
+        
     };
 
     const handleUpdate = (updatedTag: Tag) => {
