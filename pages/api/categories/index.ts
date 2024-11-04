@@ -104,43 +104,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 statusCode: StatusCode.INTERNAL_SERVER_ERROR,
             }));
         }
-    } else if (req.method === 'PUT') {
-        try {
-            const { id, name, slug, content, parent_id, image_id } = req.body;
-
-            const [updatedCategory] = await db('categories')
-                .where({ id })
-                .update({
-                    name,
-                    slug,
-                    content,
-                    parent_id,
-                    image_id,
-                    updated_at: db.fn.now(),
-                })
-                .returning('*');
-
-            if (!updatedCategory) {
-                return res.status(StatusCode.NOT_FOUND).json(transformResponse({
-                    data: null,
-                    message: 'Category not found.',
-                    statusCode: StatusCode.NOT_FOUND,
-                }));
-            }
-
-            res.status(StatusCode.OK).json(transformResponse({
-                data: updatedCategory,
-                message: 'Category updated successfully.',
-                statusCode: StatusCode.OK,
-            }));
-        } catch (error) {
-            console.error(error);
-            return res.status(StatusCode.INTERNAL_SERVER_ERROR).json(transformResponse({
-                data: null,
-                message: 'An error occurred while updating the category.',
-                statusCode: StatusCode.INTERNAL_SERVER_ERROR,
-            }));
-        }
     } else if (req.method === 'PATCH') {
         try {
             const { id, status } = req.body;

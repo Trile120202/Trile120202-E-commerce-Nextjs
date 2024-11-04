@@ -1,6 +1,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
     Pagination,
     PaginationContent,
@@ -50,6 +51,7 @@ interface ApiResponse {
 }
 
 const Page = () => {
+    const router = useRouter();
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedStatus, setSelectedStatus] = useState<string>('all');
     const [searchKeyword, setSearchKeyword] = useState<string>('');
@@ -69,7 +71,7 @@ const Page = () => {
     };
 
     const handleEdit = (id: number) => {
-        console.log(`Edit product category with id: ${id}`);
+        router.push(`/quan-tri/quan-ly-loai-san-pham/${id}`);
     };
 
     const handleDelete = (id: number) => {
