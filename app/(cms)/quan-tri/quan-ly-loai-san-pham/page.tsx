@@ -61,7 +61,7 @@ const Page = () => {
 
     useEffect(() => {
         fetchData();
-    }, [fetchData, currentPage, selectedStatus, searchKeyword, limit]);
+    }, [ currentPage, selectedStatus, searchKeyword, limit]);
 
 
     const handlePageChange = (page: number) => {

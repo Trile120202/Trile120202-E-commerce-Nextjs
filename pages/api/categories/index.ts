@@ -59,14 +59,34 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
     } else if (req.method === 'POST') {
         try {
-            const { name, slug, content, parent_id, image_id } = req.body;
+            const { name, slug, content, image_id, status } = req.body;
+
+            if (!name || !slug) {
+                return res.status(StatusCode.BAD_REQUEST).json(transformResponse({
+                    data: null,
+                    message: 'Name and slug are required fields.',
+                    statusCode: StatusCode.BAD_REQUEST,
+                }));
+            }
+
+            const existingCategory = await db('categories')
+                .where({ slug })
+                .first();
+
+            if (existingCategory) {
+                return res.status(StatusCode.BAD_REQUEST).json(transformResponse({
+                    data: null, 
+                    message: 'A category with this slug already exists.',
+                    statusCode: StatusCode.BAD_REQUEST,
+                }));
+            }
 
             const [newCategory] = await db('categories').insert({
                 name,
                 slug,
                 content,
-                parent_id,
                 image_id,
+                status,
                 created_at: db.fn.now(),
                 updated_at: db.fn.now(),
             }).returning('*');

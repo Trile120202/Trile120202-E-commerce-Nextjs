@@ -18,7 +18,6 @@ const formSchema = z.object({
     name: z.string().min(1, 'Vui lòng nhập tên loại sản phẩm'),
     slug: z.string().min(1, 'Vui lòng nhập slug'),
     content: z.string().optional(),
-    parent_id: z.string().optional(),
     image_id: z.string().optional(),
     status: z.boolean().default(true)
 });
@@ -34,37 +33,63 @@ const Page = () => {
             name: '',
             slug: '',
             content: '',
-            parent_id: '',
             image_id: '',
             status: true
         }
     });
 
+    const generateSlug = (name: string) => {
+        return name
+            .toLowerCase()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .replace(/đ/g, 'd')
+            .replace(/[^a-z0-9\s]/g, '')
+            .replace(/\s+/g, '-');
+    };
+
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         try {
             setLoading(true);
-            const response = await fetch('/api/product-categories', {
+            
+            // Validate required fields
+            if (!values.name || !values.slug) {
+                throw new Error('Tên và slug là bắt buộc');
+            }
+
+            const response = await fetch('/api/categories', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(values),
+                body: JSON.stringify({
+                    name: values.name.trim(),
+                    slug: values.slug.trim(),
+                    content: values.content?.trim() || '',
+                    image_id: values.image_id || null, // Changed from empty string to null
+                    status: values.status ? 1 : 0
+                }),
             });
 
+            const data = await response.json();
+
             if (!response.ok) {
-                throw new Error('Có lỗi xảy ra');
+                throw new Error(data.message || 'Có lỗi xảy ra khi tạo loại sản phẩm');
             }
 
             toast({
                 title: "Thành công",
-                description: "Tạo mới loại sản phẩm thành công",
+                description: data.message || "Tạo mới loại sản phẩm thành công",
             });
             router.push('/quan-tri/quan-ly-loai-san-pham');
+            router.refresh();
+
         } catch (error) {
+            console.error('Error creating category:', error);
             toast({
-                variant: "destructive",
+                variant: "destructive", 
                 title: "Lỗi",
-                description: "Có lỗi xảy ra, vui lòng thử lại" + (error as Error).message,
+                description: (error as Error).message || "Có lỗi xảy ra, vui lòng thử lại sau",
             });
         } finally {
             setLoading(false);
@@ -98,7 +123,15 @@ const Page = () => {
                                         <FormItem>
                                             <FormLabel className="text-base lg:text-lg">Tên loại sản phẩm</FormLabel>
                                             <FormControl>
-                                                <Input placeholder="Nhập tên loại sản phẩm" {...field} className="focus:ring-2 h-10 lg:h-12 text-base lg:text-lg" />
+                                                <Input 
+                                                    placeholder="Nhập tên loại sản phẩm" 
+                                                    {...field} 
+                                                    onChange={(e) => {
+                                                        field.onChange(e);
+                                                        form.setValue('slug', generateSlug(e.target.value));
+                                                    }}
+                                                    className="focus:ring-2 h-10 lg:h-12 text-base lg:text-lg" 
+                                                />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -112,7 +145,11 @@ const Page = () => {
                                         <FormItem>
                                             <FormLabel className="text-base lg:text-lg">Slug</FormLabel>
                                             <FormControl>
-                                                <Input placeholder="Nhập slug" {...field} className="focus:ring-2 h-10 lg:h-12 text-base lg:text-lg" />
+                                                <Input 
+                                                    placeholder="Slug tự động tạo" 
+                                                    {...field}
+                                                    className="focus:ring-2 h-10 lg:h-12 text-base lg:text-lg" 
+                                                />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -138,48 +175,23 @@ const Page = () => {
                                 )}
                             />
 
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
-                                <FormField
-                                    control={form.control}
-                                    name="parent_id"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel className="text-base lg:text-lg">Danh mục cha</FormLabel>
-                                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                                <FormControl>
-                                                    <SelectTrigger className="focus:ring-2 h-10 lg:h-12 text-base lg:text-lg">
-                                                        <SelectValue placeholder="Chọn danh mục cha" />
-                                                    </SelectTrigger>
-                                                </FormControl>
-                                                <SelectContent>
-                                                    <SelectItem value="1" className="text-base lg:text-lg">Không có</SelectItem>
-                                                    <SelectItem value="2" className="text-base lg:text-lg">Không có</SelectItem>
-                                                    <SelectItem value="3" className="text-base lg:text-lg">Không có</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-
-                                <FormField
-                                    control={form.control}
-                                    name="image_id"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel className="text-base lg:text-lg">Hình ảnh</FormLabel>
-                                            <FormControl>
-                                                <Input 
-                                                    type="file" 
-                                                    {...field} 
-                                                    className="h-10 lg:h-12 text-base lg:text-lg file:mr-4 lg:file:mr-5 file:py-2 file:px-4 lg:file:px-6 file:rounded-full file:border-0 file:text-base lg:file:text-lg file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90"
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                            </div>
+                            <FormField
+                                control={form.control}
+                                name="image_id"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className="text-base lg:text-lg">Hình ảnh</FormLabel>
+                                        <FormControl>
+                                            <Input 
+                                                type="file" 
+                                                {...field} 
+                                                className="h-10 lg:h-12 text-base lg:text-lg file:mr-4 lg:file:mr-5 file:py-2 file:px-4 lg:file:px-6 file:rounded-full file:border-0 file:text-base lg:file:text-lg file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90"
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
 
                             <FormField
                                 control={form.control}
