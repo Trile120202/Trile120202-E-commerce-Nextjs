@@ -1,18 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Button } from "@/components/ui/button"
-import { FaEdit, FaTrash } from 'react-icons/fa'
-import { BsThreeDots } from 'react-icons/bs'
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Card, CardHeader, CardTitle } from "@/components/ui/card"
-import { Switch } from "@/components/ui/switch"
-import DataTable from "@/components/custom/datatable";
+import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
     Pagination,
     PaginationContent,
@@ -22,353 +12,30 @@ import {
     PaginationNext,
     PaginationPrevious,
 } from "@/components/ui/pagination"
-import { useRouter, useSearchParams } from 'next/navigation';
+import { Button } from "@/components/ui/button"
+import { FaEdit, FaTrash, FaPlus } from 'react-icons/fa'
+import { BsThreeDots } from 'react-icons/bs'
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Save } from "lucide-react"
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select"
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Card, CardHeader, CardTitle } from "@/components/ui/card"
+import useApi from '@/lib/useApi';
+import DataTable from "@/components/custom/datatable";
 
 interface Ram {
     id: number;
     name: string;
-    type: string; // DDR3, DDR4, DDR5
-    capacity: number; // GB
-    speed: number; // MHz
+    type: string;
+    capacity: number;
+    speed: number;
     brand: string;
     created_at: string;
     updated_at: string;
     status: number;
 }
-
-// Mock data
-const mockRams: Ram[] = [
-    {
-        id: 1,
-        name: "Corsair Vengeance LPX 4GB",
-        type: "DDR4",
-        capacity: 4,
-        speed: 2666,
-        brand: "Corsair",
-        created_at: "2024-01-01",
-        updated_at: "2024-01-01",
-        status: 1
-    },
-    {
-        id: 2,
-        name: "Kingston Fury 8GB",
-        type: "DDR4",
-        capacity: 8,
-        speed: 3200,
-        brand: "Kingston",
-        created_at: "2024-01-01",
-        updated_at: "2024-01-01",
-        status: 1
-    },
-    {
-        id: 3,
-        name: "G.Skill Trident Z5 16GB",
-        type: "DDR5",
-        capacity: 16,
-        speed: 6000,
-        brand: "G.Skill",
-        created_at: "2024-01-01",
-        updated_at: "2024-01-01",
-        status: 0
-    }
-];
-
-const RAM_TYPES = ["DDR3", "DDR4", "DDR5"];
-const RAM_CAPACITIES = [4, 8, 16, 32, 64];
-const RAM_SPEEDS = [2400, 2666, 3000, 3200, 3600, 4000, 4800, 5200, 6000];
-const RAM_BRANDS = ["Corsair", "Kingston", "G.Skill", "Crucial", "TeamGroup", "Samsung"];
-
-interface CreateRamModalProps {
-    onCreate: (ram: Ram) => void;
-}
-
-const CreateRamModal = ({ onCreate }: CreateRamModalProps) => {
-    const [open, setOpen] = useState(false);
-    const [name, setName] = useState('');
-    const [type, setType] = useState('DDR4');
-    const [capacity, setCapacity] = useState(8);
-    const [speed, setSpeed] = useState(3200);
-    const [brand, setBrand] = useState('');
-    const [loading, setLoading] = useState(false);
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setLoading(true);
-        try {
-            const newRam: Ram = {
-                id: mockRams.length + 1,
-                name,
-                type,
-                capacity,
-                speed,
-                brand,
-                created_at: new Date().toISOString(),
-                updated_at: new Date().toISOString(),
-                status: 1
-            };
-            onCreate(newRam);
-            setOpen(false);
-            setName('');
-        } catch (error) {
-            console.error('Error creating RAM:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    return (
-        <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-                <Button className="bg-white text-blue-600 hover:bg-blue-50">
-                    <Save className="mr-2 h-4 w-4" />
-                    Tạo mới
-                </Button>
-            </DialogTrigger>
-            <DialogContent>
-                <form onSubmit={handleSubmit}>
-                    <DialogHeader>
-                        <DialogTitle>Tạo RAM mới</DialogTitle>
-                        <DialogDescription>
-                            Thêm thông tin RAM mới vào hệ thống
-                        </DialogDescription>
-                    </DialogHeader>
-                    <div className="py-4 space-y-4">
-                        <div>
-                            <Label htmlFor="name">Tên RAM</Label>
-                            <Input
-                                id="name"
-                                value={name}
-                                onChange={(e) => setName(e.target.value)}
-                                placeholder="Nhập tên RAM"
-                            />
-                        </div>
-                        <div>
-                            <Label htmlFor="type">Loại RAM</Label>
-                            <Select value={type} onValueChange={setType}>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Chọn loại RAM" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {RAM_TYPES.map(type => (
-                                        <SelectItem key={type} value={type}>{type}</SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        <div>
-                            <Label htmlFor="capacity">Dung lượng (GB)</Label>
-                            <Select value={capacity.toString()} onValueChange={(val) => setCapacity(Number(val))}>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Chọn dung lượng" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {RAM_CAPACITIES.map(cap => (
-                                        <SelectItem key={cap} value={cap.toString()}>{cap}GB</SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        <div>
-                            <Label htmlFor="speed">Bus (MHz)</Label>
-                            <Select value={speed.toString()} onValueChange={(val) => setSpeed(Number(val))}>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Chọn bus" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {RAM_SPEEDS.map(spd => (
-                                        <SelectItem key={spd} value={spd.toString()}>{spd}MHz</SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        <div>
-                            <Label htmlFor="brand">Hãng sản xuất</Label>
-                            <Select value={brand} onValueChange={setBrand}>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Chọn hãng" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {RAM_BRANDS.map(brand => (
-                                        <SelectItem key={brand} value={brand}>{brand}</SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-                    </div>
-                    <DialogFooter>
-                        <Button type="button" variant="outline" onClick={() => setOpen(false)}>
-                            Hủy
-                        </Button>
-                        <Button type="submit" disabled={loading}>
-                            {loading ? (
-                                <>
-                                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent"></div>
-                                    <span className="ml-2">Đang xử lý</span>
-                                </>
-                            ) : (
-                                <>
-                                    <Save className="mr-2 h-4 w-4" />
-                                    <span>Tạo mới</span>
-                                </>
-                            )}
-                        </Button>
-                    </DialogFooter>
-                </form>
-            </DialogContent>
-        </Dialog>
-    );
-};
-
-interface EditRamModalProps {
-    ram: Ram;
-    onUpdate: (ram: Ram) => void;
-    onClose: () => void;
-}
-
-const EditRamModal = ({ ram, onUpdate, onClose }: EditRamModalProps) => {
-    const [name, setName] = useState(ram.name);
-    const [type, setType] = useState(ram.type);
-    const [capacity, setCapacity] = useState(ram.capacity);
-    const [speed, setSpeed] = useState(ram.speed);
-    const [brand, setBrand] = useState(ram.brand);
-    const [loading, setLoading] = useState(false);
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setLoading(true);
-        try {
-            const updatedRam: Ram = {
-                ...ram,
-                name,
-                type,
-                capacity,
-                speed,
-                brand,
-                updated_at: new Date().toISOString()
-            };
-            onUpdate(updatedRam);
-        } catch (error) {
-            console.error('Error updating RAM:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    return (
-        <Dialog open={true} onOpenChange={onClose}>
-            <DialogContent>
-                <form onSubmit={handleSubmit}>
-                    <DialogHeader>
-                        <DialogTitle>Chỉnh sửa RAM</DialogTitle>
-                        <DialogDescription>
-                            Cập nhật thông tin RAM
-                        </DialogDescription>
-                    </DialogHeader>
-                    <div className="py-4 space-y-4">
-                        <div>
-                            <Label htmlFor="edit-name">Tên RAM</Label>
-                            <Input
-                                id="edit-name"
-                                value={name}
-                                onChange={(e) => setName(e.target.value)}
-                                placeholder="Nhập tên RAM"
-                            />
-                        </div>
-                        <div>
-                            <Label htmlFor="edit-type">Loại RAM</Label>
-                            <Select value={type} onValueChange={setType}>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Chọn loại RAM" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {RAM_TYPES.map(type => (
-                                        <SelectItem key={type} value={type}>{type}</SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        <div>
-                            <Label htmlFor="edit-capacity">Dung lượng (GB)</Label>
-                            <Select value={capacity.toString()} onValueChange={(val) => setCapacity(Number(val))}>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Chọn dung lượng" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {RAM_CAPACITIES.map(cap => (
-                                        <SelectItem key={cap} value={cap.toString()}>{cap}GB</SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        <div>
-                            <Label htmlFor="edit-speed">Bus (MHz)</Label>
-                            <Select value={speed.toString()} onValueChange={(val) => setSpeed(Number(val))}>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Chọn bus" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {RAM_SPEEDS.map(spd => (
-                                        <SelectItem key={spd} value={spd.toString()}>{spd}MHz</SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        <div>
-                            <Label htmlFor="edit-brand">Hãng sản xuất</Label>
-                            <Select value={brand} onValueChange={setBrand}>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Chọn hãng" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {RAM_BRANDS.map(brand => (
-                                        <SelectItem key={brand} value={brand}>{brand}</SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-                    </div>
-                    <DialogFooter>
-                        <Button type="button" variant="outline" onClick={onClose}>
-                            Hủy
-                        </Button>
-                        <Button type="submit" disabled={loading}>
-                            {loading ? (
-                                <>
-                                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent"></div>
-                                    <span className="ml-2">Đang xử lý</span>
-                                </>
-                            ) : (
-                                <>
-                                    <Save className="mr-2 h-4 w-4" />
-                                    <span>Cập nhật</span>
-                                </>
-                            )}
-                        </Button>
-                    </DialogFooter>
-                </form>
-            </DialogContent>
-        </Dialog>
-    );
-};
 
 interface Pagination {
     currentPage: number;
@@ -380,103 +47,41 @@ interface Pagination {
 interface ApiResponse {
     status: number;
     message: string;
-    data: {
-        rams: Ram[];
-        pagination: Pagination;
-    };
+    data: Ram[];
+    pagination: Pagination;
 }
 
 const Page = () => {
     const router = useRouter();
-    const searchParams = useSearchParams();
-    
-    // @ts-ignore
-    const [currentPage, setCurrentPage] = useState(Number(searchParams.get('page')) || 1);
-    // @ts-ignore
-    const [selectedStatus, setSelectedStatus] = useState<string>(searchParams.get('status') || 'all');
-    // @ts-ignore
-    const [searchKeyword, setSearchKeyword] = useState<string>(searchParams.get('search') || '');
-    // @ts-ignore
-    const [selectedType, setSelectedType] = useState<string>(searchParams.get('type') || 'all');
-    // @ts-ignore
-    const [selectedCapacity, setSelectedCapacity] = useState<string>(searchParams.get('capacity') || 'all');
-    // @ts-ignore
-    const [selectedBrand, setSelectedBrand] = useState<string>(searchParams.get('brand') || 'all');
-    // @ts-ignore
-    const [limit, setLimit] = useState<number>(Number(searchParams.get('limit')) || 10);
-    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-    const [selectedRam, setSelectedRam] = useState<Ram | null>(null);
-    const [rams, setRams] = useState<Ram[]>(mockRams);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [selectedStatus, setSelectedStatus] = useState<string>('all');
+    const [selectedType, setSelectedType] = useState<string>('all');
+    const [selectedCapacity, setSelectedCapacity] = useState<string>('all');
+    const [selectedBrand, setSelectedBrand] = useState<string>('all');
+    const [searchKeyword, setSearchKeyword] = useState<string>('');
+    const [limit, setLimit] = useState<number>(10);
 
-    const updateUrl = (params: Record<string, string | number>) => {
-        const url = new URL(window.location.href);
-        Object.entries(params).forEach(([key, value]) => {
-            if (value) {
-                url.searchParams.set(key, String(value));
-            } else {
-                url.searchParams.delete(key);
-            }
-        });
-        router.push(url.pathname + url.search);
-    };
+    const { data, loading, error, fetchData } = useApi<ApiResponse>(
+        `/api/ram?page=${currentPage}&limit=${limit}&search=${searchKeyword}${selectedStatus !== 'all' ? `&status=${selectedStatus}` : ''}${selectedType !== 'all' ? `&type=${selectedType}` : ''}${selectedCapacity !== 'all' ? `&capacity=${selectedCapacity}` : ''}${selectedBrand !== 'all' ? `&brand=${selectedBrand}` : ''}`,
+        {
+            method: 'GET'
+        }
+    );
 
-    const handleEdit = (ram: Ram) => {
-        setSelectedRam(ram);
-        setIsEditModalOpen(true);
-    };
-
-    const handleDelete = (id: number) => {
-        setRams(rams.filter(ram => ram.id !== id));
-    };
-
-    const handleCreate = (newRam: Ram) => {
-        setRams([...rams, newRam]);
-    };
-
-    const handleUpdate = (updatedRam: Ram) => {
-        setRams(rams.map(ram => ram.id === updatedRam.id ? updatedRam : ram));
-        setIsEditModalOpen(false);
-    };
-
-    const handleStatusChange = async (id: number, newStatus: number) => {
-        setRams(rams.map(ram => 
-            ram.id === id ? {...ram, status: newStatus} : ram
-        ));
-    };
+    useEffect(() => {
+        fetchData();
+    }, [currentPage, selectedStatus, selectedType, selectedCapacity, selectedBrand, searchKeyword, limit]);
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
-        updateUrl({...searchParams, page});
     };
 
-    const handleSearchChange = (search: string) => {
-        setSearchKeyword(search);
-        setCurrentPage(1);
-        updateUrl({...searchParams, search, page: 1});
+    const handleEdit = (id: number) => {
+        router.push(`/quan-tri/ram/${id}`);
     };
 
-    const handleStatusFilterChange = (status: string) => {
-        setSelectedStatus(status);
-        setCurrentPage(1);
-        updateUrl({...searchParams, status, page: 1});
-    };
-
-    const handleTypeFilterChange = (type: string) => {
-        setSelectedType(type);
-        setCurrentPage(1);
-        updateUrl({...searchParams, type, page: 1});
-    };
-
-    const handleCapacityFilterChange = (capacity: string) => {
-        setSelectedCapacity(capacity);
-        setCurrentPage(1);
-        updateUrl({...searchParams, capacity, page: 1});
-    };
-
-    const handleBrandFilterChange = (brand: string) => {
-        setSelectedBrand(brand);
-        setCurrentPage(1);
-        updateUrl({...searchParams, brand, page: 1});
+    const handleDelete = (id: number) => {
+        console.log(`Delete RAM with id: ${id}`);
     };
 
     const getStatusColor = (status: number) => {
@@ -495,15 +100,9 @@ const Page = () => {
             label: 'Trạng thái', 
             className: 'text-center hidden md:table-cell',
             render: (row: Ram) => (
-                <div className="flex items-center space-x-2">
-                    <Switch
-                        checked={row.status === 1}
-                        onCheckedChange={(checked) => handleStatusChange(row.id, checked ? 1 : 0)}
-                    />
-                    <span className={`hidden md:inline-block px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(row.status)}`}>
-                        {row.status === 1 ? 'Hoạt động' : 'Không hoạt động'}
-                    </span>
-                </div>
+                <span className={`hidden md:inline-block px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(row.status)}`}>
+                    {row.status === 1 ? 'Hoạt động' : 'Không hoạt động'}
+                </span>
             )
         },
         { 
@@ -519,7 +118,7 @@ const Page = () => {
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => handleEdit(row)}>
+                        <DropdownMenuItem onClick={() => handleEdit(row.id)}>
                             <FaEdit className="mr-2 h-4 w-4" />
                             <span>Sửa</span>
                         </DropdownMenuItem>
@@ -533,38 +132,6 @@ const Page = () => {
         },
     ];
 
-    // Filter rams based on search and filters
-    const filteredRams = rams.filter(ram => {
-        const matchesSearch = ram.name.toLowerCase().includes(searchKeyword.toLowerCase());
-        const matchesStatus = selectedStatus === 'all' || ram.status === Number(selectedStatus);
-        const matchesType = selectedType === 'all' || ram.type === selectedType;
-        const matchesCapacity = selectedCapacity === 'all' || ram.capacity === Number(selectedCapacity);
-        const matchesBrand = selectedBrand === 'all' || ram.brand === selectedBrand;
-        return matchesSearch && matchesStatus && matchesType && matchesCapacity && matchesBrand;
-    });
-
-    // Calculate pagination
-    const totalItems = filteredRams.length;
-    const totalPages = Math.ceil(totalItems / limit);
-    const startIndex = (currentPage - 1) * limit;
-    const endIndex = startIndex + limit;
-    const paginatedRams = filteredRams.slice(startIndex, endIndex);
-
-    const mockApiResponse: ApiResponse = {
-        status: 200,
-        message: "Success",
-        data: {
-            rams: paginatedRams,
-            pagination: {
-                currentPage,
-                pageSize: limit,
-                totalItems: String(totalItems),
-                totalPages
-            }
-        }
-    };
-
-    // @ts-ignore
     return (
         <div className="flex flex-col h-full">
             <div className="sticky top-0 z-20 bg-white shadow-sm">
@@ -572,7 +139,12 @@ const Page = () => {
                     <CardHeader className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-4 md:p-6">
                         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 md:gap-0">
                             <CardTitle className="text-xl md:text-2xl font-bold">Quản lý RAM</CardTitle>
-                            <CreateRamModal onCreate={handleCreate} />
+                            <Link href="/quan-tri/ram/tao-moi" className="w-full md:w-auto">
+                                <Button className="w-full md:w-auto bg-green-500 hover:bg-green-600 transition duration-300">
+                                    <FaPlus className="mr-2 h-4 w-4" />
+                                    Tạo mới
+                                </Button>
+                            </Link>
                         </div>
                     </CardHeader>
                 </Card>
@@ -580,14 +152,14 @@ const Page = () => {
 
             <div className="flex-1 overflow-auto">
                 <DataTable
-                    data={mockApiResponse.data.rams}
+                    data={data?.data || []}
                     columns={columns}
-                    loading={false}
-                    error={null}
+                    loading={loading}
+                    error={error ? new Error(error) : null}
                     filters={{
                         status: {
                             value: selectedStatus,
-                            onChange: handleStatusFilterChange,
+                            onChange: setSelectedStatus,
                             options: [
                                 { label: 'Tất cả', value: 'all' },
                                 { label: 'Hoạt động', value: '1' },
@@ -596,31 +168,42 @@ const Page = () => {
                         },
                         type: {
                             value: selectedType,
-                            onChange: handleTypeFilterChange,
+                            onChange: setSelectedType,
                             options: [
                                 { label: 'Tất cả', value: 'all' },
-                                ...RAM_TYPES.map(type => ({ label: type, value: type }))
+                                { label: 'DDR3', value: 'DDR3' },
+                                { label: 'DDR4', value: 'DDR4' },
+                                { label: 'DDR5', value: 'DDR5' },
                             ]
                         },
                         capacity: {
                             value: selectedCapacity,
-                            onChange: handleCapacityFilterChange,
+                            onChange: setSelectedCapacity,
                             options: [
                                 { label: 'Tất cả', value: 'all' },
-                                ...RAM_CAPACITIES.map(cap => ({ label: `${cap}GB`, value: cap.toString() }))
+                                { label: '4GB', value: '4' },
+                                { label: '8GB', value: '8' },
+                                { label: '16GB', value: '16' },
+                                { label: '32GB', value: '32' },
+                                { label: '64GB', value: '64' },
                             ]
                         },
                         brand: {
                             value: selectedBrand,
-                            onChange: handleBrandFilterChange,
+                            onChange: setSelectedBrand,
                             options: [
                                 { label: 'Tất cả', value: 'all' },
-                                ...RAM_BRANDS.map(brand => ({ label: brand, value: brand }))
+                                { label: 'Corsair', value: 'Corsair' },
+                                { label: 'Kingston', value: 'Kingston' },
+                                { label: 'G.Skill', value: 'G.Skill' },
+                                { label: 'Crucial', value: 'Crucial' },
+                                { label: 'TeamGroup', value: 'TeamGroup' },
+                                { label: 'Samsung', value: 'Samsung' },
                             ]
                         },
                         search: {
                             value: searchKeyword,
-                            onChange: handleSearchChange,
+                            onChange: setSearchKeyword,
                             placeholder: "Tìm kiếm RAM"
                         },
                         limit: {
@@ -633,23 +216,23 @@ const Page = () => {
             </div>
 
             <div className="sticky bottom-0 bg-white border-t z-10">
-                {mockApiResponse.data.pagination && (
+                {data?.pagination && (
                     <div className="p-4">
                         <Pagination>
                             <PaginationContent>
                                 <PaginationItem>
                                     <PaginationPrevious 
-                                        onClick={() => handlePageChange(mockApiResponse.data.pagination.currentPage - 1)}
-                                        className={mockApiResponse.data.pagination.currentPage === 1 ? 'pointer-events-none opacity-50' : ''}
+                                        onClick={() => handlePageChange(data.pagination.currentPage - 1)}
+                                        className={data.pagination.currentPage === 1 ? 'pointer-events-none opacity-50' : ''}
                                     />
                                 </PaginationItem>
                                 
-                                {[...Array(mockApiResponse.data.pagination.totalPages)].map((_, index) => {
+                                {[...Array(data.pagination.totalPages)].map((_, index) => {
                                     if (index === 0) return (
                                         <PaginationItem key={index}>
                                             <PaginationLink 
                                                 onClick={() => handlePageChange(index + 1)}
-                                                isActive={mockApiResponse.data.pagination.currentPage === index + 1}
+                                                isActive={data.pagination.currentPage === index + 1}
                                             >
                                                 {index + 1}
                                             </PaginationLink>
@@ -657,25 +240,25 @@ const Page = () => {
                                     )
                                     
                                     if (
-                                        index === mockApiResponse.data.pagination.currentPage - 1 ||
-                                        index === mockApiResponse.data.pagination.currentPage - 2 ||
-                                        index === mockApiResponse.data.pagination.currentPage
+                                        index === data.pagination.currentPage - 1 ||
+                                        index === data.pagination.currentPage - 2 ||
+                                        index === data.pagination.currentPage
                                     ) return (
                                         <PaginationItem key={index}>
                                             <PaginationLink 
                                                 onClick={() => handlePageChange(index + 1)}
-                                                isActive={mockApiResponse.data.pagination.currentPage === index + 1}
+                                                isActive={data.pagination.currentPage === index + 1}
                                             >
                                                 {index + 1}
                                             </PaginationLink>
                                         </PaginationItem>
                                     )
                                     
-                                    if (index === mockApiResponse.data.pagination.totalPages - 1) return (
+                                    if (index === data.pagination.totalPages - 1) return (
                                         <PaginationItem key={index}>
                                             <PaginationLink 
                                                 onClick={() => handlePageChange(index + 1)}
-                                                isActive={mockApiResponse.data.pagination.currentPage === index + 1}
+                                                isActive={data.pagination.currentPage === index + 1}
                                             >
                                                 {index + 1}
                                             </PaginationLink>
@@ -684,7 +267,7 @@ const Page = () => {
                                     
                                     if (
                                         index === 1 ||
-                                        index === mockApiResponse.data.pagination.totalPages - 2
+                                        index === data.pagination.totalPages - 2
                                     ) return (
                                         <PaginationItem key={index}>
                                             <PaginationEllipsis />
@@ -696,8 +279,8 @@ const Page = () => {
 
                                 <PaginationItem>
                                     <PaginationNext 
-                                        onClick={() => handlePageChange(mockApiResponse.data.pagination.currentPage + 1)}
-                                        className={mockApiResponse.data.pagination.currentPage === mockApiResponse.data.pagination.totalPages ? 'pointer-events-none opacity-50' : ''}
+                                        onClick={() => handlePageChange(data.pagination.currentPage + 1)}
+                                        className={data.pagination.currentPage === data.pagination.totalPages ? 'pointer-events-none opacity-50' : ''}
                                     />
                                 </PaginationItem>
                             </PaginationContent>
@@ -705,14 +288,6 @@ const Page = () => {
                     </div>
                 )}
             </div>
-
-            {isEditModalOpen && selectedRam && (
-                <EditRamModal
-                    ram={selectedRam}
-                    onUpdate={handleUpdate}
-                    onClose={() => setIsEditModalOpen(false)}
-                />
-            )}
         </div>
     );
 };
