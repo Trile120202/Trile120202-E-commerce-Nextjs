@@ -62,6 +62,16 @@ const Page = ({ params }: { params: { id: string } }) => {
                     image_id: data.data.image_id?.toString() || '',
                     status: data.data.status === 1
                 });
+
+                // Fetch image if image_id exists
+                if (data.data.image_id) {
+                    const imageResponse = await fetch(`/api/image/${data.data.image_id}`);
+                    const imageData = await imageResponse.json();
+                    
+                    if (imageResponse.ok) {
+                        setUrlImage(imageData.data.url);
+                    }
+                }
             } catch (error) {
                 console.error('Error fetching category:', error);
                 toast({
