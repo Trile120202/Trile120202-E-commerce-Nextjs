@@ -268,6 +268,7 @@ CREATE TABLE coupons
     end_date            DATE,
     min_purchase_amount DECIMAL(10, 2),
     max_usage           INT,
+    max_discount_value  DECIMAL(10, 2),
     is_active           BOOLEAN DEFAULT TRUE,
     created_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

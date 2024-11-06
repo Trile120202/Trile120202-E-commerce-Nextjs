@@ -1,7 +1,7 @@
 'use client'
 import React, { useState } from 'react';
 import Link from 'next/link';
-import {FaHome, FaBox, FaUsers, FaCog, FaTags, FaImage, FaList, FaShoppingCart} from 'react-icons/fa';
+import {FaHome, FaBox, FaUsers, FaCog, FaTags, FaImage, FaList, FaShoppingCart, FaMemory, FaHdd, FaPercent} from 'react-icons/fa';
 import {FaImages} from "react-icons/fa6";
 import { FaBars } from 'react-icons/fa';
 
@@ -61,14 +61,14 @@ const Sidebar = () => {
                         <li className="mb-4">
                             <Link href="/quan-tri/ram"
                                   className="flex items-center p-2 hover:bg-gray-700 rounded text-sm lg:text-base">
-                                <FaImage className="mr-3"/>
+                                <FaMemory className="mr-3"/>
                                 Quản lý ram
                             </Link>
                         </li>
                         <li className="mb-4">
                             <Link href="/quan-tri/quan-ly-o-cung"
                                   className="flex items-center p-2 hover:bg-gray-700 rounded text-sm lg:text-base">
-                                <FaImage className="mr-3"/>
+                                <FaHdd className="mr-3"/>
                                 Quản lý ổ cứng
                             </Link>
                         </li>
@@ -84,6 +84,13 @@ const Sidebar = () => {
                                   className="flex items-center p-2 hover:bg-gray-700 rounded text-sm lg:text-base">
                                 <FaImages className="mr-3"/>
                                 Quản lý banner
+                            </Link>
+                        </li>
+                        <li className="mb-4">
+                            <Link href="/quan-tri/quan-ly-khuyen-mai"
+                                  className="flex items-center p-2 hover:bg-gray-700 rounded text-sm lg:text-base">
+                                <FaPercent className="mr-3"/>
+                                Quản lý khuyến mãi
                             </Link>
                         </li>
                         <li className="mb-4">
