@@ -4,7 +4,6 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -12,6 +11,8 @@ import { useToast } from "@/hooks/use-toast";
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, Save } from "lucide-react";
+import QuillComponent from "@/components/quill";
+import { cn } from "@/lib/utils";
 
 const formSchema = z.object({
     name: z.string().min(1, 'Vui lòng nhập tên loại sản phẩm'),
@@ -195,12 +196,13 @@ const Page = ({ params }: { params: { id: string } }) => {
                                 name="content"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel className="text-base lg:text-lg">Mô tả</FormLabel>
+                                        <FormLabel className="text-base lg:text-lg">Nội dung</FormLabel>
                                         <FormControl>
-                                            <Textarea
-                                                placeholder="Nhập mô tả loại sản phẩm"
-                                                {...field}
-                                                className="focus:ring-2 min-h-[120px] text-base lg:text-lg"
+                                            <QuillComponent 
+                                                className={cn('w-full')} 
+                                                title={'Mô tả'} 
+                                                onChangeValue={(value) => field.onChange(value)}
+                                                value={category?.content || ''}
                                             />
                                         </FormControl>
                                         <FormMessage />

@@ -13,6 +13,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, Save } from "lucide-react";
+import QuillComponent from "@/components/quill";
+import {cn} from "@/lib/utils";
 
 const formSchema = z.object({
     name: z.string().min(1, 'Vui lòng nhập tên loại sản phẩm'),
@@ -164,10 +166,10 @@ const Page = () => {
                                     <FormItem>
                                         <FormLabel className="text-base lg:text-lg">Nội dung</FormLabel>
                                         <FormControl>
-                                            <Textarea 
-                                                placeholder="Nhập nội dung" 
-                                                className="min-h-[160px] lg:min-h-[200px] focus:ring-2 text-base lg:text-lg" 
-                                                {...field} 
+                                            <QuillComponent 
+                                                className={cn('w-full')} 
+                                                title={'Mô tả'} 
+                                                onChangeValue={(value) => field.onChange(value)}
                                             />
                                         </FormControl>
                                         <FormMessage />
