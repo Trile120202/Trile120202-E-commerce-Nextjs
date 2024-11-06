@@ -9,6 +9,15 @@ import { Input } from "@/components/ui/input";
 import { FaSearch } from 'react-icons/fa';
 import { UploadDropzone } from "@/components/custom/uploadthing";
 import useApi from '@/lib/useApi';
+import {
+    Pagination,
+    PaginationContent,
+    PaginationEllipsis,
+    PaginationItem,
+    PaginationLink,
+    PaginationNext,
+    PaginationPrevious,
+} from "@/components/ui/pagination";
 
 interface Image {
     id: number;
@@ -102,6 +111,101 @@ function MediaPopup({ open, onOpenChange, onSelect, multiple = false }: MediaPop
         }
     };
 
+    const renderPaginationItems = () => {
+        const items = [];
+        const totalPages = data?.pagination.totalPages || 0;
+        const maxVisiblePages = 3;
+        
+        // Previous button
+        items.push(
+            <PaginationItem key="prev">
+                <PaginationPrevious 
+                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                    className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                />
+            </PaginationItem>
+        );
+
+        items.push(
+            <PaginationItem key={1}>
+                <PaginationLink 
+                    onClick={() => setCurrentPage(1)}
+                    isActive={currentPage === 1}
+                >
+                    1
+                </PaginationLink>
+            </PaginationItem>
+        );
+
+        if (totalPages > maxVisiblePages) {
+            if (currentPage > 3) {
+                items.push(
+                    <PaginationItem key="ellipsis1">
+                        <PaginationEllipsis />
+                    </PaginationItem>
+                );
+            }
+
+            for (let i = Math.max(2, currentPage - 1); i <= Math.min(totalPages - 1, currentPage + 1); i++) {
+                items.push(
+                    <PaginationItem key={i}>
+                        <PaginationLink 
+                            onClick={() => setCurrentPage(i)}
+                            isActive={currentPage === i}
+                        >
+                            {i}
+                        </PaginationLink>
+                    </PaginationItem>
+                );
+            }
+
+            if (currentPage < totalPages - 2) {
+                items.push(
+                    <PaginationItem key="ellipsis2">
+                        <PaginationEllipsis />
+                    </PaginationItem>
+                );
+            }
+        } else {
+            for (let i = 2; i < totalPages; i++) {
+                items.push(
+                    <PaginationItem key={i}>
+                        <PaginationLink 
+                            onClick={() => setCurrentPage(i)}
+                            isActive={currentPage === i}
+                        >
+                            {i}
+                        </PaginationLink>
+                    </PaginationItem>
+                );
+            }
+        }
+
+        if (totalPages > 1) {
+            items.push(
+                <PaginationItem key={totalPages}>
+                    <PaginationLink 
+                        onClick={() => setCurrentPage(totalPages)}
+                        isActive={currentPage === totalPages}
+                    >
+                        {totalPages}
+                    </PaginationLink>
+                </PaginationItem>
+            );
+        }
+
+        items.push(
+            <PaginationItem key="next">
+                <PaginationNext 
+                    onClick={() => setCurrentPage(prev => prev < totalPages ? prev + 1 : prev)}
+                    className={currentPage >= totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                />
+            </PaginationItem>
+        );
+
+        return items;
+    };
+
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
@@ -115,30 +219,32 @@ function MediaPopup({ open, onOpenChange, onSelect, multiple = false }: MediaPop
                 <Tabs defaultValue="upload" className="mt-4">
                     <TabsList className="grid w-full grid-cols-2">
                         <TabsTrigger value="upload" className="flex items-center gap-2">
-                            <ImagePlus className="h-4 w-4" />
+                            <ImagePlus className="h-3 w-3" />
                             <span>Tải lên</span>
                         </TabsTrigger>
                         <TabsTrigger value="library" className="flex items-center gap-2">
-                            <Images className="h-4 w-4" />
+                            <Images className="h-3 w-3" />
                             <span>Thư viện</span>
                         </TabsTrigger>
                     </TabsList>
 
                     <TabsContent value="upload" className="mt-4">
-                        <UploadDropzone
-                            endpoint="imageUploader"
-                            onClientUploadComplete={(res: any[]) => {
-                                if (res && res.length > 0) {
-                                    res.forEach((file) => {
-                                        handleUpload(file.url, file.name);
-                                    });
-                                    alert("Upload Completed");
-                                }
-                            }}
-                            onUploadError={(error: Error) => {
-                                alert(`ERROR! ${error.message}`);
-                            }}
-                        />
+                        <div className="w-full max-w-[300px] mx-auto">
+                            <UploadDropzone
+                                endpoint="imageUploader"
+                                onClientUploadComplete={(res: any[]) => {
+                                    if (res && res.length > 0) {
+                                        res.forEach((file) => {
+                                            handleUpload(file.url, file.name);
+                                        });
+                                        alert("Upload Completed");
+                                    }
+                                }}
+                                onUploadError={(error: Error) => {
+                                    alert(`ERROR! ${error.message}`);
+                                }}
+                            />
+                        </div>
                     </TabsContent>
 
                     <TabsContent value="library" className="mt-4">
@@ -177,20 +283,12 @@ function MediaPopup({ open, onOpenChange, onSelect, multiple = false }: MediaPop
                             ))}
                         </div>
 
-                        <div className="flex justify-between items-center mt-6">
-                            <Button
-                                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                                disabled={currentPage === 1}
-                            >
-                                Previous
-                            </Button>
-                            <span>Page {currentPage} of {data?.pagination.totalPages}</span>
-                            <Button
-                                onClick={() => setCurrentPage((prev) => (data?.pagination.totalPages && data.pagination.totalPages > 0 && prev < data.pagination.totalPages) ? prev + 1 : prev)}
-                                disabled={data?.pagination.totalPages !== undefined && data.pagination.totalPages > 0 && currentPage >= data.pagination.totalPages}
-                            >
-                                Next
-                            </Button>
+                        <div className="mt-6">
+                            <Pagination>
+                                <PaginationContent>
+                                    {renderPaginationItems()}
+                                </PaginationContent>
+                            </Pagination>
                         </div>
                     </TabsContent>
                 </Tabs>
