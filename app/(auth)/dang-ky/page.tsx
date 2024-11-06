@@ -16,7 +16,6 @@ const Page = () => {
 
     const handleRegister = (e: React.FormEvent) => {
         e.preventDefault();
-        // Xử lý đăng ký ở đây
         console.log('Đăng ký với:', name, email, password);
     };
 

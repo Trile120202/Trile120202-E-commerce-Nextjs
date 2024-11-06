@@ -358,14 +358,20 @@ CREATE TABLE ram
 (
     id         SERIAL PRIMARY KEY,
     name       VARCHAR(100) NOT NULL,
-    size       VARCHAR(50) NOT NULL,
+    type       VARCHAR(50) NOT NULL,
+    capacity   INT NOT NULL,
+    speed      INT NOT NULL,
+    brand      VARCHAR(50) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     status     INT DEFAULT 1
 );
 
 CREATE INDEX idx_ram_name ON ram (name);
-CREATE INDEX idx_ram_size ON ram (size);
+CREATE INDEX idx_ram_type ON ram (type);
+CREATE INDEX idx_ram_capacity ON ram (capacity);
+CREATE INDEX idx_ram_speed ON ram (speed);
+CREATE INDEX idx_ram_brand ON ram (brand);
 CREATE INDEX idx_ram_created_at ON ram (created_at);
 CREATE INDEX idx_ram_updated_at ON ram (updated_at);
 CREATE INDEX idx_ram_status ON ram (status);
@@ -374,14 +380,20 @@ CREATE TABLE hard_drives
 (
     id         SERIAL PRIMARY KEY,
     name       VARCHAR(100) NOT NULL,
-    capacity   VARCHAR(50) NOT NULL,
+    type       VARCHAR(50) NOT NULL,
+    capacity   INT NOT NULL,
+    interface  VARCHAR(50) NOT NULL,
+    brand      VARCHAR(50) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     status     INT DEFAULT 1
 );
 
 CREATE INDEX idx_hard_drives_name ON hard_drives (name);
+CREATE INDEX idx_hard_drives_type ON hard_drives (type);
 CREATE INDEX idx_hard_drives_capacity ON hard_drives (capacity);
+CREATE INDEX idx_hard_drives_interface ON hard_drives (interface);
+CREATE INDEX idx_hard_drives_brand ON hard_drives (brand);
 CREATE INDEX idx_hard_drives_created_at ON hard_drives (created_at);
 CREATE INDEX idx_hard_drives_updated_at ON hard_drives (updated_at);
 CREATE INDEX idx_hard_drives_status ON hard_drives (status);

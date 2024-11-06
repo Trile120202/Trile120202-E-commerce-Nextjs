@@ -137,12 +137,12 @@ const Page = () => {
 
     const handleSearchChange = (search: string) => {
         setSearchKeyword(search);
-        setCurrentPage(1); // Reset page to 1 when search changes
+        setCurrentPage(1);
     };
 
     const handleStatusFilterChange = (status: string) => {
         setSelectedStatus(status);
-        setCurrentPage(1); // Reset page to 1 when status changes
+        setCurrentPage(1);
     };
 
     const getStatusColor = (status: number) => {

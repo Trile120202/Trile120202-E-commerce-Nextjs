@@ -63,7 +63,6 @@ const Page = ({ params }: { params: { id: string } }) => {
                     status: data.data.status === 1
                 });
 
-                // Fetch image if image_id exists
                 if (data.data.image_id) {
                     const imageResponse = await fetch(`/api/image/${data.data.image_id}`);
                     const imageData = await imageResponse.json();

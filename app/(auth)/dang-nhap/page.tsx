@@ -15,7 +15,6 @@ const Page = () => {
 
     const handleLogin = (e: React.FormEvent) => {
         e.preventDefault();
-        // Xử lý đăng nhập ở đây
         console.log('Đăng nhập với:', email, password);
     };
 

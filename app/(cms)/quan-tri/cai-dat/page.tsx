@@ -15,7 +15,6 @@ const Page = () => {
 
     const handleSave = () => {
         console.log("Saving settings...");
-        // Implement save functionality here
     };
 
     const tabVariants = {

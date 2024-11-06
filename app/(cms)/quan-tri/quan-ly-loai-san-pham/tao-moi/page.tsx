@@ -58,7 +58,6 @@ const Page = () => {
         try {
             setLoading(true);
             
-            // Validate required fields
             if (!values.name || !values.slug) {
                 throw new Error('Tên và slug là bắt buộc');
             }
