@@ -1,14 +1,14 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from '@/components/ui/button';
-import { ImageIcon, ImagePlus, Images } from 'lucide-react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { FaSearch } from 'react-icons/fa';
-import { UploadDropzone } from "@/components/custom/uploadthing";
+import {  FaSearch } from 'react-icons/fa';
+import { UploadDropzone} from "@/components/custom/uploadthing";
 import useApi from '@/lib/useApi';
+import  Image  from 'next/image';
+
 
 interface Image {
     id: number;
@@ -32,12 +32,9 @@ interface ApiResponse {
 }
 
 const Page = () => {
-    const [selectedImage, setSelectedImage] = useState<Image | null>(null);
-    const [loading, setLoading] = useState(false);
     const [searchKeyword, setSearchKeyword] = useState<string>('');
     const [currentPage, setCurrentPage] = useState(1);
-    const [limit] = useState(12);
-    const [showUploadDialog, setShowUploadDialog] = useState(false);
+    const [limit] = useState(10);
 
     const { data, fetchData } = useApi<ApiResponse>(`/api/image?page=${currentPage}&limit=${limit}&search=${searchKeyword}`, {
         method: 'GET'
@@ -73,121 +70,72 @@ const Page = () => {
     };
 
     return (
-        <Dialog open={showUploadDialog} onOpenChange={setShowUploadDialog}>
-            <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-                <DialogHeader>
-                    <DialogTitle>Quản lý hình ảnh</DialogTitle>
-                    <DialogDescription>
-                        Tải lên hoặc chọn hình ảnh có sẵn
-                    </DialogDescription>
-                </DialogHeader>
-
-                <Tabs defaultValue="upload" className="mt-4">
-                    <TabsList className="grid w-full grid-cols-2">
-                        <TabsTrigger value="upload" className="flex items-center gap-2">
-                            <ImagePlus className="h-4 w-4" />
-                            <span>Tải lên</span>
-                        </TabsTrigger>
-                        <TabsTrigger value="library" className="flex items-center gap-2">
-                            <Images className="h-4 w-4" />
-                            <span>Thư viện</span>
-                        </TabsTrigger>
-                    </TabsList>
-
-                    <TabsContent value="upload" className="mt-4">
-                        <UploadDropzone
-                            endpoint="imageUploader"
-                            onClientUploadComplete={(res: any[]) => {
-                                if (res && res.length > 0) {
-                                    res.forEach((file) => {
-                                        handleUpload(file.url, file.name);
-                                    });
-                                    alert("Upload Completed");
-                                }
-                            }}
-                            onUploadError={(error: Error) => {
-                                alert(`ERROR! ${error.message}`);
-                            }}
-                        />
-                    </TabsContent>
-
-                    <TabsContent value="library" className="mt-4">
-                        <div className="mb-6">
-                            <div className="relative w-64">
-                                <Input
-                                    placeholder="Tìm kiếm hình ảnh"
-                                    value={searchKeyword}
-                                    onChange={(e) => setSearchKeyword(e.target.value)}
-                                    className="w-full pl-10 pr-4 py-2 border-2 border-gray-300 rounded-lg"
-                                />
-                                <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                            </div>
-                        </div>
-
-                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                            {data?.data?.map((image) => (
-                                <div
-                                    key={image.id}
-                                    className={`relative group cursor-pointer ${selectedImage?.id === image.id ? 'ring-2 ring-primary' : ''}`}
-                                    onClick={() => setSelectedImage(image)}
-                                >
-                                    <img
-                                        src={image.url}
-                                        alt={image.alt_text}
-                                        className="w-full h-[200px] object-cover rounded-lg shadow-md transition-transform duration-300 group-hover:scale-105"
-                                    />
-                                    <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center rounded-lg">
-                                        <p className="text-white text-sm">{image.alt_text}</p>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-
-                        <div className="flex justify-between items-center mt-6">
-                            <Button
-                                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                                disabled={currentPage === 1}
-                            >
-                                Previous
-                            </Button>
-                            <span>Page {currentPage} of {data?.pagination.totalPages}</span>
-                            <Button
-                                onClick={() => setCurrentPage((prev) => (data?.pagination.totalPages && data.pagination.totalPages > 0 && prev < data.pagination.totalPages) ? prev + 1 : prev)}
-                                disabled={data?.pagination.totalPages !== undefined && data.pagination.totalPages > 0 && currentPage >= data.pagination.totalPages}
-                            >
-                                Next
-                            </Button>
-                        </div>
-                    </TabsContent>
-                </Tabs>
-
-                <div className="flex justify-end gap-4 mt-6">
-                    <Button
-                        variant="outline"
-                        onClick={() => setShowUploadDialog(false)}
-                    >
-                        Hủy
-                    </Button>
-                    <Button
-                        onClick={() => {
-                            if (selectedImage) {
-                                setShowUploadDialog(false);
+        <Card className="w-full shadow-lg">
+            <CardHeader className="bg-gradient-to-r from-blue-500 to-purple-600 text-white">
+                <div className="flex justify-between items-center">
+                    <CardTitle className="text-2xl font-bold">Quản lý Media</CardTitle>
+                    <UploadDropzone
+                        endpoint="imageUploader"
+                        onClientUploadComplete={(res: any[]) => {
+                            if (res && res.length > 0) {
+                                res.forEach((file) => {
+                                    handleUpload(file.url, file.name);
+                                });
+                                alert("Upload Completed");
                             }
                         }}
-                        disabled={!selectedImage || loading}
-                    >
-                        {loading ? (
-                            <div className="flex items-center gap-2">
-                                <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent"></div>
-                                <span>Đang xử lý</span>
-                            </div>
-                        ) : (
-                            'Chọn'
-                        )}
-                    </Button>
+                        onUploadError={(error: Error) => {
+                            alert(`ERROR! ${error.message}`);
+                        }}
+                    />
                 </div>
-            </DialogContent>
-        </Dialog>
+            </CardHeader>
+            <CardContent className="pt-6">
+                <div className="mb-6">
+                    <div className="relative w-64">
+                        <Input
+                            placeholder="Tìm kiếm hình ảnh"
+                            value={searchKeyword}
+                            onChange={(e) => setSearchKeyword(e.target.value)}
+                            className="w-full pl-10 pr-4 py-2 border-2 border-gray-300 rounded-lg"
+                        />
+                        <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                    </div>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                    {data?.data?.map((image) => (
+                        <a key={image.id} href={image.url} target="_blank" rel="noopener noreferrer" className="relative group flex justify-center items-center">
+                            {/*<Image src={image.url} alt={image.url} width={200} height={200} className="w-full h-auto rounded-lg shadow-md transition-transform duration-300 group-hover:scale-105" />*/}
+
+                            <img 
+                                src={image.url} 
+                                alt={image.alt_text} 
+                                width={130} 
+                                height={250} 
+                                className="w-[130px] h-[250px] object-cover rounded-lg shadow-md transition-transform duration-300 group-hover:scale-105"
+                            />
+
+                            <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center rounded-lg">
+                                <p className="text-white text-sm">{image.url}</p>
+                            </div>
+                        </a>
+                    ))}
+                </div>
+                <div className="flex justify-between items-center mt-6">
+                    <Button onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} disabled={currentPage === 1}>
+                        Previous
+                    </Button>
+                    <span>Page {currentPage} of {data?.pagination.totalPages}</span>
+                    <Button
+                        onClick={() => setCurrentPage((prev) => (data?.pagination.totalPages && data.pagination.totalPages > 0 && prev < data.pagination.totalPages) ? prev + 1 : prev)}
+                        disabled={data?.pagination.totalPages !== undefined && data.pagination.totalPages > 0 && currentPage >= data.pagination.totalPages}
+                    >
+                        Next
+                    </Button>
+
+                </div>
+            </CardContent>
+        </Card>
     );
 };
 
