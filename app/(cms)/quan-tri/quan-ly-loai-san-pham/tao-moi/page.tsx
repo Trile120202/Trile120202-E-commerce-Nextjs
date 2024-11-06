@@ -12,9 +12,11 @@ import { useToast } from "@/hooks/use-toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, Save } from "lucide-react";
+import { ArrowLeft, ImageIcon, Save } from "lucide-react";
 import QuillComponent from "@/components/quill";
 import {cn} from "@/lib/utils";
+import MediaPopup from "@/components/custom/MediaPopup";
+import { log } from 'console';
 
 const formSchema = z.object({
     name: z.string().min(1, 'Vui lòng nhập tên loại sản phẩm'),
@@ -28,6 +30,8 @@ const Page = () => {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const { toast } = useToast();
+    const [showImageDialog, setShowImageDialog] = useState(false);
+    const [urlImage, setUrlImage] = useState<string | null>(null);
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -68,7 +72,7 @@ const Page = () => {
                     name: values.name.trim(),
                     slug: values.slug.trim(),
                     content: values.content?.trim() || '',
-                    image_id: values.image_id || null, // Changed from empty string to null
+                    image_id: values.image_id || null,
                     status: values.status ? 1 : 0
                 }),
             });
@@ -99,40 +103,89 @@ const Page = () => {
     };
 
     return (
-        <div className="container mx-auto py-8 px-4 lg:px-8 xl:px-12">
-            <Card className="max-w-7xl mx-auto">
-                <CardHeader className="p-6 lg:p-8">
-                    <CardTitle className="text-2xl lg:text-3xl font-bold flex items-center gap-3">
-                        <Button 
-                            variant="ghost" 
-                            size="icon"
-                            onClick={() => router.back()}
-                            className="h-8 w-8 lg:h-10 lg:w-10"
-                        >
-                            <ArrowLeft className="h-5 w-5 lg:h-6 lg:w-6" />
-                        </Button>
-                        Tạo mới loại sản phẩm
-                    </CardTitle>
-                </CardHeader>
-                <CardContent className="p-6 lg:p-8">
-                    <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
+        <>
+            <MediaPopup 
+                open={showImageDialog} 
+                onOpenChange={setShowImageDialog}
+                onSelect={(image) => {
+                    console.log(image);
+                    form.setValue('image_id', image.id.toString())
+                    setUrlImage(image.url)
+                }}
+                multiple={false}
+            />
+
+            <div className="container mx-auto py-8 px-4 lg:px-8 xl:px-12">
+                <Card className="max-w-7xl mx-auto">
+                    <CardHeader className="p-6 lg:p-8">
+                        <CardTitle className="text-2xl lg:text-3xl font-bold flex items-center gap-3">
+                            <Button 
+                                variant="ghost" 
+                                size="icon"
+                                onClick={() => router.back()}
+                                className="h-8 w-8 lg:h-10 lg:w-10"
+                            >
+                                <ArrowLeft className="h-5 w-5 lg:h-6 lg:w-6" />
+                            </Button>
+                            Tạo mới loại sản phẩm
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-6 lg:p-8">
+                        <Form {...form}>
+                            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
+                                    <FormField
+                                        control={form.control}
+                                        name="name"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel className="text-base lg:text-lg">Tên loại sản phẩm</FormLabel>
+                                                <FormControl>
+                                                    <Input 
+                                                        placeholder="Nhập tên loại sản phẩm" 
+                                                        {...field} 
+                                                        onChange={(e) => {
+                                                            field.onChange(e);
+                                                            form.setValue('slug', generateSlug(e.target.value));
+                                                        }}
+                                                        className="focus:ring-2 h-10 lg:h-12 text-base lg:text-lg" 
+                                                    />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    <FormField
+                                        control={form.control}
+                                        name="slug"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel className="text-base lg:text-lg">Slug</FormLabel>
+                                                <FormControl>
+                                                    <Input 
+                                                        placeholder="Slug tự động tạo" 
+                                                        {...field}
+                                                        className="focus:ring-2 h-10 lg:h-12 text-base lg:text-lg" 
+                                                    />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+
                                 <FormField
                                     control={form.control}
-                                    name="name"
+                                    name="content"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className="text-base lg:text-lg">Tên loại sản phẩm</FormLabel>
+                                            <FormLabel className="text-base lg:text-lg">Nội dung</FormLabel>
                                             <FormControl>
-                                                <Input 
-                                                    placeholder="Nhập tên loại sản phẩm" 
-                                                    {...field} 
-                                                    onChange={(e) => {
-                                                        field.onChange(e);
-                                                        form.setValue('slug', generateSlug(e.target.value));
-                                                    }}
-                                                    className="focus:ring-2 h-10 lg:h-12 text-base lg:text-lg" 
+                                                <QuillComponent 
+                                                    className={cn('w-full')} 
+                                                    title={'Mô tả'} 
+                                                    onChangeValue={(value) => field.onChange(value)}
                                                 />
                                             </FormControl>
                                             <FormMessage />
@@ -142,112 +195,91 @@ const Page = () => {
 
                                 <FormField
                                     control={form.control}
-                                    name="slug"
+                                    name="image_id"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className="text-base lg:text-lg">Slug</FormLabel>
+                                            <FormLabel className="text-base lg:text-lg">Hình ảnh</FormLabel>
                                             <FormControl>
-                                                <Input 
-                                                    placeholder="Slug tự động tạo" 
-                                                    {...field}
-                                                    className="focus:ring-2 h-10 lg:h-12 text-base lg:text-lg" 
-                                                />
+                                                <div className="space-y-4">
+                                                    <Button
+                                                        type="button"
+                                                        variant="outline"
+                                                        onClick={() => setShowImageDialog(true)}
+                                                        className="w-full h-10 lg:h-12 text-base lg:text-lg flex items-center justify-center gap-2"
+                                                    >
+                                                        <ImageIcon className="h-5 w-5" />
+                                                        <span>Chọn hình ảnh</span>
+                                                    </Button>
+                                                    {urlImage && (
+                                                        <div className="relative w-[200px] h-[200px]">
+                                                            <img 
+                                                                src={urlImage} 
+                                                                alt="Selected image"
+                                                                className="w-full h-full object-cover rounded-lg"
+                                                            />
+                                                        </div>
+                                                    )}
+                                                </div>
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
                                     )}
                                 />
-                            </div>
 
-                            <FormField
-                                control={form.control}
-                                name="content"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel className="text-base lg:text-lg">Nội dung</FormLabel>
-                                        <FormControl>
-                                            <QuillComponent 
-                                                className={cn('w-full')} 
-                                                title={'Mô tả'} 
-                                                onChangeValue={(value) => field.onChange(value)}
-                                            />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-
-                            <FormField
-                                control={form.control}
-                                name="image_id"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel className="text-base lg:text-lg">Hình ảnh</FormLabel>
-                                        <FormControl>
-                                            <Input 
-                                                type="file" 
-                                                {...field} 
-                                                className="h-10 lg:h-12 text-base lg:text-lg file:mr-4 lg:file:mr-5 file:py-2 file:px-4 lg:file:px-6 file:rounded-full file:border-0 file:text-base lg:file:text-lg file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90"
-                                            />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-
-                            <FormField
-                                control={form.control}
-                                name="status"
-                                render={({ field }) => (
-                                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 lg:p-6 shadow-sm">
-                                        <div className="space-y-0.5">
-                                            <FormLabel className="text-base lg:text-lg">
-                                                Trạng thái
-                                            </FormLabel>
-                                        </div>
-                                        <FormControl>
-                                            <Switch
-                                                checked={field.value}
-                                                onCheckedChange={field.onChange}
-                                                className="scale-110 lg:scale-125"
-                                            />
-                                        </FormControl>
-                                    </FormItem>
-                                )}
-                            />
-
-                            <div className="flex justify-end gap-4 lg:gap-6 pt-6">
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                    onClick={() => router.back()}
-                                    className="w-[120px] lg:w-[140px] h-10 lg:h-12 text-base lg:text-lg"
-                                >
-                                    Hủy
-                                </Button>
-                                <Button 
-                                    type="submit" 
-                                    disabled={loading}
-                                    className="w-[120px] lg:w-[140px] h-10 lg:h-12 text-base lg:text-lg"
-                                >
-                                    {loading ? (
-                                        <div className="flex items-center gap-2 lg:gap-3">
-                                            <div className="h-4 w-4 lg:h-5 lg:w-5 animate-spin rounded-full border-2 border-primary border-t-transparent"></div>
-                                            <span>Đang xử lý</span>
-                                        </div>
-                                    ) : (
-                                        <div className="flex items-center gap-2 lg:gap-3">
-                                            <Save className="h-4 w-4 lg:h-5 lg:w-5" />
-                                            <span>Tạo mới</span>
-                                        </div>
+                                <FormField
+                                    control={form.control}
+                                    name="status"
+                                    render={({ field }) => (
+                                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 lg:p-6 shadow-sm">
+                                            <div className="space-y-0.5">
+                                                <FormLabel className="text-base lg:text-lg">
+                                                    Trạng thái
+                                                </FormLabel>
+                                            </div>
+                                            <FormControl>
+                                                <Switch
+                                                    checked={field.value}
+                                                    onCheckedChange={field.onChange}
+                                                    className="scale-110 lg:scale-125"
+                                                />
+                                            </FormControl>
+                                        </FormItem>
                                     )}
-                                </Button>
-                            </div>
-                        </form>
-                    </Form>
-                </CardContent>
-            </Card>
-        </div>
+                                />
+
+                                <div className="flex justify-end gap-4 lg:gap-6 pt-6">
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        onClick={() => router.back()}
+                                        className="w-[120px] lg:w-[140px] h-10 lg:h-12 text-base lg:text-lg"
+                                    >
+                                        Hủy
+                                    </Button>
+                                    <Button 
+                                        type="submit" 
+                                        disabled={loading}
+                                        className="w-[120px] lg:w-[140px] h-10 lg:h-12 text-base lg:text-lg"
+                                    >
+                                        {loading ? (
+                                            <div className="flex items-center gap-2 lg:gap-3">
+                                                <div className="h-4 w-4 lg:h-5 lg:w-5 animate-spin rounded-full border-2 border-primary border-t-transparent"></div>
+                                                <span>Đang xử lý</span>
+                                            </div>
+                                        ) : (
+                                            <div className="flex items-center gap-2 lg:gap-3">
+                                                <Save className="h-4 w-4 lg:h-5 lg:w-5" />
+                                                <span>Tạo mới</span>
+                                            </div>
+                                        )}
+                                    </Button>
+                                </div>
+                            </form>
+                        </Form>
+                    </CardContent>
+                </Card>
+            </div>
+        </>
     );
 };
 

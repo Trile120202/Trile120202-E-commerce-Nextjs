@@ -31,13 +31,20 @@ interface ApiResponse {
     };
 }
 
-const Page = () => {
+interface MediaPopupProps {
+    open: boolean;
+    onOpenChange: (open: boolean) => void;
+    onSelect?: (image: Image | Image[]) => void;
+    multiple?: boolean;
+}
+
+function MediaPopup({ open, onOpenChange, onSelect, multiple = false }: MediaPopupProps) {
     const [selectedImage, setSelectedImage] = useState<Image | null>(null);
+    const [selectedImages, setSelectedImages] = useState<Image[]>([]);
     const [loading, setLoading] = useState(false);
     const [searchKeyword, setSearchKeyword] = useState<string>('');
     const [currentPage, setCurrentPage] = useState(1);
     const [limit] = useState(12);
-    const [showUploadDialog, setShowUploadDialog] = useState(false);
 
     const { data, fetchData } = useApi<ApiResponse>(`/api/image?page=${currentPage}&limit=${limit}&search=${searchKeyword}`, {
         method: 'GET'
@@ -72,13 +79,36 @@ const Page = () => {
         }
     };
 
+    const handleImageClick = (image: Image) => {
+        if (multiple) {
+            if (selectedImages.find(img => img.id === image.id)) {
+                setSelectedImages(selectedImages.filter(img => img.id !== image.id));
+            } else {
+                setSelectedImages([...selectedImages, image]);
+            }
+        } else {
+            setSelectedImage(image);
+        }
+    };
+
+    const handleSelect = () => {
+        if (onSelect) {
+            if (multiple) {
+                onSelect(selectedImages);
+            } else if (selectedImage) {
+                onSelect(selectedImage);
+            }
+            onOpenChange(false);
+        }
+    };
+
     return (
-        <Dialog open={showUploadDialog} onOpenChange={setShowUploadDialog}>
+        <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>Quản lý hình ảnh</DialogTitle>
                     <DialogDescription>
-                        Tải lên hoặc chọn hình ảnh có sẵn
+                        Tải lên hoặc chọn hình ảnh có sẵn {multiple ? '(Có thể chọn nhiều ảnh)' : ''}
                     </DialogDescription>
                 </DialogHeader>
 
@@ -128,8 +158,12 @@ const Page = () => {
                             {data?.data?.map((image) => (
                                 <div
                                     key={image.id}
-                                    className={`relative group cursor-pointer ${selectedImage?.id === image.id ? 'ring-2 ring-primary' : ''}`}
-                                    onClick={() => setSelectedImage(image)}
+                                    className={`relative group cursor-pointer ${
+                                        multiple 
+                                            ? selectedImages.find(img => img.id === image.id) ? 'ring-2 ring-primary' : ''
+                                            : selectedImage?.id === image.id ? 'ring-2 ring-primary' : ''
+                                    }`}
+                                    onClick={() => handleImageClick(image)}
                                 >
                                     <img
                                         src={image.url}
@@ -164,17 +198,13 @@ const Page = () => {
                 <div className="flex justify-end gap-4 mt-6">
                     <Button
                         variant="outline"
-                        onClick={() => setShowUploadDialog(false)}
+                        onClick={() => onOpenChange(false)}
                     >
                         Hủy
                     </Button>
                     <Button
-                        onClick={() => {
-                            if (selectedImage) {
-                                setShowUploadDialog(false);
-                            }
-                        }}
-                        disabled={!selectedImage || loading}
+                        onClick={handleSelect}
+                        disabled={(multiple ? selectedImages.length === 0 : !selectedImage) || loading}
                     >
                         {loading ? (
                             <div className="flex items-center gap-2">
@@ -189,6 +219,6 @@ const Page = () => {
             </DialogContent>
         </Dialog>
     );
-};
+}
 
-export default Page;
+export default MediaPopup;
