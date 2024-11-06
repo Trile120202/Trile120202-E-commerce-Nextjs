@@ -50,7 +50,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 is_active
             } = req.body;
 
-            // Validate required fields
             if (!code || !discount_type || !discount_value) {
                 return res.status(StatusCode.BAD_REQUEST).json(transformResponse({
                     data: null,
@@ -59,7 +58,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 }));
             }
 
-            // Validate discount_type
             if (!['percentage', 'fixed_amount'].includes(discount_type)) {
                 return res.status(StatusCode.BAD_REQUEST).json(transformResponse({
                     data: null,
@@ -68,7 +66,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 }));
             }
 
-            // Check if code exists but belongs to a different coupon
             const existingCoupon = await db('coupons')
                 .where('code', code)
                 .whereNot('id', id)

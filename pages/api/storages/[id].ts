@@ -40,7 +40,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         try {
             const { name, type, capacity, interface: interfaceType, brand, status } = req.body;
 
-            // Validate required fields
             if (!name || !type || !capacity || !interfaceType || !brand) {
                 return res.status(StatusCode.BAD_REQUEST).json(transformResponse({
                     data: null,
@@ -49,7 +48,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 }));
             }
 
-            // Validate field lengths
             if (name.length > 100 || type.length > 50 || interfaceType.length > 50 || brand.length > 50) {
                 return res.status(StatusCode.BAD_REQUEST).json(transformResponse({
                     data: null,
@@ -58,7 +56,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 }));
             }
 
-            // Validate capacity is a positive integer
             if (!Number.isInteger(capacity) || capacity <= 0) {
                 return res.status(StatusCode.BAD_REQUEST).json(transformResponse({
                     data: null,

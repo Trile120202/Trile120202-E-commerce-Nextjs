@@ -54,7 +54,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 }));
             }
 
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { password: _, ...userData } = user;
 
             const accessToken = jwt.sign(
@@ -69,8 +68,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 { expiresIn: '7d' }
             );
 
-            // Remove the refresh token storage for now
-            // TODO: Create a 'refresh_tokens' table in the database schema
 
             res.setHeader('Set-Cookie', serialize('token', refreshToken, {
                 httpOnly: true,

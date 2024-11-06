@@ -5,7 +5,6 @@ import knexConfig from '../../../knexfile';
 import { StatusCode } from "@/lib/statusCodes";
 import { transformResponse } from "@/lib/interceptors/transformInterceptor";
 import { StatusApp } from "@/lib/statusApp";
-// import {parse} from "cookie";
 
 const db = knex(knexConfig);
 
@@ -54,7 +53,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 }));
             }
 
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { password, ...userData } = user;
 
             res.status(StatusCode.OK).json(transformResponse({

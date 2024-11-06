@@ -69,7 +69,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 is_active
             } = req.body;
 
-            // Validate required fields
             if (!code || !discount_type || !discount_value) {
                 return res.status(StatusCode.BAD_REQUEST).json(transformResponse({
                     data: null,
@@ -78,7 +77,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 }));
             }
 
-            // Validate discount type
             if (!['percentage', 'fixed_amount'].includes(discount_type)) {
                 return res.status(StatusCode.BAD_REQUEST).json(transformResponse({
                     data: null,
@@ -87,7 +85,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 }));
             }
 
-            // Check for existing coupon code
             const existingCoupon = await db('coupons')
                 .where({ code })
                 .first();
@@ -100,7 +97,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 }));
             }
 
-            // Insert new coupon
             const [newCoupon] = await db('coupons').insert({
                 code,
                 discount_type,

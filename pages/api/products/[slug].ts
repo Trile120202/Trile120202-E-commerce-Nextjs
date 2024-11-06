@@ -18,7 +18,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 .leftJoin('categories as c', 'pc.category_id', 'c.id')
                 .leftJoin('product_images as pi', 'p.id', 'pi.product_id')
                 .leftJoin('images as i2', 'pi.image_id', 'i2.id')
-                .where('p.slug', slug) // Get product by slug
+                .where('p.slug', slug)
                 .andWhere('p.status', 1)
                 .select(
                     'p.id AS product_id',
@@ -41,7 +41,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     db.raw('ARRAY_AGG(DISTINCT i2.url) AS product_image_urls')
                 )
                 .groupBy('p.id', 'i.id')
-                .first(); // Use 'first' to get a single product
+                .first();
 
             if (!product) {
                 return res.status(StatusCode.NOT_FOUND).json(transformResponse({

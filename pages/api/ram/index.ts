@@ -46,7 +46,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         try {
             const { name, type, capacity, speed, brand, status } = req.body;
 
-            // Validate required fields
             if (!name || !type || !capacity || !speed || !brand) {
                 return res.status(StatusCode.BAD_REQUEST).json(transformResponse({
                     data: null,
@@ -55,7 +54,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 }));
             }
 
-            // Validate name length
             if (name.length > 100) {
                 return res.status(StatusCode.BAD_REQUEST).json(transformResponse({
                     data: null,
@@ -64,7 +62,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 }));
             }
 
-            // Validate type length
             if (type.length > 50) {
                 return res.status(StatusCode.BAD_REQUEST).json(transformResponse({
                     data: null,
@@ -73,7 +70,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 }));
             }
 
-            // Validate brand length
             if (brand.length > 50) {
                 return res.status(StatusCode.BAD_REQUEST).json(transformResponse({
                     data: null,
@@ -82,7 +78,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 }));
             }
 
-            // Validate capacity and speed are positive numbers
             if (typeof capacity !== 'number' || capacity <= 0) {
                 return res.status(StatusCode.BAD_REQUEST).json(transformResponse({
                     data: null,
@@ -99,7 +94,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 }));
             }
 
-            // Validate status
             if (status !== undefined && (typeof status !== 'number' || ![0, 1].includes(status))) {
                 return res.status(StatusCode.BAD_REQUEST).json(transformResponse({
                     data: null,
