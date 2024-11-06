@@ -8,6 +8,7 @@ import {  FaSearch } from 'react-icons/fa';
 import { UploadDropzone} from "@/components/custom/uploadthing";
 import useApi from '@/lib/useApi';
 import  Image  from 'next/image';
+import {MultiUploader} from "@/components/upload-thing";
 
 
 interface Image {
@@ -88,6 +89,7 @@ const Page = () => {
                             alert(`ERROR! ${error.message}`);
                         }}
                     />
+                    <MultiUploader/>
                 </div>
             </CardHeader>
             <CardContent className="pt-6">
@@ -102,12 +104,18 @@ const Page = () => {
                         <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                     </div>
                 </div>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-4">
                     {data?.data?.map((image) => (
-                        <a key={image.id} href={image.url} target="_blank" rel="noopener noreferrer" className="relative group">
+                        <a key={image.id} href={image.url} target="_blank" rel="noopener noreferrer" className="relative group flex justify-center items-center">
                             {/*<Image src={image.url} alt={image.url} width={200} height={200} className="w-full h-auto rounded-lg shadow-md transition-transform duration-300 group-hover:scale-105" />*/}
 
-                            <img src={image.url} alt={image.alt_text} width={80} height={80} className="w-full h-auto rounded-lg shadow-md transition-transform duration-300 group-hover:scale-105"/>
+                            <img 
+                                src={image.url} 
+                                alt={image.alt_text} 
+                                width={130} 
+                                height={250} 
+                                className="w-[130px] h-[250px] object-cover rounded-lg shadow-md transition-transform duration-300 group-hover:scale-105"
+                            />
 
                             <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center rounded-lg">
                                 <p className="text-white text-sm">{image.url}</p>
