@@ -25,6 +25,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const formSchema = z.object({
     name: z.string()
@@ -47,6 +48,7 @@ const formSchema = z.object({
 const Page = ({ params }: { params: { id: string } }) => {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
     const { toast } = useToast();
     const [storage, setStorage] = useState<any>(null);
 
@@ -88,6 +90,8 @@ const Page = ({ params }: { params: { id: string } }) => {
                     title: "Lỗi",
                     description: (error as Error).message || "Có lỗi xảy ra, vui lòng thử lại sau",
                 });
+            } finally {
+                setIsLoading(false);
             }
         };
 
@@ -135,6 +139,30 @@ const Page = ({ params }: { params: { id: string } }) => {
             setLoading(false);
         }
     };
+
+    if (isLoading) {
+        return (
+            <div className="container mx-auto py-10">
+                <Card>
+                    <CardHeader>
+                        <Skeleton className="h-8 w-[300px]" />
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                        {[...Array(6)].map((_, index) => (
+                            <div key={index} className="space-y-2">
+                                <Skeleton className="h-5 w-[150px]" />
+                                <Skeleton className="h-12 w-full" />
+                            </div>
+                        ))}
+                        <div className="flex justify-end gap-4 lg:gap-6 pt-6">
+                            <Skeleton className="h-12 w-[140px]" />
+                            <Skeleton className="h-12 w-[140px]" />
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+        );
+    }
 
     return (
         <div className="container mx-auto py-10">
