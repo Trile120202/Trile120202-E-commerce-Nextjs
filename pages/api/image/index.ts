@@ -15,7 +15,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             const search = req.query.search as string;
             const status = req.query.status as string;
 
-            let query = db('images');
+            let query = db('images').whereNot('status', -2);
 
             if (search) {
                 query = query.where((builder) => {

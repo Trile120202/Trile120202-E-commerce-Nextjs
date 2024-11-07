@@ -27,23 +27,24 @@ const Sidebar = () => {
     return (
         <>
             <button
-                className="lg:hidden fixed top-4 left-4 z-20 p-2 bg-gray-800 text-white rounded"
+                className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-gray-800 text-white rounded"
                 onClick={() => setIsOpen(!isOpen)}
             >
                 <FaBars className="w-6 h-6" />
             </button>
 
-            <aside className={`bg-gray-800 text-white w-64 min-h-screen p-4 fixed lg:static transition-transform duration-300 ease-in-out z-10 ${
+            <aside className={`bg-gray-800 text-white w-64 min-h-screen p-4 fixed inset-y-0 left-0 transform transition-transform duration-300 ease-in-out z-40 overflow-y-auto ${
                 isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
-            }`}>
-                <div className="mb-6 text-xl lg:text-2xl font-bold text-center">Z-Shop</div>
-                <nav>
-                    <ul>
+            } lg:static lg:translate-x-0`}>
+                <div className="mb-6 text-xl lg:text-2xl font-bold text-center pt-2">Z-Shop</div>
+                <nav className="mt-8">
+                    <ul className="space-y-2">
                         {menuItems.map((item, index) => (
-                            <li key={index} className="mb-4">
+                            <li key={index}>
                                 <Link href={item.href}
-                                      className="flex items-center p-2 hover:bg-gray-700 rounded text-sm lg:text-base">
-                                    <item.icon className="mr-3"/>
+                                      className="flex items-center p-3 hover:bg-gray-700 rounded transition-colors duration-200 text-sm lg:text-base"
+                                      onClick={() => setIsOpen(false)}>
+                                    <item.icon className="w-5 h-5 mr-3"/>
                                     {item.label}
                                 </Link>
                             </li>
@@ -61,13 +62,13 @@ const Layout = ({
     children: React.ReactNode;
 }>) => {
     return (
-        <div className="flex h-screen bg-gray-100">
+        <div className="flex min-h-screen bg-gray-100">
             <Sidebar/>
-            <div className="flex-1 flex flex-col overflow-hidden">
+            <div className="flex-1 flex flex-col">
                 <header className="bg-white shadow-md p-4 pl-16 lg:pl-4">
-                    <h1 className="text-xl lg:text-2xl font-bold">CMS Dashboard</h1>
+                    <h1 className="text-lg lg:text-2xl font-bold">CMS Dashboard</h1>
                 </header>
-                <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-200 p-4 lg:p-6">
+                <main className="flex-1 p-4 lg:p-6 bg-gray-200 overflow-x-hidden">
                     {children}
                 </main>
             </div>

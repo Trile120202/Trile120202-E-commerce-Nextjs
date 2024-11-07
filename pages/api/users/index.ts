@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import knex from 'knex';
+import bcrypt from 'bcrypt';
 import knexConfig from '../../../knexfile';
 import { StatusCode } from "@/lib/statusCodes";
 import { transformResponse } from "@/lib/interceptors/transformInterceptor";
@@ -18,22 +19,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             let query = db('users')
                 .select('users.*', 'roles.name as role_name', 'images.url as avatar_url')
                 .leftJoin('roles', 'users.role_id', 'roles.id')
-                .leftJoin('images', 'users.avatar_id', 'images.id');
-
-                
-
-                // res.status(StatusCode.OK).json(transformResponse({
-                //     data: [],
-                //     message: 'No users found.',
-                //     statusCode: StatusCode.OK,
-                //     pagination: {
-                //         currentPage: page,
-                //         pageSize: limit,
-                //         totalItems: 0,
-                //         totalPages: 0,
-                //     },
-                // }
-                // ))
+                .leftJoin('images', 'users.avatar_id', 'images.id')
+                .whereNot('users.status', -2);
 
             if (search) {
                 query = query.where((builder) => {
@@ -48,37 +35,28 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 query = query.where('users.status', status);
             }
 
-            // const [count] = await query.clone().count('* as total');
-            // const totalItems = count.total as number;
-            //
-            // const users = await query
-            //     .offset(offset)
-            //     .limit(limit);
-            //
-            // const totalPages = Math.ceil(totalItems / limit);
-            // res.status(StatusCode.OK).json(transformResponse({
-            //     data: users || [],
-            //     message: 'Users retrieved successfully.',
-            //     statusCode: StatusCode.OK,
-            //     pagination: {
-            //         currentPage: page,
-            //         pageSize: limit,
-            //         totalItems,
-            //         totalPages,
-            //     },
-            // }));
+            const [count] = await db('users')
+                .whereNot('status', -2)
+                .count('* as total');
+            const totalItems = parseInt(count.total as string);
+
+            const users = await query
+                .offset(offset)
+                .limit(limit)
+                .orderBy('users.id', 'desc');
+
+            const totalPages = Math.ceil(totalItems / limit);
             res.status(StatusCode.OK).json(transformResponse({
-                data: [],
-                message: 'No users found.',
+                data: users || [],
+                message: users.length ? 'Users retrieved successfully.' : 'No users found.',
                 statusCode: StatusCode.OK,
                 pagination: {
                     currentPage: page,
                     pageSize: limit,
-                    totalItems: 0,
-                    totalPages: 0,
+                    totalItems,
+                    totalPages,
                 },
-            }
-            ))
+            }));
         } catch (error) {
             console.error(error);
             return res.status(StatusCode.INTERNAL_SERVER_ERROR).json(transformResponse({
@@ -112,9 +90,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 }));
             }
 
+            const hashedPassword = await bcrypt.hash(password, 10);
+
             const [newUser] = await db('users').insert({
                 username,
-                password,
+                password: hashedPassword,
                 email,
                 first_name,
                 last_name,

@@ -78,8 +78,27 @@ const Page = () => {
         router.push(`/quan-tri/quan-ly-nguoi-dung/${id}`);
     };
 
-    const handleDelete = (id: number) => {
-        console.log(`Delete user with id: ${id}`);
+    const handleDelete = async (id: number) => {
+        try {
+            const response = await fetch('/api/users/update-status', {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    id,
+                    status: -2
+                }),
+            });
+
+            if (response.ok) {
+                fetchData();
+            } else {
+                console.error('Failed to delete user');
+            }
+        } catch (error) {
+            console.error('Error deleting user:', error);
+        }
     };
 
     const getStatusColor = (status: number) => {

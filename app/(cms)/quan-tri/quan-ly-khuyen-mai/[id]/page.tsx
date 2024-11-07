@@ -27,6 +27,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const formSchema = z.object({
     code: z.string()
@@ -55,6 +56,7 @@ const formSchema = z.object({
 const Page = ({ params }: { params: { id: string } }) => {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
     const { toast } = useToast();
     const [coupon, setCoupon] = useState<any>(null);
 
@@ -102,6 +104,8 @@ const Page = ({ params }: { params: { id: string } }) => {
                     title: 'Lỗi',
                     description: (error as Error).message || 'Có lỗi xảy ra, vui lòng thử lại sau',
                 });
+            } finally {
+                setIsLoading(false);
             }
         };
 
@@ -160,212 +164,229 @@ const Page = ({ params }: { params: { id: string } }) => {
                     <CardTitle className="text-2xl">Chỉnh sửa khuyến mãi</CardTitle>
                 </CardHeader>
                 <CardContent className="p-6">
-                    <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                    {isLoading ? (
+                        <div className="space-y-4">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <FormField
-                                    control={form.control}
-                                    name="code"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel className="text-base lg:text-lg">Mã khuyến mãi</FormLabel>
-                                            <FormControl>
-                                                <Input 
-                                                    placeholder="Nhập mã khuyến mãi"
-                                                    {...field}
-                                                    className="focus:ring-2 h-10 lg:h-12 text-base lg:text-lg"
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-
-                                <FormField
-                                    control={form.control}
-                                    name="discount_type"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel className="text-base lg:text-lg">Loại giảm giá</FormLabel>
-                                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                                <FormControl>
-                                                    <SelectTrigger className="focus:ring-2 h-10 lg:h-12 text-base lg:text-lg">
-                                                        <SelectValue placeholder="Chọn loại giảm giá" />
-                                                    </SelectTrigger>
-                                                </FormControl>
-                                                <SelectContent>
-                                                    <SelectItem value="percentage">Phần trăm</SelectItem>
-                                                    <SelectItem value="fixed_amount">Số tiền cố định</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-
-                                <FormField
-                                    control={form.control}
-                                    name="discount_value"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel className="text-base lg:text-lg">Giá trị giảm</FormLabel>
-                                            <FormControl>
-                                                <Input 
-                                                    type="number"
-                                                    placeholder="Nhập giá trị giảm"
-                                                    {...field}
-                                                    className="focus:ring-2 h-10 lg:h-12 text-base lg:text-lg"
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-
-                                <FormField
-                                    control={form.control}
-                                    name="max_discount_value"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel className="text-base lg:text-lg">Giảm tối đa</FormLabel>
-                                            <FormControl>
-                                                <Input 
-                                                    type="number"
-                                                    placeholder="Nhập giá trị giảm tối đa"
-                                                    {...field}
-                                                    className="focus:ring-2 h-10 lg:h-12 text-base lg:text-lg"
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-
-                                <FormField
-                                    control={form.control}
-                                    name="start_date"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel className="text-base lg:text-lg">Ngày bắt đầu</FormLabel>
-                                            <FormControl>
-                                                <Input 
-                                                    type="date"
-                                                    {...field}
-                                                    className="focus:ring-2 h-10 lg:h-12 text-base lg:text-lg"
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-
-                                <FormField
-                                    control={form.control}
-                                    name="end_date"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel className="text-base lg:text-lg">Ngày kết thúc</FormLabel>
-                                            <FormControl>
-                                                <Input 
-                                                    type="date"
-                                                    {...field}
-                                                    className="focus:ring-2 h-10 lg:h-12 text-base lg:text-lg"
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-
-                                <FormField
-                                    control={form.control}
-                                    name="min_purchase_amount"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel className="text-base lg:text-lg">Giá trị đơn hàng tối thiểu</FormLabel>
-                                            <FormControl>
-                                                <Input 
-                                                    type="number"
-                                                    placeholder="Nhập giá trị đơn hàng tối thiểu"
-                                                    {...field}
-                                                    className="focus:ring-2 h-10 lg:h-12 text-base lg:text-lg"
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-
-                                <FormField
-                                    control={form.control}
-                                    name="max_usage"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel className="text-base lg:text-lg">Số lần sử dụng tối đa</FormLabel>
-                                            <FormControl>
-                                                <Input 
-                                                    type="number"
-                                                    placeholder="Nhập số lần sử dụng tối đa"
-                                                    {...field}
-                                                    className="focus:ring-2 h-10 lg:h-12 text-base lg:text-lg"
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-
-                                <FormField
-                                    control={form.control}
-                                    name="is_active"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <div className="flex items-center gap-2">
-                                                <FormLabel className="text-base lg:text-lg">
-                                                    Trạng thái
-                                                </FormLabel>
-                                            </div>
-                                            <FormControl>
-                                                <Switch
-                                                    checked={field.value}
-                                                    onCheckedChange={field.onChange}
-                                                    className="scale-110 lg:scale-125"
-                                                />
-                                            </FormControl>
-                                        </FormItem>
-                                    )}
-                                />
+                                {[...Array(9)].map((_, index) => (
+                                    <div key={index} className="space-y-2">
+                                        <Skeleton className="h-5 w-1/3" />
+                                        <Skeleton className="h-12 w-full" />
+                                    </div>
+                                ))}
                             </div>
-
                             <div className="flex justify-end gap-4 lg:gap-6 pt-6">
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                    onClick={() => router.back()}
-                                    className="w-[120px] lg:w-[140px] h-10 lg:h-12 text-base lg:text-lg"
-                                >
-                                    Hủy
-                                </Button>
-                                <Button 
-                                    type="submit"
-                                    disabled={loading}
-                                    className="w-[120px] lg:w-[140px] h-10 lg:h-12 text-base lg:text-lg"
-                                >
-                                    {loading ? (
-                                        <div className="flex items-center gap-2 lg:gap-3">
-                                            <div className="h-4 w-4 lg:h-5 lg:w-5 animate-spin rounded-full border-2 border-primary border-t-transparent"></div>
-                                            <span>Đang xử lý</span>
-                                        </div>
-                                    ) : (
-                                        <div className="flex items-center gap-2 lg:gap-3">
-                                            <Save className="h-4 w-4 lg:h-5 lg:w-5" />
-                                            <span>Cập nhật</span>
-                                        </div>
-                                    )}
-                                </Button>
+                                <Skeleton className="w-[120px] lg:w-[140px] h-10 lg:h-12" />
+                                <Skeleton className="w-[120px] lg:w-[140px] h-10 lg:h-12" />
                             </div>
-                        </form>
-                    </Form>
+                        </div>
+                    ) : (
+                        <Form {...form}>
+                            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <FormField
+                                        control={form.control}
+                                        name="code"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel className="text-base lg:text-lg">Mã khuyến mãi</FormLabel>
+                                                <FormControl>
+                                                    <Input 
+                                                        placeholder="Nhập mã khuyến mãi"
+                                                        {...field}
+                                                        className="focus:ring-2 h-10 lg:h-12 text-base lg:text-lg"
+                                                    />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    <FormField
+                                        control={form.control}
+                                        name="discount_type"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel className="text-base lg:text-lg">Loại giảm giá</FormLabel>
+                                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                    <FormControl>
+                                                        <SelectTrigger className="focus:ring-2 h-10 lg:h-12 text-base lg:text-lg">
+                                                            <SelectValue placeholder="Chọn loại giảm giá" />
+                                                        </SelectTrigger>
+                                                    </FormControl>
+                                                    <SelectContent>
+                                                        <SelectItem value="percentage">Phần trăm</SelectItem>
+                                                        <SelectItem value="fixed_amount">Số tiền cố định</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    <FormField
+                                        control={form.control}
+                                        name="discount_value"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel className="text-base lg:text-lg">Giá trị giảm</FormLabel>
+                                                <FormControl>
+                                                    <Input 
+                                                        type="number"
+                                                        placeholder="Nhập giá trị giảm"
+                                                        {...field}
+                                                        className="focus:ring-2 h-10 lg:h-12 text-base lg:text-lg"
+                                                    />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    <FormField
+                                        control={form.control}
+                                        name="max_discount_value"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel className="text-base lg:text-lg">Giảm tối đa</FormLabel>
+                                                <FormControl>
+                                                    <Input 
+                                                        type="number"
+                                                        placeholder="Nhập giá trị giảm tối đa"
+                                                        {...field}
+                                                        className="focus:ring-2 h-10 lg:h-12 text-base lg:text-lg"
+                                                    />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    <FormField
+                                        control={form.control}
+                                        name="start_date"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel className="text-base lg:text-lg">Ngày bắt đầu</FormLabel>
+                                                <FormControl>
+                                                    <Input 
+                                                        type="date"
+                                                        {...field}
+                                                        className="focus:ring-2 h-10 lg:h-12 text-base lg:text-lg"
+                                                    />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    <FormField
+                                        control={form.control}
+                                        name="end_date"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel className="text-base lg:text-lg">Ngày kết thúc</FormLabel>
+                                                <FormControl>
+                                                    <Input 
+                                                        type="date"
+                                                        {...field}
+                                                        className="focus:ring-2 h-10 lg:h-12 text-base lg:text-lg"
+                                                    />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    <FormField
+                                        control={form.control}
+                                        name="min_purchase_amount"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel className="text-base lg:text-lg">Giá trị đơn hàng tối thiểu</FormLabel>
+                                                <FormControl>
+                                                    <Input 
+                                                        type="number"
+                                                        placeholder="Nhập giá trị đơn hàng tối thiểu"
+                                                        {...field}
+                                                        className="focus:ring-2 h-10 lg:h-12 text-base lg:text-lg"
+                                                    />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    <FormField
+                                        control={form.control}
+                                        name="max_usage"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel className="text-base lg:text-lg">Số lần sử dụng tối đa</FormLabel>
+                                                <FormControl>
+                                                    <Input 
+                                                        type="number"
+                                                        placeholder="Nhập số lần sử dụng tối đa"
+                                                        {...field}
+                                                        className="focus:ring-2 h-10 lg:h-12 text-base lg:text-lg"
+                                                    />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    <FormField
+                                        control={form.control}
+                                        name="is_active"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <div className="flex items-center gap-2">
+                                                    <FormLabel className="text-base lg:text-lg">
+                                                        Trạng thái
+                                                    </FormLabel>
+                                                </div>
+                                                <FormControl>
+                                                    <Switch
+                                                        checked={field.value}
+                                                        onCheckedChange={field.onChange}
+                                                        className="scale-110 lg:scale-125"
+                                                    />
+                                                </FormControl>
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+
+                                <div className="flex justify-end gap-4 lg:gap-6 pt-6">
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        onClick={() => router.back()}
+                                        className="w-[120px] lg:w-[140px] h-10 lg:h-12 text-base lg:text-lg"
+                                    >
+                                        Hủy
+                                    </Button>
+                                    <Button 
+                                        type="submit"
+                                        disabled={loading}
+                                        className="w-[120px] lg:w-[140px] h-10 lg:h-12 text-base lg:text-lg"
+                                    >
+                                        {loading ? (
+                                            <div className="flex items-center gap-2 lg:gap-3">
+                                                <div className="h-4 w-4 lg:h-5 lg:w-5 animate-spin rounded-full border-2 border-primary border-t-transparent"></div>
+                                                <span>Đang xử lý</span>
+                                            </div>
+                                        ) : (
+                                            <div className="flex items-center gap-2 lg:gap-3">
+                                                <Save className="h-4 w-4 lg:h-5 lg:w-5" />
+                                                <span>Cập nhật</span>
+                                            </div>
+                                        )}
+                                    </Button>
+                                </div>
+                            </form>
+                        </Form>
+                    )}
                 </CardContent>
             </Card>
         </div>
