@@ -24,6 +24,9 @@ import {
 import { Card, CardHeader, CardTitle } from "@/components/ui/card"
 import useApi from '@/lib/useApi';
 import DataTable from "@/components/custom/datatable";
+import { useToast } from "@/hooks/use-toast";
+import {ChangeStatus} from "@/components/custom/ChangeStatus";
+
 
 interface Ram {
     id: number;
@@ -53,6 +56,7 @@ interface ApiResponse {
 
 const Page = () => {
     const router = useRouter();
+    const { toast } = useToast();
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedStatus, setSelectedStatus] = useState<string>('all');
     const [selectedType, setSelectedType] = useState<string>('all');
@@ -60,6 +64,7 @@ const Page = () => {
     const [selectedBrand, setSelectedBrand] = useState<string>('all');
     const [searchKeyword, setSearchKeyword] = useState<string>('');
     const [limit, setLimit] = useState<number>(10);
+    const [selectedId, setSelectedId] = useState<number | null>(null);
 
     const { data, loading, error, fetchData } = useApi<ApiResponse>(
         `/api/ram?page=${currentPage}&limit=${limit}&search=${searchKeyword}${selectedStatus !== 'all' ? `&status=${selectedStatus}` : ''}${selectedType !== 'all' ? `&type=${selectedType}` : ''}${selectedCapacity !== 'all' ? `&capacity=${selectedCapacity}` : ''}${selectedBrand !== 'all' ? `&brand=${selectedBrand}` : ''}`,
@@ -80,8 +85,40 @@ const Page = () => {
         router.push(`/quan-tri/ram/${id}`);
     };
 
-    const handleDelete = (id: number) => {
-        console.log(`Delete RAM with id: ${id}`);
+    const handleDelete = async (id: number) => {
+        try {
+            const response = await fetch('/api/ram/update-status', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    id,
+                    status: -2
+                }),
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(result.message || 'Có lỗi xảy ra khi xóa RAM');
+            }
+
+            toast({
+                title: "Thành công",
+                description: "Xóa RAM thành công",
+            });
+
+            fetchData();
+
+        } catch (error) {
+            console.error('Error deleting RAM:', error);
+            toast({
+                variant: "destructive",
+                title: "Lỗi",
+                description: (error as Error).message || "Có lỗi xảy ra khi xóa RAM",
+            });
+        }
     };
 
     const getStatusColor = (status: number) => {
@@ -110,24 +147,41 @@ const Page = () => {
             label: 'Thao tác', 
             className: 'text-right',
             render: (row: Ram) => (
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
-                            <BsThreeDots className="h-4 w-4" />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => handleEdit(row.id)}>
-                            <FaEdit className="mr-2 h-4 w-4" />
-                            <span>Sửa</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleDelete(row.id)}>
-                            <FaTrash className="mr-2 h-4 w-4" />
-                            <span>Xóa</span>
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                <>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="h-8 w-8 p-0">
+                                <span className="sr-only">Open menu</span>
+                                <BsThreeDots className="h-4 w-4" />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => handleEdit(row.id)}>
+                                <FaEdit className="mr-2 h-4 w-4" />
+                                <span>Sửa</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => setSelectedId(row.id)}>
+                                <FaTrash className="mr-2 h-4 w-4" />
+                                <span>Xóa</span>
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                    
+                    <ChangeStatus
+                        id={row.id}
+                        isOpen={selectedId === row.id}
+                        onClose={() => setSelectedId(null)}
+                        onSuccess={fetchData}
+                        endpoint="/api/ram/update-status"
+                        status={-2}
+                        title="Xác nhận xóa RAM"
+                        description="Bạn có chắc chắn muốn xóa RAM này? Hành động này không thể hoàn tác."
+                        confirmText="Xóa"
+                        cancelText="Hủy"
+                        successMessage="Xóa RAM thành công"
+                        errorMessage="Có lỗi xảy ra khi xóa RAM"
+                    />
+                </>
             )
         },
     ];

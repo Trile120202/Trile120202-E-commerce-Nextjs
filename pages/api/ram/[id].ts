@@ -13,6 +13,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         try {
             const ram = await db('ram')
                 .where('id', id)
+                .where('status', '!=', -2)
                 .first();
 
             if (!ram) {

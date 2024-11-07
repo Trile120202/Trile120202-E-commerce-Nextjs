@@ -20,6 +20,7 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const formSchema = z.object({
     name: z.string()
@@ -43,6 +44,7 @@ const formSchema = z.object({
 const Page = ({ params }: { params: { id: string } }) => {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
     const { toast } = useToast();
     const [ram, setRam] = useState<any>(null);
 
@@ -61,6 +63,7 @@ const Page = ({ params }: { params: { id: string } }) => {
     useEffect(() => {
         const fetchRam = async () => {
             try {
+                setIsLoading(true);
                 const response = await fetch(`/api/ram/${params.id}`);
                 const data = await response.json();
 
@@ -84,6 +87,8 @@ const Page = ({ params }: { params: { id: string } }) => {
                     title: "Lỗi",
                     description: (error as Error).message || "Có lỗi xảy ra, vui lòng thử lại sau",
                 });
+            } finally {
+                setIsLoading(false);
             }
         };
 
@@ -133,6 +138,30 @@ const Page = ({ params }: { params: { id: string } }) => {
             setLoading(false);
         }
     };
+
+    if (isLoading) {
+        return (
+            <div className="p-6">
+                <Card>
+                    <CardHeader className="space-y-1">
+                        <Skeleton className="h-8 w-1/4" />
+                    </CardHeader>
+                    <CardContent className="p-6 space-y-4">
+                        {[...Array(6)].map((_, i) => (
+                            <div key={i} className="space-y-2.5">
+                                <Skeleton className="h-4 w-[100px]" />
+                                <Skeleton className="h-10 w-full" />
+                            </div>
+                        ))}
+                        <div className="flex justify-end gap-4 lg:gap-6 pt-6">
+                            <Skeleton className="w-[120px] lg:w-[140px] h-10 lg:h-12" />
+                            <Skeleton className="w-[120px] lg:w-[140px] h-10 lg:h-12" />
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+        );
+    }
 
     return (
         <div className="p-6">

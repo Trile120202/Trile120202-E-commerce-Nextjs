@@ -20,6 +20,7 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const formSchema = z.object({
     name: z.string()
@@ -34,6 +35,7 @@ const formSchema = z.object({
 const Page = ({ params }: { params: { id: string } }) => {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
     const { toast } = useToast();
     const [role, setRole] = useState<any>(null);
 
@@ -49,6 +51,7 @@ const Page = ({ params }: { params: { id: string } }) => {
     useEffect(() => {
         const fetchRole = async () => {
             try {
+                setIsLoading(true);
                 const response = await fetch(`/api/role/${params.id}`);
                 const data = await response.json();
 
@@ -69,6 +72,8 @@ const Page = ({ params }: { params: { id: string } }) => {
                     title: "Lỗi",
                     description: (error as Error).message || "Có lỗi xảy ra, vui lòng thử lại sau",
                 });
+            } finally {
+                setIsLoading(false);
             }
         };
 
@@ -116,6 +121,36 @@ const Page = ({ params }: { params: { id: string } }) => {
             setLoading(false);
         }
     };
+
+    if (isLoading) {
+        return (
+            <div className="p-6">
+                <Card>
+                    <CardHeader className="space-y-1">
+                        <Skeleton className="h-8 w-[200px]" />
+                    </CardHeader>
+                    <CardContent className="p-6 space-y-4">
+                        <div className="space-y-2">
+                            <Skeleton className="h-4 w-[100px]" />
+                            <Skeleton className="h-10 w-full" />
+                        </div>
+                        <div className="space-y-2">
+                            <Skeleton className="h-4 w-[100px]" />
+                            <Skeleton className="h-10 w-full" />
+                        </div>
+                        <div className="space-y-2">
+                            <Skeleton className="h-4 w-[100px]" />
+                            <Skeleton className="h-6 w-[60px]" />
+                        </div>
+                        <div className="flex justify-end gap-4 lg:gap-6 pt-6">
+                            <Skeleton className="h-12 w-[140px]" />
+                            <Skeleton className="h-12 w-[140px]" />
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+        );
+    }
 
     return (
         <div className="p-6">

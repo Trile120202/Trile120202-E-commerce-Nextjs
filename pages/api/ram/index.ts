@@ -13,12 +13,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             const limit = parseInt(req.query.limit as string) || 10;
             const offset = (page - 1) * limit;
 
-            const [{ count }] = await db('ram').count();
+            const [{ count }] = await db('ram')
+                .whereNot('status', -2)
+                .count();
             const totalItems = parseInt(count as string);
             const totalPages = Math.ceil(totalItems / limit);
 
             const rams = await db('ram')
                 .select('*')
+                .whereNot('status', -2)
                 .offset(offset)
                 .limit(limit)
                 .orderBy('created_at', 'desc');
