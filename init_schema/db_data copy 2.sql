@@ -19,6 +19,8 @@ DROP TABLE IF EXISTS ram CASCADE;
 DROP TABLE IF EXISTS hard_drives CASCADE;
 DROP TABLE IF EXISTS product_ram CASCADE;
 DROP TABLE IF EXISTS product_hard_drives CASCADE;
+DROP TABLE IF EXISTS cart_items CASCADE;
+DROP TABLE IF EXISTS carts CASCADE;
 
 DROP FUNCTION IF EXISTS update_modified_column() CASCADE;
 
@@ -434,6 +436,41 @@ CREATE INDEX idx_product_hard_hard_id ON product_hard_drives (hard_id);
 CREATE INDEX idx_product_hard_created_at ON product_hard_drives (created_at);
 CREATE INDEX idx_product_hard_updated_at ON product_hard_drives (updated_at);
 CREATE INDEX idx_product_hard_status ON product_hard_drives (status);
+
+CREATE TABLE carts
+(
+    id         SERIAL PRIMARY KEY,
+    user_id    INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status     INT DEFAULT 1,
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_carts_user_id ON carts (user_id);
+CREATE INDEX idx_carts_created_at ON carts (created_at);
+CREATE INDEX idx_carts_updated_at ON carts (updated_at);
+CREATE INDEX idx_carts_status ON carts (status);
+
+CREATE TABLE cart_items
+(
+    id         SERIAL PRIMARY KEY,
+    cart_id    INT NOT NULL,
+    product_id INT NOT NULL,
+    quantity   INT NOT NULL DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status     INT DEFAULT 1,
+    FOREIGN KEY (cart_id) REFERENCES carts (id) ON DELETE CASCADE,
+    FOREIGN KEY (product_id) REFERENCES products (id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_cart_items_cart_id ON cart_items (cart_id);
+CREATE INDEX idx_cart_items_product_id ON cart_items (product_id);
+CREATE INDEX idx_cart_items_created_at ON cart_items (created_at);
+CREATE INDEX idx_cart_items_updated_at ON cart_items (updated_at);
+CREATE INDEX idx_cart_items_status ON cart_items (status);
+
 
 CREATE OR REPLACE FUNCTION update_modified_column()
     RETURNS TRIGGER AS
