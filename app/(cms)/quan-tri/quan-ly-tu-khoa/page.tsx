@@ -1,21 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Button } from "@/components/ui/button"
-import { FaEdit, FaTrash } from 'react-icons/fa'
-import { BsThreeDots } from 'react-icons/bs'
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Card, CardHeader, CardTitle } from "@/components/ui/card"
-import { Switch } from "@/components/ui/switch"
-import {CreateTagModal} from "@/components/CreateTagModal"
-import {EditTagModal} from "@/components/EditTagModal"
-import useApi from '@/lib/useApi';
-import DataTable from "@/components/custom/datatable";
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
     Pagination,
     PaginationContent,
@@ -25,7 +12,20 @@ import {
     PaginationNext,
     PaginationPrevious,
 } from "@/components/ui/pagination"
-import { useRouter, useSearchParams } from 'next/navigation';
+import { Button } from "@/components/ui/button"
+import { FaEdit, FaTrash, FaPlus } from 'react-icons/fa'
+import { BsThreeDots } from 'react-icons/bs'
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Card, CardHeader, CardTitle } from "@/components/ui/card"
+import useApi from '@/lib/useApi';
+import DataTable from "@/components/custom/datatable";
+import { useToast } from "@/hooks/use-toast";
+import {ChangeStatus} from "@/components/custom/ChangeStatus";
 
 interface Tag {
     id: number;
@@ -45,104 +45,36 @@ interface Pagination {
 interface ApiResponse {
     status: number;
     message: string;
-    data: {
-        tags: Tag[];
-        pagination: Pagination;
-    };
+    data: Tag[];
+    pagination: Pagination;
 }
 
 const Page = () => {
     const router = useRouter();
-    const searchParams = useSearchParams();
+    const { toast } = useToast();
+    const [currentPage, setCurrentPage] = useState(1);
+    const [selectedStatus, setSelectedStatus] = useState<string>('all');
+    const [searchKeyword, setSearchKeyword] = useState<string>('');
+    const [limit, setLimit] = useState<number>(10);
+    const [selectedId, setSelectedId] = useState<number | null>(null);
 
-    const [currentPage, setCurrentPage] = useState(Number(searchParams.get('page')) || 1);
-    const [selectedStatus, setSelectedStatus] = useState<string>(searchParams.get('status') || 'all');
-    const [searchKeyword, setSearchKeyword] = useState<string>(searchParams.get('search') || '');
-    const [limit, setLimit] = useState<number>(Number(searchParams.get('limit')) || 10);
-    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-    const [selectedTag, setSelectedTag] = useState<Tag | null>(null);
-
-    const updateUrl = (params: Record<string, string | number>) => {
-        const url = new URL(window.location.href);
-        Object.entries(params).forEach(([key, value]) => {
-            if (value) {
-                url.searchParams.set(key, String(value));
-            } else {
-                url.searchParams.delete(key);
-            }
-        });
-        router.push(url.pathname + url.search);
-    };
-
-    const { data, loading, error, fetchData } = useApi<ApiResponse>(`/api/tag?page=${currentPage}&limit=${limit}&search=${searchKeyword}${selectedStatus !== 'all' ? `&status=${selectedStatus}` : ''}`, {
-        method: 'GET'
-    });
+    const { data, loading, error, fetchData } = useApi<ApiResponse>(
+        `/api/tag?page=${currentPage}&limit=${limit}&search=${searchKeyword}${selectedStatus !== 'all' ? `&status=${selectedStatus}` : ''}`,
+        {
+            method: 'GET'
+        }
+    );
 
     useEffect(() => {
         fetchData();
-        updateUrl({
-            page: currentPage,
-            limit,
-            search: searchKeyword,
-            status: selectedStatus !== 'all' ? selectedStatus : ''
-        });
     }, [currentPage, selectedStatus, searchKeyword, limit]);
-
-    const handleEdit = (tag: Tag) => {
-        setSelectedTag(tag);
-        setIsEditModalOpen(true);
-    };
-
-    const handleDelete = (id: number) => {
-        console.log(`Delete tag with id: ${id}`);
-    };
-
-    const handleCreate = (newTag: Tag) => {
-        console.log('New tag created:', newTag);
-    setTimeout(() => {
-    window.location.reload();
-    }, 1200);
-        
-    };
-
-    const handleUpdate = (updatedTag: Tag) => {
-        console.log('Tag updated:', updatedTag);
-        fetchData();
-        setIsEditModalOpen(false);
-    };
-
-    const handleStatusChange = async (id: number, newStatus: number) => {
-        try {
-            const response = await fetch('/api/tag', {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ id, status: newStatus }),
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to update status');
-            }
-
-            fetchData();
-        } catch (error) {
-            console.error('Error updating status:', error);
-        }
-    };
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
     };
 
-    const handleSearchChange = (search: string) => {
-        setSearchKeyword(search);
-        setCurrentPage(1);
-    };
-
-    const handleStatusFilterChange = (status: string) => {
-        setSelectedStatus(status);
-        setCurrentPage(1);
+    const handleEdit = (id: number) => {
+        router.push(`/quan-tri/quan-ly-tu-khoa/${id}`);
     };
 
     const getStatusColor = (status: number) => {
@@ -157,15 +89,9 @@ const Page = () => {
             label: 'Trạng thái',
             className: 'text-center hidden md:table-cell',
             render: (row: Tag) => (
-                <div className="flex items-center space-x-2">
-                    <Switch
-                        checked={row.status === 1}
-                        onCheckedChange={(checked) => handleStatusChange(row.id, checked ? 1 : 0)}
-                    />
-                    <span className={`hidden md:inline-block px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(row.status)}`}>
-                        {row.status === 1 ? 'Hoạt động' : 'Không hoạt động'}
-                    </span>
-                </div>
+                <span className={`hidden md:inline-block px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(row.status)}`}>
+                    {row.status === 1 ? 'Hoạt động' : 'Không hoạt động'}
+                </span>
             )
         },
         {
@@ -173,26 +99,43 @@ const Page = () => {
             label: 'Thao tác',
             className: 'text-right',
             render: (row: Tag) => (
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
-                            <BsThreeDots className="h-4 w-4" />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => handleEdit(row)}>
-                            <FaEdit className="mr-2 h-4 w-4" />
-                            <span>Sửa</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleDelete(row.id)}>
-                            <FaTrash className="mr-2 h-4 w-4" />
-                            <span>Xóa</span>
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                <>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="h-8 w-8 p-0">
+                                <span className="sr-only">Open menu</span>
+                                <BsThreeDots className="h-4 w-4" />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => handleEdit(row.id)}>
+                                <FaEdit className="mr-2 h-4 w-4" />
+                                <span>Sửa</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => setSelectedId(row.id)}>
+                                <FaTrash className="mr-2 h-4 w-4" />
+                                <span>Xóa</span>
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+
+                    <ChangeStatus
+                        id={row.id}
+                        isOpen={selectedId === row.id}
+                        onClose={() => setSelectedId(null)}
+                        onSuccess={fetchData}
+                        endpoint="/api/tag/update-status"
+                        status={-2}
+                        title="Xác nhận xóa từ khóa"
+                        description="Bạn có chắc chắn muốn xóa từ khóa này? Hành động này không thể hoàn tác."
+                        confirmText="Xóa"
+                        cancelText="Hủy"
+                        successMessage="Xóa từ khóa thành công"
+                        errorMessage="Có lỗi xảy ra khi xóa từ khóa"
+                    />
+                </>
             )
-        },
+        }
     ];
 
     return (
@@ -202,7 +145,12 @@ const Page = () => {
                     <CardHeader className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-4 md:p-6">
                         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 md:gap-0">
                             <CardTitle className="text-xl md:text-2xl font-bold">Quản lý từ khóa</CardTitle>
-                            <CreateTagModal onCreate={handleCreate} />
+                            <Link href="/quan-tri/quan-ly-tu-khoa/tao-moi" className="w-full md:w-auto">
+                                <Button className="w-full md:w-auto bg-green-500 hover:bg-green-600 transition duration-300">
+                                    <FaPlus className="mr-2 h-4 w-4" />
+                                    Tạo mới
+                                </Button>
+                            </Link>
                         </div>
                     </CardHeader>
                 </Card>
@@ -210,14 +158,14 @@ const Page = () => {
 
             <div className="flex-1 overflow-auto">
                 <DataTable
-                    data={data?.data.tags || []}
+                    data={data?.data || []}
                     columns={columns}
                     loading={loading}
                     error={error ? new Error(error) : null}
                     filters={{
                         status: {
                             value: selectedStatus,
-                            onChange: handleStatusFilterChange,
+                            onChange: setSelectedStatus,
                             options: [
                                 { label: 'Tất cả', value: 'all' },
                                 { label: 'Hoạt động', value: '1' },
@@ -226,7 +174,7 @@ const Page = () => {
                         },
                         search: {
                             value: searchKeyword,
-                            onChange: handleSearchChange,
+                            onChange: setSearchKeyword,
                             placeholder: "Tìm kiếm từ khóa"
                         },
                         limit: {
@@ -239,71 +187,71 @@ const Page = () => {
             </div>
 
             <div className="sticky bottom-0 bg-white border-t z-10">
-                {data?.data.pagination && (
+                {data?.pagination && (
                     <div className="p-4">
                         <Pagination>
                             <PaginationContent>
                                 <PaginationItem>
-                                    <PaginationPrevious
-                                        onClick={() => handlePageChange(data.data.pagination.currentPage - 1)}
-                                        className={data.data.pagination.currentPage === 1 ? 'pointer-events-none opacity-50' : ''}
+                                    <PaginationPrevious 
+                                        onClick={() => handlePageChange(data.pagination.currentPage - 1)}
+                                        className={data.pagination.currentPage === 1 ? 'pointer-events-none opacity-50' : ''}
                                     />
                                 </PaginationItem>
-
-                                {[...Array(data.data.pagination.totalPages)].map((_, index) => {
+                                
+                                {[...Array(data.pagination.totalPages)].map((_, index) => {
                                     if (index === 0) return (
                                         <PaginationItem key={index}>
-                                            <PaginationLink
+                                            <PaginationLink 
                                                 onClick={() => handlePageChange(index + 1)}
-                                                isActive={data.data.pagination.currentPage === index + 1}
+                                                isActive={data.pagination.currentPage === index + 1}
                                             >
                                                 {index + 1}
                                             </PaginationLink>
                                         </PaginationItem>
                                     )
-
+                                    
                                     if (
-                                        index === data.data.pagination.currentPage - 1 ||
-                                        index === data.data.pagination.currentPage - 2 ||
-                                        index === data.data.pagination.currentPage
+                                        index === data.pagination.currentPage - 1 ||
+                                        index === data.pagination.currentPage - 2 ||
+                                        index === data.pagination.currentPage
                                     ) return (
                                         <PaginationItem key={index}>
-                                            <PaginationLink
+                                            <PaginationLink 
                                                 onClick={() => handlePageChange(index + 1)}
-                                                isActive={data.data.pagination.currentPage === index + 1}
+                                                isActive={data.pagination.currentPage === index + 1}
                                             >
                                                 {index + 1}
                                             </PaginationLink>
                                         </PaginationItem>
                                     )
-
-                                    if (index === data.data.pagination.totalPages - 1) return (
+                                    
+                                    if (index === data.pagination.totalPages - 1) return (
                                         <PaginationItem key={index}>
-                                            <PaginationLink
+                                            <PaginationLink 
                                                 onClick={() => handlePageChange(index + 1)}
-                                                isActive={data.data.pagination.currentPage === index + 1}
+                                                isActive={data.pagination.currentPage === index + 1}
                                             >
                                                 {index + 1}
                                             </PaginationLink>
                                         </PaginationItem>
                                     )
-
+                                    
                                     if (
                                         index === 1 ||
-                                        index === data.data.pagination.totalPages - 2
+                                        index === data.pagination.totalPages - 2
                                     ) return (
                                         <PaginationItem key={index}>
                                             <PaginationEllipsis />
                                         </PaginationItem>
                                     )
-
+                                    
                                     return null
                                 })}
 
                                 <PaginationItem>
-                                    <PaginationNext
-                                        onClick={() => handlePageChange(data.data.pagination.currentPage + 1)}
-                                        className={data.data.pagination.currentPage === data.data.pagination.totalPages ? 'pointer-events-none opacity-50' : ''}
+                                    <PaginationNext 
+                                        onClick={() => handlePageChange(data.pagination.currentPage + 1)}
+                                        className={data.pagination.currentPage === data.pagination.totalPages ? 'pointer-events-none opacity-50' : ''}
                                     />
                                 </PaginationItem>
                             </PaginationContent>
@@ -311,14 +259,6 @@ const Page = () => {
                     </div>
                 )}
             </div>
-
-            {isEditModalOpen && selectedTag && (
-                <EditTagModal
-                    tag={selectedTag}
-                    onUpdate={handleUpdate}
-                    onClose={() => setIsEditModalOpen(false)}
-                />
-            )}
         </div>
     );
 };

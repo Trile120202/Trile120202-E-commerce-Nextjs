@@ -15,7 +15,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             const search = req.query.search as string;
             const status = req.query.status as string;
 
-            let query = db('tags');
+            let query = db('tags').whereNot('status', -2);
 
             if (search) {
                 query = query.whereRaw('LOWER(name) LIKE ?', [`%${search.toLowerCase()}%`]);
@@ -38,23 +38,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             const totalPages = Math.ceil(total / limit);
 
             res.status(StatusCode.OK).json(transformResponse({
-                data: {
-                    tags,
-                    pagination: {
-                        currentPage: page,
-                        totalPages,
-                        totalItems: total,
-                        itemsPerPage: limit
-                    }
-                },
-                message: 'Tags retrieved successfully.',
+                data: tags,
+                message: 'Lấy danh sách từ khóa thành công.',
                 statusCode: StatusCode.OK,
+                pagination: {
+                    currentPage: page,
+                    pageSize: limit,
+                    totalItems: total,
+                    totalPages
+                }
             }));
         } catch (error) {
-            console.error(error);
+            console.error('Lỗi khi lấy danh sách từ khóa:', error);
             return res.status(StatusCode.INTERNAL_SERVER_ERROR).json(transformResponse({
                 data: null,
-                message: 'An error occurred while retrieving tags.',
+                message: 'Đã xảy ra lỗi khi lấy danh sách từ khóa.',
                 statusCode: StatusCode.INTERNAL_SERVER_ERROR,
             }));
         }
@@ -65,7 +63,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             if (!name) {
                 return res.status(StatusCode.BAD_REQUEST).json(transformResponse({
                     data: null,
-                    message: 'Tag name is required.',
+                    message: 'Tên từ khóa không được để trống.',
                     statusCode: StatusCode.BAD_REQUEST,
                 }));
             }
@@ -74,25 +72,28 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             if (existingTag) {
                 return res.status(StatusCode.CONFLICT).json(transformResponse({
                     data: null,
-                    message: 'Tag with this name already exists.',
+                    message: 'Từ khóa này đã tồn tại.',
                     statusCode: StatusCode.CONFLICT,
                 }));
             }
 
             const [newTag] = await db('tags')
-                .insert({ name, status: status || 1 })
+                .insert({ 
+                    name, 
+                    status: status || 1
+                })
                 .returning('*');
 
             res.status(StatusCode.CREATED).json(transformResponse({
                 data: newTag,
-                message: 'Tag created successfully.',
+                message: 'Tạo từ khóa thành công.',
                 statusCode: StatusCode.CREATED,
             }));
         } catch (error) {
-            console.error(error);
+            console.error('Lỗi khi tạo từ khóa:', error);
             return res.status(StatusCode.INTERNAL_SERVER_ERROR).json(transformResponse({
                 data: null,
-                message: 'An error occurred while creating the tag.',
+                message: 'Đã xảy ra lỗi khi tạo từ khóa.',
                 statusCode: StatusCode.INTERNAL_SERVER_ERROR,
             }));
         }
@@ -103,7 +104,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             if (!id || !name) {
                 return res.status(StatusCode.BAD_REQUEST).json(transformResponse({
                     data: null,
-                    message: 'Tag ID and name are required.',
+                    message: 'ID và tên từ khóa không được để trống.',
                     statusCode: StatusCode.BAD_REQUEST,
                 }));
             }
@@ -114,77 +115,46 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             if (existingTag) {
                 return res.status(StatusCode.CONFLICT).json(transformResponse({
                     data: null,
-                    message: 'Another tag with this name already exists.',
+                    message: 'Từ khóa này đã tồn tại.',
                     statusCode: StatusCode.CONFLICT,
                 }));
             }
 
             const [updatedTag] = await db('tags')
                 .where({ id })
-                .update({ name, status: status !== undefined ? status : 1 })
+                .update({ 
+                    name, 
+                    status: status !== undefined ? status : 1
+                })
                 .returning('*');
 
             if (!updatedTag) {
                 return res.status(StatusCode.NOT_FOUND).json(transformResponse({
                     data: null,
-                    message: 'Tag not found.',
+                    message: 'Không tìm thấy từ khóa.',
                     statusCode: StatusCode.NOT_FOUND,
                 }));
             }
 
             res.status(StatusCode.OK).json(transformResponse({
                 data: updatedTag,
-                message: 'Tag updated successfully.',
+                message: 'Cập nhật từ khóa thành công.',
                 statusCode: StatusCode.OK,
             }));
         } catch (error) {
-            console.error(error);
+            console.error('Lỗi khi cập nhật từ khóa:', error);
             return res.status(StatusCode.INTERNAL_SERVER_ERROR).json(transformResponse({
                 data: null,
-                message: 'An error occurred while updating the tag.',
-                statusCode: StatusCode.INTERNAL_SERVER_ERROR,
-            }));
-        }
-    } else if (req.method === 'PATCH') {
-        try {
-            const { id, status } = req.body;
-
-            if (!id || status === undefined) {
-                return res.status(StatusCode.BAD_REQUEST).json(transformResponse({
-                    data: null,
-                    message: 'Tag ID and status are required.',
-                    statusCode: StatusCode.BAD_REQUEST,
-                }));
-            }
-
-            const updatedTag = await db('tags')
-                .where({ id })
-                .update({ status })
-                .returning('*');
-
-            if (updatedTag.length === 0) {
-                return res.status(StatusCode.NOT_FOUND).json(transformResponse({
-                    data: null,
-                    message: 'Tag not found.',
-                    statusCode: StatusCode.NOT_FOUND,
-                }));
-            }
-
-            res.status(StatusCode.OK).json(transformResponse({
-                data: updatedTag[0],
-                message: 'Tag status updated successfully.',
-                statusCode: StatusCode.OK,
-            }));
-        } catch (error) {
-            console.error(error);
-            return res.status(StatusCode.INTERNAL_SERVER_ERROR).json(transformResponse({
-                data: null,
-                message: 'An error occurred while updating the tag status.',
+                message: 'Đã xảy ra lỗi khi cập nhật từ khóa.',
                 statusCode: StatusCode.INTERNAL_SERVER_ERROR,
             }));
         }
     } else {
-        res.setHeader('Allow', ['GET', 'POST', 'PUT', 'PATCH']);
-        return res.status(StatusCode.METHOD_NOT_ALLOWED).end(`Method ${req.method} Not Allowed`);
+        res.setHeader('Allow', ['GET', 'POST', 'PUT']);
+        return res.status(StatusCode.METHOD_NOT_ALLOWED).json(transformResponse({
+            data: null,
+            message: `Phương thức ${req.method} không được hỗ trợ.`,
+            statusCode: StatusCode.METHOD_NOT_ALLOWED,
+        }));
     }
 }
