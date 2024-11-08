@@ -38,7 +38,7 @@ const formSchema = z.object({
         .min(1, "Dung lượng ổ cứng không được để trống")
         .refine((val) => !isNaN(Number(val)) && Number(val) > 0, "Dung lượng ổ cứng phải là số dương"),
     interface: z.string()
-        .min(1, "Giao diện không được để trống"),
+        .min(1, "Cổng không được để trống"),
     brand: z.string()
         .min(1, "Hãng sản xuất không được để trống")
         .max(50, "Thương hiệu không được vượt quá 50 ký tự"),
@@ -233,10 +233,10 @@ const Page = ({ params }: { params: { id: string } }) => {
                                 name="interface"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel className="text-base lg:text-lg">Giao diện</FormLabel>
+                                        <FormLabel className="text-base lg:text-lg">Cổng kết nối</FormLabel>
                                         <FormControl>
                                             <Input 
-                                                placeholder="Nhập giao diện" 
+                                                placeholder="Nhập cổng kết nối"
                                                 {...field}
                                                 className="focus:ring-2 h-10 lg:h-12 text-base lg:text-lg"
                                             />
