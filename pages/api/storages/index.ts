@@ -16,12 +16,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
             const [{ count }] = await db('hard_drives')
                 .where('name', 'ilike', `%${search}%`)
+                .whereNot('status', -2)
                 .count();
             const totalItems = parseInt(count as string);
             const totalPages = Math.ceil(totalItems / limit);
 
             const hardDrives = await db('hard_drives')
                 .where('name', 'ilike', `%${search}%`)
+                .whereNot('status', -2)
                 .select('*')
                 .offset(offset)
                 .limit(limit)

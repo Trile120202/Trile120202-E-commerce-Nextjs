@@ -13,6 +13,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         try {
             const storage = await db('hard_drives')
                 .where('id', id)
+                .whereNot('status', -2)
                 .first();
 
             if (!storage) {
@@ -98,6 +99,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
             const [updatedStorage] = await db('hard_drives')
                 .where({ id })
+                .whereNot('status', -2)
                 .update({
                     name,
                     type,

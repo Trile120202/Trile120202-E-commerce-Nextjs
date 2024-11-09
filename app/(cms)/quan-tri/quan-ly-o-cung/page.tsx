@@ -1,24 +1,19 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table"
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
     Pagination,
     PaginationContent,
+    PaginationEllipsis,
     PaginationItem,
     PaginationLink,
     PaginationNext,
     PaginationPrevious,
 } from "@/components/ui/pagination"
 import { Button } from "@/components/ui/button"
-import { FaEdit, FaTrash, FaPlus, FaSearch } from 'react-icons/fa'
+import { FaEdit, FaTrash, FaPlus } from 'react-icons/fa'
 import { BsThreeDots } from 'react-icons/bs'
 import {
     DropdownMenu,
@@ -26,11 +21,11 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { Card, CardHeader, CardTitle } from "@/components/ui/card"
+import useApi from '@/lib/useApi';
+import DataTable from "@/components/custom/datatable";
+import { useToast } from "@/hooks/use-toast";
+import { ChangeStatus } from "@/components/custom/ChangeStatus";
 
 interface Storage {
     id: number;
@@ -60,40 +55,26 @@ interface ApiResponse {
 
 const Page = () => {
     const router = useRouter();
+    const { toast } = useToast();
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedStatus, setSelectedStatus] = useState<string>('all');
+    const [selectedType, setSelectedType] = useState<string>('all');
+    const [selectedCapacity, setSelectedCapacity] = useState<string>('all');
+    const [selectedBrand, setSelectedBrand] = useState<string>('all');
     const [searchKeyword, setSearchKeyword] = useState<string>('');
-    const [data, setData] = useState<Storage[]>([]);
-    const [pagination, setPagination] = useState<Pagination | null>(null);
-    const [loading, setLoading] = useState(false);
+    const [limit, setLimit] = useState<number>(10);
+    const [selectedId, setSelectedId] = useState<number | null>(null);
 
-    const columns = [
-        { accessor: 'id', label: 'ID', className: 'font-medium' },
-        { accessor: 'name', label: 'Tên ổ cứng', className: 'font-medium' },
-        { accessor: 'type', label: 'Loại', className: 'text-center' },
-        { accessor: 'capacity', label: 'Dung lượng', className: 'text-right' },
-        { accessor: 'interface', label: 'Chuẩn kết nối', className: 'text-center' },
-        { accessor: 'brand', label: 'Hãng', className: 'text-center' },
-        { accessor: 'status', label: 'Trạng thái', className: 'text-center' },
-        { accessor: 'actions', label: 'Thao tác', className: 'text-right' },
-    ];
+    const { data, loading, error, fetchData } = useApi<ApiResponse>(
+        `/api/storages?page=${currentPage}&limit=${limit}&search=${searchKeyword}${selectedStatus !== 'all' ? `&status=${selectedStatus}` : ''}${selectedType !== 'all' ? `&type=${selectedType}` : ''}${selectedCapacity !== 'all' ? `&capacity=${selectedCapacity}` : ''}${selectedBrand !== 'all' ? `&brand=${selectedBrand}` : ''}`,
+        {
+            method: 'GET'
+        }
+    );
 
     useEffect(() => {
-        const fetchData = async () => {
-            setLoading(true);
-            try {
-                const response = await fetch(`/api/storages?page=${currentPage}&search=${searchKeyword}${selectedStatus !== 'all' ? `&status=${selectedStatus}` : ''}`);
-                const result: ApiResponse = await response.json();
-                setData(result.data);
-                setPagination(result.pagination);
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            }
-            setLoading(false);
-        };
-
         fetchData();
-    }, [currentPage, selectedStatus, searchKeyword]);
+    }, [currentPage, selectedStatus, selectedType, selectedCapacity, selectedBrand, searchKeyword, limit]);
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
@@ -103,156 +84,227 @@ const Page = () => {
         router.push(`/quan-tri/quan-ly-o-cung/${id}`);
     };
 
-    const handleDelete = async (id: number) => {
-        try {
-            const response = await fetch(`/api/storages?id=${id}`, {
-                method: 'DELETE',
-            });
-            if (response.ok) {
-                setData(data.filter(item => item.id !== id));
-            }
-        } catch (error) {
-            console.error('Error deleting storage:', error);
-        }
-    };
-
     const getStatusColor = (status: number) => {
         return status === 1 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
     };
 
+    const columns = [
+        { accessor: 'id', label: 'ID', className: 'font-medium' },
+        { accessor: 'name', label: 'Tên ổ cứng', className: 'font-medium' },
+        { accessor: 'type', label: 'Loại', className: 'font-medium' },
+        { accessor: 'capacity', label: 'Dung lượng', render: (row: Storage) => `${row.capacity}GB` },
+        { accessor: 'interface', label: 'Chuẩn kết nối', className: 'font-medium' },
+        { accessor: 'brand', label: 'Hãng sản xuất', className: 'font-medium' },
+        {
+            accessor: 'status',
+            label: 'Trạng thái',
+            className: 'text-center hidden md:table-cell',
+            render: (row: Storage) => (
+                <span className={`hidden md:inline-block px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(row.status)}`}>
+                    {row.status === 1 ? 'Hoạt động' : 'Không hoạt động'}
+                </span>
+            )
+        },
+        {
+            accessor: 'actions',
+            label: 'Thao tác',
+            className: 'text-right',
+            render: (row: Storage) => (
+                <>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="h-8 w-8 p-0">
+                                <span className="sr-only">Open menu</span>
+                                <BsThreeDots className="h-4 w-4" />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => handleEdit(row.id)}>
+                                <FaEdit className="mr-2 h-4 w-4" />
+                                <span>Sửa</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => setSelectedId(row.id)}>
+                                <FaTrash className="mr-2 h-4 w-4" />
+                                <span>Xóa</span>
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+
+                    <ChangeStatus
+                        id={row.id}
+                        isOpen={selectedId === row.id}
+                        onClose={() => setSelectedId(null)}
+                        onSuccess={fetchData}
+                        endpoint="/api/storages/update-status"
+                        status={-2}
+                        title="Xác nhận xóa ổ cứng"
+                        description="Bạn có chắc chắn muốn xóa ổ cứng này? Hành động này không thể hoàn tác."
+                        confirmText="Xóa"
+                        cancelText="Hủy"
+                        successMessage="Xóa ổ cứng thành công"
+                        errorMessage="Có lỗi xảy ra khi xóa ổ cứng"
+                    />
+                </>
+            )
+        },
+    ];
+
     return (
-        <Card className="w-full shadow-lg">
-            <CardHeader className="bg-gradient-to-r from-blue-500 to-purple-600 text-white">
-                <div className="flex justify-between items-center">
-                    <CardTitle className="text-2xl font-bold">Quản lý ổ cứng</CardTitle>
-                    <Link href="/quan-tri/quan-ly-o-cung/tao-moi">
-                        <Button className="bg-green-500 hover:bg-green-600 transition duration-300">
-                            <FaPlus className="mr-2 h-4 w-4" />
-                            Tạo mới
-                        </Button>
-                    </Link>
-                </div>
-            </CardHeader>
-            <CardContent className="pt-6">
-                <div className="flex space-x-4 mb-6">
-                    <div className="relative">
-                        <Select onValueChange={setSelectedStatus} defaultValue="all">
-                            <SelectTrigger className="w-[200px] border-2 border-gray-300 rounded-lg">
-                                <SelectValue placeholder="Chọn trạng thái" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="all">Tất cả</SelectItem>
-                                <SelectItem value="1">Hoạt động</SelectItem>
-                                <SelectItem value="0">Không hoạt động</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
-                    <div className="relative w-64">
-                        <Input
-                            placeholder="Tìm kiếm ổ cứng"
-                            value={searchKeyword}
-                            onChange={(e) => setSearchKeyword(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2 border-2 border-gray-300 rounded-lg"
-                        />
-                        <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                    </div>
-                </div>
-                <div className="overflow-x-auto">
-                    <Table className="w-full">
-                        <TableHeader>
-                            <TableRow className="bg-gray-100">
-                                {columns.map((col, index) => (
-                                    <TableHead key={index} className={`${col.className} py-3`}>
-                                        {col.label}
-                                    </TableHead>
-                                ))}
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {loading ? (
-                                <TableRow>
-                                    <TableCell colSpan={columns.length} className="text-center py-4">
-                                        Loading...
-                                    </TableCell>
-                                </TableRow>
-                            ) : data && data.length > 0 ? data.map((row, index) => (
-                                <TableRow key={index} className="hover:bg-gray-50 transition duration-150">
-                                    {columns.map((col, colIndex) => (
-                                        <TableCell 
-                                            key={colIndex} 
-                                            className={`${col.className} py-4`}
-                                        >
-                                            {col.accessor === 'actions' ? (
-                                                <DropdownMenu>
-                                                    <DropdownMenuTrigger asChild>
-                                                        <Button variant="ghost" className="h-8 w-8 p-0">
-                                                            <span className="sr-only">Open menu</span>
-                                                            <BsThreeDots className="h-4 w-4" />
-                                                        </Button>
-                                                    </DropdownMenuTrigger>
-                                                    <DropdownMenuContent align="end">
-                                                        <DropdownMenuItem onClick={() => handleEdit(row.id)}>
-                                                            <FaEdit className="mr-2 h-4 w-4" />
-                                                            <span>Sửa</span>
-                                                        </DropdownMenuItem>
-                                                        <DropdownMenuItem onClick={() => handleDelete(row.id)}>
-                                                            <FaTrash className="mr-2 h-4 w-4" />
-                                                            <span>Xóa</span>
-                                                        </DropdownMenuItem>
-                                                    </DropdownMenuContent>
-                                                </DropdownMenu>
-                                            ) : col.accessor === 'status' ? (
-                                                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(row.status)}`}>
-                                                    {row.status === 1 ? 'Hoạt động' : 'Không hoạt động'}
-                                                </span>
-                                            ) : col.accessor === 'capacity' ? (
-                                                `${row[col.accessor]}`
-                                            ) : (
-                                                row[col.accessor as keyof Storage]
-                                            )}
-                                        </TableCell>
-                                    ))}
-                                </TableRow>
-                            )) : (
-                                <TableRow>
-                                    <TableCell colSpan={columns.length} className="text-center py-4">
-                                        Không có dữ liệu
-                                    </TableCell>
-                                </TableRow>
-                            )}
-                        </TableBody>
-                    </Table>
-                </div>
-                {pagination && (
-                    <Pagination className="mt-6">
-                        <PaginationContent>
-                            <PaginationItem>
-                                <PaginationPrevious 
-                                    onClick={() => handlePageChange(pagination.currentPage - 1)}
-                                    className={pagination.currentPage === 1 ? 'pointer-events-none opacity-50' : ''}
-                                />
-                            </PaginationItem>
-                            {[...Array(pagination.totalPages)].map((_, index) => (
-                                <PaginationItem key={index}>
-                                    <PaginationLink 
-                                        onClick={() => handlePageChange(index + 1)}
-                                        isActive={pagination.currentPage === index + 1}
-                                    >
-                                        {index + 1}
-                                    </PaginationLink>
+        <div className="flex flex-col h-full">
+            <div className="sticky top-0 z-20 bg-white shadow-sm">
+                <Card className="rounded-none shadow-none border-0">
+                    <CardHeader className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-4 md:p-6">
+                        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 md:gap-0">
+                            <CardTitle className="text-xl md:text-2xl font-bold">Quản lý ổ cứng</CardTitle>
+                            <Link href="/quan-tri/quan-ly-o-cung/tao-moi" className="w-full md:w-auto">
+                                <Button className="w-full md:w-auto bg-green-500 hover:bg-green-600 transition duration-300">
+                                    <FaPlus className="mr-2 h-4 w-4" />
+                                    Tạo mới
+                                </Button>
+                            </Link>
+                        </div>
+                    </CardHeader>
+                </Card>
+            </div>
+
+            <div className="flex-1 overflow-auto">
+                <DataTable
+                    data={data?.data || []}
+                    columns={columns}
+                    loading={loading}
+                    error={error ? new Error(error) : null}
+                    filters={{
+                        status: {
+                            value: selectedStatus,
+                            onChange: setSelectedStatus,
+                            options: [
+                                { label: 'Tất cả', value: 'all' },
+                                { label: 'Hoạt động', value: '1' },
+                                { label: 'Không hoạt động', value: '0' },
+                            ]
+                        },
+                        type: {
+                            value: selectedType,
+                            onChange: setSelectedType,
+                            options: [
+                                { label: 'Tất cả', value: 'all' },
+                                { label: 'HDD', value: 'HDD' },
+                                { label: 'SSD', value: 'SSD' },
+                                { label: 'NVMe', value: 'NVMe' },
+                            ]
+                        },
+                        capacity: {
+                            value: selectedCapacity,
+                            onChange: setSelectedCapacity,
+                            options: [
+                                { label: 'Tất cả', value: 'all' },
+                                { label: '128GB', value: '128' },
+                                { label: '256GB', value: '256' },
+                                { label: '512GB', value: '512' },
+                                { label: '1TB', value: '1000' },
+                                { label: '2TB', value: '2000' },
+                            ]
+                        },
+                        brand: {
+                            value: selectedBrand,
+                            onChange: setSelectedBrand,
+                            options: [
+                                { label: 'Tất cả', value: 'all' },
+                                { label: 'Samsung', value: 'Samsung' },
+                                { label: 'Western Digital', value: 'Western Digital' },
+                                { label: 'Seagate', value: 'Seagate' },
+                                { label: 'Kingston', value: 'Kingston' },
+                                { label: 'Crucial', value: 'Crucial' },
+                            ]
+                        },
+                        search: {
+                            value: searchKeyword,
+                            onChange: setSearchKeyword,
+                            placeholder: "Tìm kiếm ổ cứng"
+                        },
+                        limit: {
+                            value: limit,
+                            onChange: setLimit,
+                            options: [4, 10, 20, 50, 100]
+                        }
+                    }}
+                />
+            </div>
+
+            <div className="sticky bottom-0 bg-white border-t z-10">
+                {data?.pagination && (
+                    <div className="p-4">
+                        <Pagination>
+                            <PaginationContent>
+                                <PaginationItem>
+                                    <PaginationPrevious
+                                        onClick={() => handlePageChange(data.pagination.currentPage - 1)}
+                                        className={data.pagination.currentPage === 1 ? 'pointer-events-none opacity-50' : ''}
+                                    />
                                 </PaginationItem>
-                            ))}
-                            <PaginationItem>
-                                <PaginationNext 
-                                    onClick={() => handlePageChange(pagination.currentPage + 1)}
-                                    className={pagination.currentPage === pagination.totalPages ? 'pointer-events-none opacity-50' : ''}
-                                />
-                            </PaginationItem>
-                        </PaginationContent>
-                    </Pagination>
+
+                                {[...Array(data.pagination.totalPages)].map((_, index) => {
+                                    if (index === 0) return (
+                                        <PaginationItem key={index}>
+                                            <PaginationLink
+                                                onClick={() => handlePageChange(index + 1)}
+                                                isActive={data.pagination.currentPage === index + 1}
+                                            >
+                                                {index + 1}
+                                            </PaginationLink>
+                                        </PaginationItem>
+                                    )
+
+                                    if (
+                                        index === data.pagination.currentPage - 1 ||
+                                        index === data.pagination.currentPage - 2 ||
+                                        index === data.pagination.currentPage
+                                    ) return (
+                                        <PaginationItem key={index}>
+                                            <PaginationLink
+                                                onClick={() => handlePageChange(index + 1)}
+                                                isActive={data.pagination.currentPage === index + 1}
+                                            >
+                                                {index + 1}
+                                            </PaginationLink>
+                                        </PaginationItem>
+                                    )
+
+                                    if (index === data.pagination.totalPages - 1) return (
+                                        <PaginationItem key={index}>
+                                            <PaginationLink
+                                                onClick={() => handlePageChange(index + 1)}
+                                                isActive={data.pagination.currentPage === index + 1}
+                                            >
+                                                {index + 1}
+                                            </PaginationLink>
+                                        </PaginationItem>
+                                    )
+
+                                    if (
+                                        index === 1 ||
+                                        index === data.pagination.totalPages - 2
+                                    ) return (
+                                        <PaginationItem key={index}>
+                                            <PaginationEllipsis />
+                                        </PaginationItem>
+                                    )
+
+                                    return null
+                                })}
+
+                                <PaginationItem>
+                                    <PaginationNext
+                                        onClick={() => handlePageChange(data.pagination.currentPage + 1)}
+                                        className={data.pagination.currentPage === data.pagination.totalPages ? 'pointer-events-none opacity-50' : ''}
+                                    />
+                                </PaginationItem>
+                            </PaginationContent>
+                        </Pagination>
+                    </div>
                 )}
-            </CardContent>
-        </Card>
+            </div>
+        </div>
     );
 };
 
