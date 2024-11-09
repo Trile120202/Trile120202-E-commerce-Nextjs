@@ -13,13 +13,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             const limit = parseInt(req.query.limit as string) || 10;
             const offset = (page - 1) * limit;
 
-            const [{ count }] = await db('ram')
+            const [{ count }] = await db('displays')
                 .whereNot('status', -2)
                 .count();
             const totalItems = parseInt(count as string);
             const totalPages = Math.ceil(totalItems / limit);
 
-            const rams = await db('ram')
+            const displays = await db('displays')
                 .select('*')
                 .whereNot('status', -2)
                 .offset(offset)
@@ -27,8 +27,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 .orderBy('created_at', 'desc');
 
             res.status(StatusCode.OK).json(transformResponse({
-                data: rams,
-                message: 'RAM items retrieved successfully.',
+                data: displays,
+                message: 'Displays retrieved successfully.',
                 statusCode: StatusCode.OK,
                 pagination: {
                     currentPage: page,
@@ -41,18 +41,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             console.error(error);
             return res.status(StatusCode.INTERNAL_SERVER_ERROR).json(transformResponse({
                 data: null,
-                message: 'An error occurred while retrieving RAM items.',
+                message: 'An error occurred while retrieving displays.',
                 statusCode: StatusCode.INTERNAL_SERVER_ERROR,
             }));
         }
     } else if (req.method === 'POST') {
         try {
-            const { name, type, capacity, speed, brand, status } = req.body;
+            const { name, size, resolution, panel_type, refresh_rate, status } = req.body;
 
-            if (!name || !type || !capacity || !speed || !brand) {
+            if (!name) {
                 return res.status(StatusCode.BAD_REQUEST).json(transformResponse({
                     data: null,
-                    message: 'Tên RAM, loại RAM, dung lượng RAM, tốc độ RAM và thương hiệu không được để trống.',
+                    message: 'Tên màn hình không được để trống.',
                     statusCode: StatusCode.BAD_REQUEST,
                 }));
             }
@@ -60,39 +60,39 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             if (name.length > 100) {
                 return res.status(StatusCode.BAD_REQUEST).json(transformResponse({
                     data: null,
-                    message: 'Tên RAM không được vượt quá 100 ký tự.',
+                    message: 'Tên màn hình không được vượt quá 100 ký tự.',
                     statusCode: StatusCode.BAD_REQUEST,
                 }));
             }
 
-            if (type.length > 50) {
+            if (size && size.length > 50) {
                 return res.status(StatusCode.BAD_REQUEST).json(transformResponse({
                     data: null,
-                    message: 'Loại RAM không được vượt quá 50 ký tự.',
+                    message: 'Kích thước không được vượt quá 50 ký tự.',
                     statusCode: StatusCode.BAD_REQUEST,
                 }));
             }
 
-            if (brand.length > 50) {
+            if (resolution && resolution.length > 50) {
                 return res.status(StatusCode.BAD_REQUEST).json(transformResponse({
                     data: null,
-                    message: 'Thương hiệu không được vượt quá 50 ký tự.',
+                    message: 'Độ phân giải không được vượt quá 50 ký tự.',
                     statusCode: StatusCode.BAD_REQUEST,
                 }));
             }
 
-            if (typeof capacity !== 'number' || capacity <= 0) {
+            if (panel_type && panel_type.length > 50) {
                 return res.status(StatusCode.BAD_REQUEST).json(transformResponse({
                     data: null,
-                    message: 'Dung lượng RAM phải là số dương.',
+                    message: 'Loại tấm nền không được vượt quá 50 ký tự.',
                     statusCode: StatusCode.BAD_REQUEST,
                 }));
             }
 
-            if (typeof speed !== 'number' || speed <= 0) {
+            if (refresh_rate && refresh_rate.length > 20) {
                 return res.status(StatusCode.BAD_REQUEST).json(transformResponse({
                     data: null,
-                    message: 'Tốc độ RAM phải là số dương.',
+                    message: 'Tần số quét không được vượt quá 20 ký tự.',
                     statusCode: StatusCode.BAD_REQUEST,
                 }));
             }
@@ -105,36 +105,36 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 }));
             }
 
-            const [newRam] = await db('ram').insert({
+            const [newDisplay] = await db('displays').insert({
                 name,
-                type,
-                capacity,
-                speed,
-                brand,
+                size,
+                resolution,
+                panel_type,
+                refresh_rate,
                 status: status ?? 1,
                 created_at: db.fn.now(),
                 updated_at: db.fn.now(),
             }).returning('*');
 
-            if (!newRam) {
-                throw new Error('Không thể tạo RAM mới');
+            if (!newDisplay) {
+                throw new Error('Không thể tạo màn hình mới');
             }
 
             res.status(StatusCode.CREATED).json(transformResponse({
-                data: newRam,
-                message: 'Tạo RAM mới thành công.',
+                data: newDisplay,
+                message: 'Tạo màn hình mới thành công.',
                 statusCode: StatusCode.CREATED,
             }));
         } catch (error) {
-            console.error('Lỗi khi tạo RAM:', error);
+            console.error('Lỗi khi tạo màn hình:', error);
             return res.status(StatusCode.INTERNAL_SERVER_ERROR).json(transformResponse({
                 data: null,
-                message: 'Đã xảy ra lỗi khi tạo RAM mới.',
+                message: 'Đã xảy ra lỗi khi tạo màn hình mới.',
                 statusCode: StatusCode.INTERNAL_SERVER_ERROR,
             }));
         }
     } else {
-        res.setHeader('Allow', ['GET', 'POST', 'PATCH']);
+        res.setHeader('Allow', ['GET', 'POST']);
         return res.status(StatusCode.METHOD_NOT_ALLOWED).end(`Method ${req.method} Not Allowed`);
     }
 }

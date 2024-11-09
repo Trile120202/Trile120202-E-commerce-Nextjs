@@ -23,6 +23,8 @@ DROP TABLE IF EXISTS cart_items CASCADE;
 DROP TABLE IF EXISTS carts CASCADE;
 DROP TABLE IF EXISTS banners CASCADE;
 DROP TABLE IF EXISTS banner_images CASCADE;
+DROP TABLE IF EXISTS product_graphics_cards CASCADE;
+DROP TABLE IF EXISTS graphics_cards CASCADE;
 
 DROP FUNCTION IF EXISTS update_modified_column() CASCADE;
 
@@ -500,6 +502,103 @@ CREATE INDEX idx_banner_images_image_id ON banner_images (image_id);
 CREATE INDEX idx_banner_images_created_at ON banner_images (created_at);
 CREATE INDEX idx_banner_images_updated_at ON banner_images (updated_at);
 CREATE INDEX idx_banner_images_status ON banner_images (status);
+
+
+CREATE TABLE displays
+(
+    id          SERIAL PRIMARY KEY,
+    name        VARCHAR(100) NOT NULL,
+    size        VARCHAR(50),
+    resolution  VARCHAR(50),
+    panel_type  VARCHAR(50),
+    refresh_rate VARCHAR(20),
+    status      INT NOT NULL DEFAULT 1,
+    created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_displays_name ON displays (name);
+CREATE INDEX idx_displays_status ON displays (status);
+CREATE INDEX idx_displays_created_at ON displays (created_at);
+CREATE INDEX idx_displays_updated_at ON displays (updated_at);
+
+CREATE TABLE cpus
+(
+    id          SERIAL PRIMARY KEY,
+    name        VARCHAR(100) NOT NULL,
+    brand       VARCHAR(50),
+    model       VARCHAR(50),
+    cores       INT,
+    threads     INT,
+    base_clock  VARCHAR(20),
+    boost_clock VARCHAR(20),
+    cache       VARCHAR(50),
+    status      INT NOT NULL DEFAULT 1,
+    created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_cpus_name ON cpus (name);
+CREATE INDEX idx_cpus_brand ON cpus (brand);
+CREATE INDEX idx_cpus_status ON cpus (status);
+CREATE INDEX idx_cpus_created_at ON cpus (created_at);
+CREATE INDEX idx_cpus_updated_at ON cpus (updated_at);
+
+CREATE TABLE graphics_cards
+(
+    id          SERIAL PRIMARY KEY,
+    name        VARCHAR(100) NOT NULL,
+    brand       VARCHAR(50),
+    memory_size VARCHAR(20),
+    memory_type VARCHAR(20),
+    clock_speed VARCHAR(20),
+    status      INT NOT NULL DEFAULT 1,
+    created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_graphics_cards_name ON graphics_cards (name);
+CREATE INDEX idx_graphics_cards_brand ON graphics_cards (brand);
+CREATE INDEX idx_graphics_cards_status ON graphics_cards (status);
+CREATE INDEX idx_graphics_cards_created_at ON graphics_cards (created_at);
+CREATE INDEX idx_graphics_cards_updated_at ON graphics_cards (updated_at);
+
+CREATE TABLE product_displays
+(
+    id          SERIAL PRIMARY KEY,
+    product_id  INT NOT NULL,
+    display_id  INT NOT NULL,
+    status      INT NOT NULL DEFAULT 1,
+    created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (product_id) REFERENCES products (id) ON DELETE CASCADE,
+    FOREIGN KEY (display_id) REFERENCES displays (id) ON DELETE CASCADE
+);
+
+CREATE TABLE product_cpus
+(
+    id          SERIAL PRIMARY KEY,
+    product_id  INT NOT NULL,
+    cpu_id      INT NOT NULL,
+    status      INT NOT NULL DEFAULT 1,
+    created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (product_id) REFERENCES products (id) ON DELETE CASCADE,
+    FOREIGN KEY (cpu_id) REFERENCES cpus (id) ON DELETE CASCADE
+);
+
+CREATE TABLE product_graphics_cards
+(
+    id               SERIAL PRIMARY KEY,
+    product_id       INT NOT NULL,
+    graphics_card_id INT NOT NULL,
+    status           INT NOT NULL DEFAULT 1,
+    created_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (product_id) REFERENCES products (id) ON DELETE CASCADE,
+    FOREIGN KEY (graphics_card_id) REFERENCES graphics_cards (id) ON DELETE CASCADE
+);
+
 
 
 CREATE OR REPLACE FUNCTION update_modified_column()

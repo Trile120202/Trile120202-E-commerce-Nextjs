@@ -1,7 +1,7 @@
 'use client'
 import React, { useState } from 'react';
 import Link from 'next/link';
-import {FaHome, FaBox, FaUsers, FaCog, FaTags, FaImage, FaList, FaShoppingCart, FaMemory, FaHdd, FaPercent, FaUserTag} from 'react-icons/fa';
+import {FaHome, FaBox, FaUsers, FaCog, FaTags, FaImage, FaList, FaShoppingCart, FaMemory, FaHdd, FaPercent, FaUserTag, FaMicrochip, FaDesktop, FaVideo} from 'react-icons/fa';
 import {FaImages} from "react-icons/fa6";
 import { FaBars } from 'react-icons/fa';
 
@@ -13,6 +13,9 @@ const menuItems = [
     { href: '/quan-tri/quan-ly-media', icon: FaImage, label: 'Quản lý media' },
     { href: '/quan-tri/ram', icon: FaMemory, label: 'Quản lý ram' },
     { href: '/quan-tri/quan-ly-o-cung', icon: FaHdd, label: 'Quản lý ổ cứng' },
+    { href: '/quan-tri/quan-ly-card-man-hinh', icon: FaVideo, label: 'Quản lý card màn hình' },
+    { href: '/quan-tri/quan-ly-cpu', icon: FaMicrochip, label: 'Quản lý CPU' },
+    { href: '/quan-tri/quan-ly-man-hinh', icon: FaDesktop, label: 'Quản lý màn hình' },
     { href: '/quan-tri/quan-ly-don-hang', icon: FaShoppingCart, label: 'Quản lý đơn hàng' },
     { href: '/quan-tri/quan-ly-banner', icon: FaImages, label: 'Quản lý banner' },
     { href: '/quan-tri/quan-ly-khuyen-mai', icon: FaPercent, label: 'Quản lý khuyến mãi' },

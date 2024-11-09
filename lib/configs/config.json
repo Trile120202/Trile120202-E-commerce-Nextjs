@@ -170,5 +170,161 @@
       "HP Spectre x360",
       "HP Envy x360"
     ]
+  },
+  "cpu": {
+    "brands": [
+      "Intel",
+      "AMD"
+    ],
+    "models": {
+      "Intel": [
+        "Core i9-13900K",
+        "Core i9-13900KF", 
+        "Core i7-13700K",
+        "Core i7-13700KF",
+        "Core i5-13600K",
+        "Core i5-13600KF",
+        "Core i9-12900K",
+        "Core i9-12900KF",
+        "Core i7-12700K", 
+        "Core i7-12700KF",
+        "Core i5-12600K",
+        "Core i5-12600KF"
+      ],
+      "AMD": [
+        "Ryzen 9 7950X3D",
+        "Ryzen 9 7900X3D",
+        "Ryzen 9 7950X",
+        "Ryzen 9 7900X",
+        "Ryzen 7 7800X3D",
+        "Ryzen 7 7700X",
+        "Ryzen 5 7600X",
+        "Ryzen 9 5950X",
+        "Ryzen 9 5900X",
+        "Ryzen 7 5800X3D",
+        "Ryzen 7 5800X",
+        "Ryzen 5 5600X"
+      ]
+    },
+    "cache": [
+      "36MB",
+      "32MB",
+      "30MB",
+      "25MB",
+      "24MB",
+      "20MB",
+      "16MB",
+      "12MB",
+      "8MB",
+      "6MB",
+      "4MB"
+    ],
+    "base_clock": [
+      "3.0 GHz",
+      "3.2 GHz", 
+      "3.4 GHz",
+      "3.6 GHz",
+      "3.8 GHz",
+      "4.0 GHz",
+      "4.2 GHz",
+      "4.4 GHz",
+      "4.5 GHz",
+      "4.7 GHz",
+      "4.8 GHz",
+      "5.0 GHz"
+    ],
+    "boost_clock": [
+      "4.5 GHz",
+      "4.7 GHz",
+      "4.9 GHz",
+      "5.0 GHz", 
+      "5.2 GHz",
+      "5.4 GHz",
+      "5.6 GHz",
+      "5.7 GHz",
+      "5.8 GHz",
+      "6.0 GHz"
+    ]
+  },
+  "graphics_cards": {
+    "brand": [
+      "NVIDIA",
+      "AMD",
+      "Intel",
+      "ASUS",
+      "MSI",
+      "Gigabyte",
+      "EVGA",
+      "Sapphire",
+      "PowerColor",
+      "Zotac"
+    ],
+    "memory_size": [
+      "2GB",
+      "4GB", 
+      "6GB",
+      "8GB",
+      "10GB",
+      "12GB",
+      "16GB",
+      "24GB"
+    ],
+    "memory_type": [
+      "GDDR5",
+      "GDDR5X",
+      "GDDR6",
+      "GDDR6X",
+      "HBM2",
+      "HBM2e"
+    ],
+    "clock_speed": [
+      "1.0 GHz",
+      "1.2 GHz",
+      "1.4 GHz", 
+      "1.6 GHz",
+      "1.8 GHz",
+      "2.0 GHz",
+      "2.2 GHz",
+      "2.4 GHz",
+      "2.6 GHz",
+      "2.8 GHz"
+    ]
+  },
+  "displays": {
+    "size": [
+      "21.5",
+      "23.8",
+      "24", 
+      "27",
+      "32",
+      "34",
+      "49",
+      "55"
+    ],
+    "resolution": [
+      "1920x1080",
+      "2560x1440",
+      "3440x1440",
+      "3840x2160",
+      "5120x1440",
+      "7680x4320"
+    ],
+    "panel_type": [
+      "IPS",
+      "VA",
+      "TN",
+      "OLED",
+      "Mini LED"
+    ],
+    "refresh_rate": [
+      "60Hz",
+      "75Hz",
+      "100Hz", 
+      "120Hz",
+      "144Hz",
+      "165Hz",
+      "240Hz",
+      "360Hz"
+    ]
   }
 }
