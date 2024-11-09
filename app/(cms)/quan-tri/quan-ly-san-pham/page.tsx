@@ -3,15 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import {
-    Pagination,
-    PaginationContent,
-    PaginationEllipsis,
-    PaginationItem,
-    PaginationLink,
-    PaginationNext,
-    PaginationPrevious,
-} from "@/components/ui/pagination"
 import { Button } from "@/components/ui/button"
 import { FaEdit, FaTrash, FaPlus } from 'react-icons/fa'
 import { BsThreeDots } from 'react-icons/bs'
@@ -26,6 +17,7 @@ import useApi from '@/lib/useApi';
 import DataTable from "@/components/custom/datatable";
 import { useToast } from "@/hooks/use-toast";
 import { ChangeStatus } from "@/components/custom/ChangeStatus";
+import Image from 'next/image';
 
 interface Product {
     product_id: number;
@@ -34,39 +26,36 @@ interface Product {
     price: string;
     stock_quantity: number;
     product_status: number;
-    product_created_at: string;
-    product_updated_at: string;
-}
-
-interface Pagination {
-    currentPage: number;
-    pageSize: number;
-    totalItems: string;
-    totalPages: number;
+    thumbnail_url: string;
+    thumbnail_alt_text: string;
+    ram_names: string;
+    storage_names: string;
 }
 
 interface ApiResponse {
     status: number;
     message: string;
     data: Product[];
-    pagination: Pagination;
+    pagination: {
+        currentPage: number;
+        pageSize: number;
+        totalItems: string;
+        totalPages: number;
+    };
 }
 
 const Page = () => {
     const router = useRouter();
     const { toast } = useToast();
     const [currentPage, setCurrentPage] = useState(1);
-    const [selectedStatus, setSelectedStatus] = useState<string>('all');
-    const [selectedCategory, setSelectedCategory] = useState<string>('all');
-    const [searchKeyword, setSearchKeyword] = useState<string>('');
-    const [limit, setLimit] = useState<number>(10);
+    const [selectedStatus, setSelectedStatus] = useState('all');
+    const [searchKeyword, setSearchKeyword] = useState('');
+    const [limit, setLimit] = useState(10);
     const [selectedId, setSelectedId] = useState<number | null>(null);
 
     const { data, loading, error, fetchData } = useApi<ApiResponse>(
-        `/api/products?page=${currentPage}&limit=${limit}&search=${encodeURIComponent(searchKeyword)}${selectedStatus !== 'all' ? `&status=${selectedStatus}` : ''}${selectedCategory !== 'all' ? `&category=${selectedCategory}` : ''}`,
-        {
-            method: 'GET'
-        }
+        `/api/products?page=${currentPage}&limit=${limit}&search=${encodeURIComponent(searchKeyword)}${selectedStatus !== 'all' ? `&status=${selectedStatus}` : ''}`,
+        { method: 'GET' }
     );
 
     useEffect(() => {
@@ -75,55 +64,22 @@ const Page = () => {
         } catch (err) {
             console.error('Error fetching products:', err);
             toast({
-                variant: "destructive", 
+                variant: "destructive",
                 title: "Lỗi",
                 description: "Có lỗi xảy ra khi tải dữ liệu sản phẩm"
             });
         }
-    }, [currentPage, selectedStatus, selectedCategory, searchKeyword, limit]);
-
-    const handlePageChange = (page: number) => {
-        setCurrentPage(page);
-    };
+    }, [currentPage, selectedStatus, searchKeyword, limit]);
 
     const handleEdit = (id: number) => {
         router.push(`/quan-tri/quan-ly-san-pham/${id}`);
     };
 
-    const handleDelete = async (id: number) => {
-        try {
-            const response = await fetch('/api/products/update-status', {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    id,
-                    status: -2
-                }),
-            });
-
-            const result = await response.json();
-
-            if (!response.ok) {
-                throw new Error(result.message || 'Có lỗi xảy ra khi xóa sản phẩm');
-            }
-
-            toast({
-                title: "Thành công",
-                description: "Xóa sản phẩm thành công",
-            });
-
-            fetchData();
-
-        } catch (error) {
-            console.error('Error deleting product:', error);
-            toast({
-                variant: "destructive",
-                title: "Lỗi",
-                description: (error as Error).message || "Có lỗi xảy ra khi xóa sản phẩm",
-            });
-        }
+    const formatPrice = (price: string) => {
+        return new Intl.NumberFormat('vi-VN', {
+            style: 'currency',
+            currency: 'VND'
+        }).format(parseFloat(price));
     };
 
     const getStatusColor = (status: number) => {
@@ -131,17 +87,76 @@ const Page = () => {
     };
 
     const columns = [
-        { accessor: 'product_id', label: 'ID', className: 'font-medium' },
-        { accessor: 'product_name', label: 'Tên sản phẩm', className: 'font-medium' },
-        { accessor: 'categories', label: 'Danh mục', className: 'text-center' },
-        { accessor: 'price', label: 'Giá', className: 'text-right' },
-        { accessor: 'stock_quantity', label: 'Tồn kho', className: 'text-right' },
+        {
+            accessor: 'thumbnail',
+            label: 'Hình ảnh',
+            className: 'w-24',
+            render: (row: Product) => (
+                <div className="relative w-20 h-20 rounded-lg overflow-hidden">
+                    <Image
+                        src={row.thumbnail_url}
+                        alt={row.thumbnail_alt_text}
+                        fill
+                        className="object-cover"
+                    />
+                </div>
+            )
+        },
+        {
+            accessor: 'product_info',
+            label: 'Thông tin sản phẩm',
+            className: 'min-w-[300px]',
+            render: (row: Product) => (
+                <div className="space-y-2">
+                    <h3 className="font-medium text-gray-900">{row.product_name}</h3>
+                    <div className="flex flex-wrap gap-2 text-sm text-gray-500">
+                        {row.categories.split(',').map((category, index) => (
+                            <span key={index} className="px-2 py-1 bg-gray-100 rounded-full">
+                                {category.trim()}
+                            </span>
+                        ))}
+                    </div>
+                    <div className="flex gap-4 text-sm text-gray-600">
+                        {row.ram_names && (
+                            <span className="flex items-center gap-1">
+                                <span className="font-medium">RAM:</span> {row.ram_names}
+                            </span>
+                        )}
+                        {row.storage_names && (
+                            <span className="flex items-center gap-1">
+                                <span className="font-medium">Bộ nhớ:</span> {row.storage_names}
+                            </span>
+                        )}
+                    </div>
+                </div>
+            )
+        },
+        {
+            accessor: 'price',
+            label: 'Giá',
+            className: 'text-right',
+            render: (row: Product) => (
+                <span className="font-medium text-gray-900">
+                    {formatPrice(row.price)}
+                </span>
+            )
+        },
+        {
+            accessor: 'stock_quantity',
+            label: 'Tồn kho',
+            className: 'text-center',
+            render: (row: Product) => (
+                <span className="font-medium">
+                    {row.stock_quantity.toLocaleString()}
+                </span>
+            )
+        },
         {
             accessor: 'product_status',
             label: 'Trạng thái',
-            className: 'text-center hidden md:table-cell',
+            className: 'text-center',
             render: (row: Product) => (
-                <span className={`hidden md:inline-block px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(row.product_status)}`}>
+                <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(row.product_status)}`}>
                     {row.product_status === 1 ? 'Còn hàng' : 'Hết hàng'}
                 </span>
             )
@@ -157,7 +172,7 @@ const Page = () => {
                             variant="outline"
                             size="sm"
                             onClick={() => handleEdit(row.product_id)}
-                            className="hidden md:flex items-center gap-2"
+                            className="hidden md:flex items-center gap-2 hover:bg-blue-50 hover:text-blue-600"
                         >
                             <FaEdit className="h-4 w-4" />
                             Sửa
@@ -166,7 +181,7 @@ const Page = () => {
                             variant="destructive"
                             size="sm"
                             onClick={() => setSelectedId(row.product_id)}
-                            className="hidden md:flex items-center gap-2"
+                            className="hidden md:flex items-center gap-2 hover:bg-red-600"
                         >
                             <FaTrash className="h-4 w-4" />
                             Xóa
@@ -212,7 +227,7 @@ const Page = () => {
 
     return (
         <div className="flex flex-col min-h-screen bg-gray-50">
-            <div className="sticky top-0 z-20 bg-white shadow">
+            <div className="sticky top-0 z-20 bg-white shadow-lg">
                 <Card className="rounded-none border-0">
                     <CardHeader className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
                         <div className="container mx-auto px-4 py-6">
@@ -231,7 +246,7 @@ const Page = () => {
             </div>
 
             <div className="flex-1 container mx-auto px-4 py-8">
-                <Card className="shadow-lg">
+                <Card className="shadow-xl rounded-xl overflow-hidden">
                     <div className="p-6">
                         <DataTable
                             data={data?.data || []}
@@ -262,83 +277,6 @@ const Page = () => {
                         />
                     </div>
                 </Card>
-            </div>
-
-            <div className="sticky bottom-0 bg-white border-t shadow-lg">
-                {data?.pagination && (
-                    <div className="container mx-auto px-4 py-4">
-                        <Pagination>
-                            <PaginationContent>
-                                <PaginationItem>
-                                    <PaginationPrevious
-                                        onClick={() => handlePageChange(data.pagination.currentPage - 1)}
-                                        className={`${data.pagination.currentPage === 1 ? 'pointer-events-none opacity-50' : ''} hover:bg-gray-100`}
-                                    />
-                                </PaginationItem>
-
-                                {[...Array(data.pagination.totalPages)].map((_, index) => {
-                                    if (index === 0) return (
-                                        <PaginationItem key={index}>
-                                            <PaginationLink
-                                                onClick={() => handlePageChange(index + 1)}
-                                                isActive={data.pagination.currentPage === index + 1}
-                                                className="hover:bg-gray-100"
-                                            >
-                                                {index + 1}
-                                            </PaginationLink>
-                                        </PaginationItem>
-                                    )
-
-                                    if (
-                                        index === data.pagination.currentPage - 1 ||
-                                        index === data.pagination.currentPage - 2 ||
-                                        index === data.pagination.currentPage
-                                    ) return (
-                                        <PaginationItem key={index}>
-                                            <PaginationLink
-                                                onClick={() => handlePageChange(index + 1)}
-                                                isActive={data.pagination.currentPage === index + 1}
-                                                className="hover:bg-gray-100"
-                                            >
-                                                {index + 1}
-                                            </PaginationLink>
-                                        </PaginationItem>
-                                    )
-
-                                    if (index === data.pagination.totalPages - 1) return (
-                                        <PaginationItem key={index}>
-                                            <PaginationLink
-                                                onClick={() => handlePageChange(index + 1)}
-                                                isActive={data.pagination.currentPage === index + 1}
-                                                className="hover:bg-gray-100"
-                                            >
-                                                {index + 1}
-                                            </PaginationLink>
-                                        </PaginationItem>
-                                    )
-
-                                    if (
-                                        index === 1 ||
-                                        index === data.pagination.totalPages - 2
-                                    ) return (
-                                        <PaginationItem key={index}>
-                                            <PaginationEllipsis />
-                                        </PaginationItem>
-                                    )
-
-                                    return null
-                                })}
-
-                                <PaginationItem>
-                                    <PaginationNext
-                                        onClick={() => handlePageChange(data.pagination.currentPage + 1)}
-                                        className={`${data.pagination.currentPage === data.pagination.totalPages ? 'pointer-events-none opacity-50' : ''} hover:bg-gray-100`}
-                                    />
-                                </PaginationItem>
-                            </PaginationContent>
-                        </Pagination>
-                    </div>
-                )}
             </div>
         </div>
     );
