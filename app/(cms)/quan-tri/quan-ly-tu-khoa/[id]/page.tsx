@@ -17,16 +17,17 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
+import SelectStatus from "@/components/custom/SelectStatus";
+import { Status } from "@/lib/configs/enum.status";
 
 const formSchema = z.object({
     name: z.string()
         .min(1, "Tên từ khóa không được để trống")
         .max(100, "Tên từ khóa không được vượt quá 100 ký tự"),
-    status: z.boolean().default(true)
+    status: z.number().default(Status.ACTIVE)
 });
 
 const Page = ({ params }: { params: { id: string } }) => {
@@ -40,7 +41,7 @@ const Page = ({ params }: { params: { id: string } }) => {
         resolver: zodResolver(formSchema),
         defaultValues: {
             name: "",
-            status: true
+            status: Status.ACTIVE
         },
     });
 
@@ -58,7 +59,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                 setTag(data.data);
                 form.reset({
                     name: data.data.name,
-                    status: data.data.status === 1
+                    status: data.data.status
                 });
             } catch (error) {
                 console.error('Error fetching tag:', error);
@@ -85,10 +86,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    ...values,
-                    status: values.status ? 1 : 0
-                }),
+                body: JSON.stringify(values),
             });
 
             const data = await response.json();
@@ -169,18 +167,15 @@ const Page = ({ params }: { params: { id: string } }) => {
                                 name="status"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <div className="flex items-center gap-2">
-                                            <FormLabel>
-                                                Trạng thái
-                                            </FormLabel>
-                                        </div>
+                                        <FormLabel>Trạng thái</FormLabel>
                                         <FormControl>
-                                            <Switch
-                                                checked={field.value}
-                                                onCheckedChange={field.onChange}
-                                                className="scale-110 lg:scale-125"
+                                            <SelectStatus
+                                                value={field.value}
+                                                onValueChange={field.onChange}
+                                                options="basic"
                                             />
                                         </FormControl>
+                                        <FormMessage />
                                     </FormItem>
                                 )}
                             />

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import * as React from 'react';
 import { useRouter } from 'next/navigation';
 import { Save } from 'lucide-react';
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -23,24 +23,31 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+import { Status } from "@/lib/configs/enum.status";
 
 const formSchema = z.object({
     name: z.string()
         .min(1, "Tên từ khóa không được để trống")
         .max(100, "Tên từ khóa không được vượt quá 100 ký tự"),
-    status: z.boolean().default(true)
+    status: z.number().default(Status.ACTIVE)
 });
 
 const Page = () => {
     const router = useRouter();
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = React.useState(false);
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
             name: "",
-            status: true
+            status: Status.ACTIVE
         },
     });
 
@@ -52,10 +59,7 @@ const Page = () => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    ...values,
-                    status: values.status ? 1 : 0
-                }),
+                body: JSON.stringify(values),
             });
 
             if (!response.ok) {
@@ -103,19 +107,23 @@ const Page = () => {
                                 control={form.control}
                                 name="status"
                                 render={({ field }) => (
-                                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 lg:p-6 shadow-sm">
-                                        <div className="space-y-0.5">
-                                            <FormLabel className="text-base lg:text-lg">
-                                                Trạng thái
-                                            </FormLabel>
-                                        </div>
-                                        <FormControl>
-                                            <Switch
-                                                checked={field.value}
-                                                onCheckedChange={field.onChange}
-                                                className="scale-110 lg:scale-125"
-                                            />
-                                        </FormControl>
+                                    <FormItem>
+                                        <FormLabel className="text-base lg:text-lg">Trạng thái</FormLabel>
+                                        <Select
+                                            value={field.value.toString()}
+                                            onValueChange={(value) => field.onChange(Number(value))}
+                                        >
+                                            <FormControl>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Chọn trạng thái" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                <SelectItem value={Status.INACTIVE.toString()}>Không hoạt động</SelectItem>
+                                                <SelectItem value={Status.ACTIVE.toString()}>Hoạt động</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                        <FormMessage />
                                     </FormItem>
                                 )}
                             />

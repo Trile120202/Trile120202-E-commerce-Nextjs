@@ -17,7 +17,6 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -28,6 +27,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import SelectStatus from "@/components/custom/SelectStatus";
 import config from "@/lib/configs/config.json";
 
 const formSchema = z.object({
@@ -43,7 +43,7 @@ const formSchema = z.object({
     brand: z.string()
         .min(1, "Hãng sản xuất không được để trống")
         .max(50, "Thương hiệu không được vượt quá 50 ký tự"),
-    status: z.boolean().default(true)
+    status: z.number().default(1)
 });
 
 const Page = ({ params }: { params: { id: string } }) => {
@@ -75,7 +75,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                     capacity: data.data.capacity + "GB",
                     speed: data.data.speed + "MHz",
                     brand: data.data.brand,
-                    status: data.data.status === 1
+                    status: data.data.status
                 });
             } catch (error) {
                 console.error('Error fetching RAM:', error);
@@ -106,7 +106,6 @@ const Page = ({ params }: { params: { id: string } }) => {
                     ...values,
                     capacity: parseInt(values.capacity),
                     speed: parseInt(values.speed.replace("MHz", "")),
-                    status: values.status ? 1 : 0
                 }),
             });
 
@@ -174,9 +173,9 @@ const Page = ({ params }: { params: { id: string } }) => {
                                 name="name"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Tên RAM</FormLabel>
+                                        <FormLabel className="text-base lg:text-lg">Tên RAM</FormLabel>
                                         <FormControl>
-                                            <Input {...field} placeholder="Nhập tên RAM" />
+                                            <Input {...field} placeholder="Nhập tên RAM" className="h-10 lg:h-12 text-base lg:text-lg" />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -188,10 +187,10 @@ const Page = ({ params }: { params: { id: string } }) => {
                                 name="type"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Loại RAM</FormLabel>
+                                        <FormLabel className="text-base lg:text-lg">Loại RAM</FormLabel>
                                         <Select onValueChange={field.onChange} value={field.value}>
                                             <FormControl>
-                                                <SelectTrigger>
+                                                <SelectTrigger className="focus:ring-2 h-10 lg:h-12 text-base lg:text-lg">
                                                     <SelectValue placeholder="Chọn loại RAM" />
                                                 </SelectTrigger>
                                             </FormControl>
@@ -213,10 +212,10 @@ const Page = ({ params }: { params: { id: string } }) => {
                                 name="capacity"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Dung lượng</FormLabel>
+                                        <FormLabel className="text-base lg:text-lg">Dung lượng</FormLabel>
                                         <Select onValueChange={field.onChange} value={field.value}>
                                             <FormControl>
-                                                <SelectTrigger>
+                                                <SelectTrigger className="focus:ring-2 h-10 lg:h-12 text-base lg:text-lg">
                                                     <SelectValue placeholder="Chọn dung lượng RAM" />
                                                 </SelectTrigger>
                                             </FormControl>
@@ -238,10 +237,10 @@ const Page = ({ params }: { params: { id: string } }) => {
                                 name="speed"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Tốc độ</FormLabel>
+                                        <FormLabel className="text-base lg:text-lg">Tốc độ</FormLabel>
                                         <Select onValueChange={field.onChange} value={field.value}>
                                             <FormControl>
-                                                <SelectTrigger>
+                                                <SelectTrigger className="focus:ring-2 h-10 lg:h-12 text-base lg:text-lg">
                                                     <SelectValue placeholder="Chọn tốc độ RAM" />
                                                 </SelectTrigger>
                                             </FormControl>
@@ -263,10 +262,21 @@ const Page = ({ params }: { params: { id: string } }) => {
                                 name="brand"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Thương hiệu</FormLabel>
-                                        <FormControl>
-                                            <Input {...field} placeholder="Nhập thương hiệu" />
-                                        </FormControl>
+                                        <FormLabel className="text-base lg:text-lg">Thương hiệu</FormLabel>
+                                        <Select onValueChange={field.onChange} value={field.value}>
+                                            <FormControl>
+                                                <SelectTrigger className="focus:ring-2 h-10 lg:h-12 text-base lg:text-lg">
+                                                    <SelectValue placeholder="Chọn hãng sản xuất" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                {config.ram.brands.map((brand) => (
+                                                    <SelectItem key={brand} value={brand}>
+                                                        {brand}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
                                         <FormMessage />
                                     </FormItem>
                                 )}
@@ -277,18 +287,15 @@ const Page = ({ params }: { params: { id: string } }) => {
                                 name="status"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <div className="flex items-center gap-2">
-                                            <FormLabel>
-                                                Trạng thái
-                                            </FormLabel>
-                                        </div>
+                                        <FormLabel className="text-base lg:text-lg">Trạng thái</FormLabel>
                                         <FormControl>
-                                            <Switch
-                                                checked={field.value}
-                                                onCheckedChange={field.onChange}
-                                                className="scale-110 lg:scale-125"
+                                            <SelectStatus
+                                                value={field.value}
+                                                onValueChange={field.onChange}
+                                                options="basic"
                                             />
                                         </FormControl>
+                                        <FormMessage />
                                     </FormItem>
                                 )}
                             />

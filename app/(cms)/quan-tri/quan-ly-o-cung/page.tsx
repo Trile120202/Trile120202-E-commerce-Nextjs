@@ -175,7 +175,7 @@ const Page = () => {
                                         Loading...
                                     </TableCell>
                                 </TableRow>
-                            ) : data.map((row, index) => (
+                            ) : data && data.length > 0 ? data.map((row, index) => (
                                 <TableRow key={index} className="hover:bg-gray-50 transition duration-150">
                                     {columns.map((col, colIndex) => (
                                         <TableCell 
@@ -213,7 +213,13 @@ const Page = () => {
                                         </TableCell>
                                     ))}
                                 </TableRow>
-                            ))}
+                            )) : (
+                                <TableRow>
+                                    <TableCell colSpan={columns.length} className="text-center py-4">
+                                        Không có dữ liệu
+                                    </TableCell>
+                                </TableRow>
+                            )}
                         </TableBody>
                     </Table>
                 </div>

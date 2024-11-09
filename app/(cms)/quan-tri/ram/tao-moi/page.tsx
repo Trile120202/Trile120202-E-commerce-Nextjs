@@ -23,7 +23,6 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
 import {
     Select,
     SelectContent,
@@ -31,6 +30,8 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import SelectStatus from "@/components/custom/SelectStatus";
+import { Status } from "@/lib/configs/enum.status";
 
 import ramConfig from "@/lib/configs/config.json";
 
@@ -47,7 +48,7 @@ const formSchema = z.object({
     brand: z.string()
         .min(1, "Hãng sản xuất không được để trống")
         .max(50, "Thương hiệu không được vượt quá 50 ký tự"),
-    status: z.boolean().default(true)
+    status: z.number().default(Status.ACTIVE)
 });
 
 const Page = () => {
@@ -62,7 +63,7 @@ const Page = () => {
             capacity: "",
             speed: "",
             brand: "",
-            status: true
+            status: Status.ACTIVE
         },
     });
 
@@ -78,7 +79,6 @@ const Page = () => {
                     ...values,
                     capacity: parseInt(values.capacity),
                     speed: parseInt(values.speed.replace("MHz", "")),
-                    status: values.status ? 1 : 0
                 }),
             });
 
@@ -204,13 +204,20 @@ const Page = () => {
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel className="text-base lg:text-lg">Hãng sản xuất</FormLabel>
-                                        <FormControl>
-                                            <Input 
-                                                placeholder="Nhập hãng sản xuất" 
-                                                {...field}
-                                                className="focus:ring-2 h-10 lg:h-12 text-base lg:text-lg"
-                                            />
-                                        </FormControl>
+                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                            <FormControl>
+                                                <SelectTrigger className="focus:ring-2 h-10 lg:h-12 text-base lg:text-lg">
+                                                    <SelectValue placeholder="Chọn hãng sản xuất" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                {ramConfig.ram.brands.map((brand) => (
+                                                    <SelectItem key={brand} value={brand}>
+                                                        {brand}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
                                         <FormMessage />
                                     </FormItem>
                                 )}
@@ -220,19 +227,16 @@ const Page = () => {
                                 control={form.control}
                                 name="status"
                                 render={({ field }) => (
-                                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 lg:p-6 shadow-sm">
-                                        <div className="space-y-0.5">
-                                            <FormLabel className="text-base lg:text-lg">
-                                                Trạng thái
-                                            </FormLabel>
-                                        </div>
+                                    <FormItem>
+                                        <FormLabel className="text-base lg:text-lg">Trạng thái</FormLabel>
                                         <FormControl>
-                                            <Switch
-                                                checked={field.value}
-                                                onCheckedChange={field.onChange}
-                                                className="scale-110 lg:scale-125"
+                                            <SelectStatus
+                                                value={field.value}
+                                                onValueChange={field.onChange}
+                                                options="basic"
                                             />
                                         </FormControl>
+                                        <FormMessage />
                                     </FormItem>
                                 )}
                             />

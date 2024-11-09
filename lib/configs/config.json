@@ -23,6 +23,27 @@
       "4800MHz",
       "5200MHz",
       "5600MHz"
+    ],
+    "brands": [
+      "Kingston",
+      "Corsair", 
+      "G.Skill",
+      "Crucial",
+      "Samsung",
+      "Team Group",
+      "Adata",
+      "Gigabyte",
+      "Thermaltake",
+      "Patriot",
+      "Silicon Power",
+      "Apacer",
+      "Transcend",
+      "PNY",
+      "Mushkin",
+      "Geil",
+      "Klevv",
+      "Lexar",
+      "Zadak"
     ]
   },
   "hard_drives": {
@@ -49,6 +70,23 @@
       "2.5\"",
       "3.5\"",
       "M.2"
+    ],
+    "brands": [
+      "Samsung",
+      "Western Digital",
+      "Seagate",
+      "Crucial",
+      "Kingston",
+      "SanDisk",
+      "Intel",
+      "Corsair",
+      "Adata",
+      "Team Group",
+      "Gigabyte",
+      "MSI",
+      "Transcend",
+      "PNY",
+      "Lexar"
     ]
   },
   "banners": {
