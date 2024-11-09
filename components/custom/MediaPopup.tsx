@@ -54,6 +54,7 @@ function MediaPopup({ open, onOpenChange, onSelect, multiple = false }: MediaPop
     const [searchKeyword, setSearchKeyword] = useState<string>('');
     const [currentPage, setCurrentPage] = useState(1);
     const [limit] = useState(12);
+    const [uploadedImages, setUploadedImages] = useState<{url: string, name: string}[]>([]);
 
     const { data, fetchData } = useApi<ApiResponse>(`/api/image?page=${currentPage}&limit=${limit}&search=${searchKeyword}`, {
         method: 'GET'
@@ -234,6 +235,11 @@ function MediaPopup({ open, onOpenChange, onSelect, multiple = false }: MediaPop
                                 endpoint="imageUploader"
                                 onClientUploadComplete={(res: any[]) => {
                                     if (res && res.length > 0) {
+                                        const newImages = res.map(file => ({
+                                            url: file.url,
+                                            name: file.name
+                                        }));
+                                        setUploadedImages([...uploadedImages, ...newImages]);
                                         res.forEach((file) => {
                                             handleUpload(file.url, file.name);
                                         });
@@ -245,6 +251,22 @@ function MediaPopup({ open, onOpenChange, onSelect, multiple = false }: MediaPop
                                 }}
                             />
                         </div>
+                        {uploadedImages.length > 0 && (
+                            <div className="mt-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                                {uploadedImages.map((image, index) => (
+                                    <div key={index} className="relative">
+                                        <img
+                                            src={image.url}
+                                            alt={image.name}
+                                            className="w-full h-[200px] object-cover rounded-lg shadow-md"
+                                        />
+                                        <p className="mt-2 text-sm text-center text-gray-600 truncate">
+                                            {image.name}
+                                        </p>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </TabsContent>
 
                     <TabsContent value="library" className="mt-4">
