@@ -12,7 +12,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             const page = parseInt(req.query.page as string) || 1;
             const limit = parseInt(req.query.limit as string) || 10;
             const search = req.query.search as string;
-
+        
             let query = db('products as p')
                 .leftJoin('images as i', 'p.thumbnail_id', 'i.id')
                 .leftJoin('product_categories as pc', 'p.id', 'pc.product_id')
@@ -51,36 +51,36 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     db.raw('ARRAY_AGG(DISTINCT t.id) FILTER (WHERE t.id IS NOT NULL) AS tag_ids')
                 )
                 .groupBy('p.id', 'i.id');
-
+        
             if (search) {
                 query = query.where((builder) => {
                     builder.where('p.name', 'ilike', `%${search}%`)
                         .orWhere('p.description', 'ilike', `%${search}%`);
                 });
             }
-
+        
             let countQuery = db('products as p').where('p.status', 1);
-
+        
             if (search) {
                 countQuery = countQuery.where((builder) => {
                     builder.where('p.name', 'ilike', `%${search}%`)
                         .orWhere('p.description', 'ilike', `%${search}%`);
                 });
             }
-
+        
             const [countResult] = await countQuery.clone().count('* as total');
             const totalItems = parseInt(countResult.total as string, 10);
-
+        
             const totalPages = totalItems > 0 ? Math.ceil(totalItems / limit) : 1;
-
+        
             const adjustedPage = Math.min(page, totalPages);
             const adjustedOffset = (adjustedPage - 1) * limit;
-
+        
             const products = await query
                 .orderBy('p.created_at', 'desc')
                 .limit(limit)
                 .offset(adjustedOffset);
-
+        
             products.forEach((product: any) => {
                 product.product_image_ids = product.product_image_ids || [];
                 product.product_image_urls = product.product_image_urls || [];
@@ -88,7 +88,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 product.storage_ids = product.storage_ids || [];
                 product.tag_ids = product.tag_ids || [];
             });
-
+        
             res.status(StatusCode.OK).json(transformResponse({
                 data: products,
                 message: 'Products retrieved successfully.',
@@ -100,6 +100,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     totalPages,
                 },
             }));
+        
         } catch (error) {
             console.error(error);
             return res.status(StatusCode.INTERNAL_SERVER_ERROR).json(transformResponse({
@@ -108,6 +109,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 statusCode: StatusCode.INTERNAL_SERVER_ERROR,
             }));
         }
+        
     } else if (req.method === 'POST') {
         try {
             const { name, price, description, specifications, stock_quantity, thumbnail_id, categories, images, ram_ids, storage_ids, tag_ids } = req.body;
