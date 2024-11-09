@@ -82,10 +82,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 }));
             }
 
-            if (typeof capacity !== 'number' || capacity <= 0) {
+            if (driveInterface.length > 50) {
                 return res.status(StatusCode.BAD_REQUEST).json(transformResponse({
                     data: null,
-                    message: 'Dung lượng ổ cứng phải là số dương.',
+                    message: 'Giao diện không được vượt quá 50 ký tự.',
+                    statusCode: StatusCode.BAD_REQUEST,
+                }));
+            }
+
+            if (capacity.length > 50) {
+                return res.status(StatusCode.BAD_REQUEST).json(transformResponse({
+                    data: null,
+                    message: 'Dung lượng không được vượt quá 50 ký tự.',
                     statusCode: StatusCode.BAD_REQUEST,
                 }));
             }
@@ -138,17 +146,78 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 }));
             }
 
+            const updateData: any = {};
+            if (name) {
+                if (name.length > 100) {
+                    return res.status(StatusCode.BAD_REQUEST).json(transformResponse({
+                        data: null,
+                        message: 'Tên ổ cứng không được vượt quá 100 ký tự.',
+                        statusCode: StatusCode.BAD_REQUEST,
+                    }));
+                }
+                updateData.name = name;
+            }
+
+            if (type) {
+                if (type.length > 50) {
+                    return res.status(StatusCode.BAD_REQUEST).json(transformResponse({
+                        data: null,
+                        message: 'Loại ổ cứng không được vượt quá 50 ký tự.',
+                        statusCode: StatusCode.BAD_REQUEST,
+                    }));
+                }
+                updateData.type = type;
+            }
+
+            if (capacity) {
+                if (capacity.length > 50) {
+                    return res.status(StatusCode.BAD_REQUEST).json(transformResponse({
+                        data: null,
+                        message: 'Dung lượng không được vượt quá 50 ký tự.',
+                        statusCode: StatusCode.BAD_REQUEST,
+                    }));
+                }
+                updateData.capacity = capacity;
+            }
+
+            if (driveInterface) {
+                if (driveInterface.length > 50) {
+                    return res.status(StatusCode.BAD_REQUEST).json(transformResponse({
+                        data: null,
+                        message: 'Giao diện không được vượt quá 50 ký tự.',
+                        statusCode: StatusCode.BAD_REQUEST,
+                    }));
+                }
+                updateData.interface = driveInterface;
+            }
+
+            if (brand) {
+                if (brand.length > 50) {
+                    return res.status(StatusCode.BAD_REQUEST).json(transformResponse({
+                        data: null,
+                        message: 'Thương hiệu không được vượt quá 50 ký tự.',
+                        statusCode: StatusCode.BAD_REQUEST,
+                    }));
+                }
+                updateData.brand = brand;
+            }
+
+            if (status !== undefined) {
+                if (typeof status !== 'number' || ![0, 1].includes(status)) {
+                    return res.status(StatusCode.BAD_REQUEST).json(transformResponse({
+                        data: null,
+                        message: 'Trạng thái không hợp lệ.',
+                        statusCode: StatusCode.BAD_REQUEST,
+                    }));
+                }
+                updateData.status = status;
+            }
+
+            updateData.updated_at = db.fn.now();
+
             const [updatedHardDrive] = await db('hard_drives')
                 .where({ id })
-                .update({
-                    name: name || undefined,
-                    type: type || undefined,
-                    capacity: capacity || undefined,
-                    interface: driveInterface || undefined,
-                    brand: brand || undefined,
-                    status: status || undefined,
-                    updated_at: db.fn.now()
-                })
+                .update(updateData)
                 .returning('*');
 
             if (!updatedHardDrive) {

@@ -24,19 +24,25 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
+import config from "@/lib/configs/config.json";
 
 const formSchema = z.object({
     name: z.string()
         .min(1, "Tên ổ cứng không được để trống")
         .max(100, "Tên ổ cứng không được vượt quá 100 ký tự"),
     type: z.string()
-        .min(1, "Loại ổ cứng không được để trống")
-        .max(50, "Loại ổ cứng không được vượt quá 50 ký tự"),
+        .min(1, "Loại ổ cứng không được để trống"),
     capacity: z.string()
-        .min(1, "Dung lượng ổ cứng không được để trống")
-        .refine((val) => !isNaN(Number(val)) && Number(val) > 0, "Dung lượng ổ cứng phải là số dương"),
+        .min(1, "Dung lượng ổ cứng không được để trống"),
     interface: z.string()
         .min(1, "Cổng không được để trống"),
     brand: z.string()
@@ -78,7 +84,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                 form.reset({
                     name: data.data.name,
                     type: data.data.type,
-                    capacity: data.data.capacity.toString(),
+                    capacity: data.data.capacity,
                     interface: data.data.interface,
                     brand: data.data.brand,
                     status: data.data.status === 1
@@ -110,7 +116,6 @@ const Page = ({ params }: { params: { id: string } }) => {
                 },
                 body: JSON.stringify({
                     ...values,
-                    capacity: parseInt(values.capacity),
                     status: values.status ? 1 : 0
                 }),
             });
@@ -197,13 +202,20 @@ const Page = ({ params }: { params: { id: string } }) => {
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel className="text-base lg:text-lg">Loại ổ cứng</FormLabel>
-                                        <FormControl>
-                                            <Input 
-                                                placeholder="Nhập loại ổ cứng" 
-                                                {...field}
-                                                className="focus:ring-2 h-10 lg:h-12 text-base lg:text-lg"
-                                            />
-                                        </FormControl>
+                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                            <FormControl>
+                                                <SelectTrigger className="focus:ring-2 h-10 lg:h-12 text-base lg:text-lg">
+                                                    <SelectValue placeholder="Chọn loại ổ cứng" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                {config.hard_drives.types.map((type) => (
+                                                    <SelectItem key={type} value={type}>
+                                                        {type}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
                                         <FormMessage />
                                     </FormItem>
                                 )}
@@ -214,15 +226,21 @@ const Page = ({ params }: { params: { id: string } }) => {
                                 name="capacity"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel className="text-base lg:text-lg">Dung lượng (GB)</FormLabel>
-                                        <FormControl>
-                                            <Input 
-                                                type="number"
-                                                placeholder="Nhập dung lượng ổ cứng" 
-                                                {...field}
-                                                className="focus:ring-2 h-10 lg:h-12 text-base lg:text-lg"
-                                            />
-                                        </FormControl>
+                                        <FormLabel className="text-base lg:text-lg">Dung lượng</FormLabel>
+                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                            <FormControl>
+                                                <SelectTrigger className="focus:ring-2 h-10 lg:h-12 text-base lg:text-lg">
+                                                    <SelectValue placeholder="Chọn dung lượng" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                {config.hard_drives.capacities.map((capacity) => (
+                                                    <SelectItem key={capacity} value={capacity}>
+                                                        {capacity}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
                                         <FormMessage />
                                     </FormItem>
                                 )}
@@ -234,13 +252,20 @@ const Page = ({ params }: { params: { id: string } }) => {
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel className="text-base lg:text-lg">Cổng kết nối</FormLabel>
-                                        <FormControl>
-                                            <Input 
-                                                placeholder="Nhập cổng kết nối"
-                                                {...field}
-                                                className="focus:ring-2 h-10 lg:h-12 text-base lg:text-lg"
-                                            />
-                                        </FormControl>
+                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                            <FormControl>
+                                                <SelectTrigger className="focus:ring-2 h-10 lg:h-12 text-base lg:text-lg">
+                                                    <SelectValue placeholder="Chọn cổng kết nối" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                {config.hard_drives.interfaces.map((interface_type) => (
+                                                    <SelectItem key={interface_type} value={interface_type}>
+                                                        {interface_type}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
                                         <FormMessage />
                                     </FormItem>
                                 )}

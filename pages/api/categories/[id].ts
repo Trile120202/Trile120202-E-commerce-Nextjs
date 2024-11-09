@@ -15,6 +15,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 .select('categories.*', 'images.url as image_url', 'images.alt_text as image_alt_text')
                 .leftJoin('images', 'categories.image_id', 'images.id')
                 .where('categories.id', id)
+                .where('categories.status', '!=', -2)
                 .first();
 
             if (!category) {

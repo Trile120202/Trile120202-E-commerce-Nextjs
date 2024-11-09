@@ -15,7 +15,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             const search = req.query.search as string;
             const status = req.query.status as string;
 
-            let query = db('categories');
+            let query = db('categories')
+                .where('status', '!=', -2);
 
             if (search) {
                 query = query.where((builder) => {
@@ -34,7 +35,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             const categories = await query
                 .select('*')
                 .offset(offset)
-                .limit(limit);
+                .limit(limit)
+                .orderBy('created_at', 'desc');
 
             const totalPages = Math.ceil(totalItems / limit);
 
@@ -104,38 +106,5 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 statusCode: StatusCode.INTERNAL_SERVER_ERROR,
             }));
         }
-    } else if (req.method === 'PATCH') {
-        try {
-            const { id, status } = req.body;
-
-            const [updatedCategory] = await db('categories')
-                .where({ id })
-                .update({ status, updated_at: db.fn.now() })
-                .returning('*');
-
-            if (!updatedCategory) {
-                return res.status(StatusCode.NOT_FOUND).json(transformResponse({
-                    data: null,
-                    message: 'Category not found.',
-                    statusCode: StatusCode.NOT_FOUND,
-                }));
-            }
-
-            res.status(StatusCode.OK).json(transformResponse({
-                data: updatedCategory,
-                message: 'Category status updated successfully.',
-                statusCode: StatusCode.OK,
-            }));
-        } catch (error) {
-            console.error(error);
-            return res.status(StatusCode.INTERNAL_SERVER_ERROR).json(transformResponse({
-                data: null,
-                message: 'An error occurred while updating the category status.',
-                statusCode: StatusCode.INTERNAL_SERVER_ERROR,
-            }));
-        }
-    } else {
-        res.setHeader('Allow', ['GET', 'POST', 'PUT', 'PATCH']);
-        return res.status(StatusCode.METHOD_NOT_ALLOWED).end(`Method ${req.method} Not Allowed`);
     }
 }

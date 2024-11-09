@@ -21,20 +21,25 @@ import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+import config from "@/lib/configs/config.json";
 
 const formSchema = z.object({
     name: z.string()
         .min(1, "Tên RAM không được để trống")
         .max(100, "Tên RAM không được vượt quá 100 ký tự"),
     type: z.string()
-        .min(1, "Loại RAM không được để trống")
-        .max(50, "Loại RAM không được vượt quá 50 ký tự"),
+        .min(1, "Loại RAM không được để trống"),
     capacity: z.string()
-        .min(1, "Dung lượng RAM không được để trống")
-        .refine((val) => !isNaN(Number(val)) && Number(val) > 0, "Dung lượng RAM phải là số dương"),
+        .min(1, "Dung lượng RAM không được để trống"),
     speed: z.string()
-        .min(1, "Tốc độ RAM không được để trống")
-        .refine((val) => !isNaN(Number(val)) && Number(val) > 0, "Tốc độ RAM phải là số dương"),
+        .min(1, "Tốc độ RAM không được để trống"),
     brand: z.string()
         .min(1, "Hãng sản xuất không được để trống")
         .max(50, "Thương hiệu không được vượt quá 50 ký tự"),
@@ -49,15 +54,7 @@ const Page = ({ params }: { params: { id: string } }) => {
     const [ram, setRam] = useState<any>(null);
 
     const form = useForm<z.infer<typeof formSchema>>({
-        resolver: zodResolver(formSchema),
-        defaultValues: {
-            name: "",
-            type: "",
-            capacity: "",
-            speed: "",
-            brand: "",
-            status: true
-        },
+        resolver: zodResolver(formSchema)
     });
 
     useEffect(() => {
@@ -75,8 +72,8 @@ const Page = ({ params }: { params: { id: string } }) => {
                 form.reset({
                     name: data.data.name,
                     type: data.data.type,
-                    capacity: data.data.capacity.toString(),
-                    speed: data.data.speed.toString(),
+                    capacity: data.data.capacity + "GB",
+                    speed: data.data.speed + "MHz",
                     brand: data.data.brand,
                     status: data.data.status === 1
                 });
@@ -108,7 +105,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                 body: JSON.stringify({
                     ...values,
                     capacity: parseInt(values.capacity),
-                    speed: parseInt(values.speed),
+                    speed: parseInt(values.speed.replace("MHz", "")),
                     status: values.status ? 1 : 0
                 }),
             });
@@ -192,9 +189,20 @@ const Page = ({ params }: { params: { id: string } }) => {
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Loại RAM</FormLabel>
-                                        <FormControl>
-                                            <Input {...field} placeholder="Nhập loại RAM" />
-                                        </FormControl>
+                                        <Select onValueChange={field.onChange} value={field.value}>
+                                            <FormControl>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Chọn loại RAM" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                {config.ram.types.map((type) => (
+                                                    <SelectItem key={type} value={type}>
+                                                        {type}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
                                         <FormMessage />
                                     </FormItem>
                                 )}
@@ -205,10 +213,21 @@ const Page = ({ params }: { params: { id: string } }) => {
                                 name="capacity"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Dung lượng (GB)</FormLabel>
-                                        <FormControl>
-                                            <Input {...field} type="number" placeholder="Nhập dung lượng RAM" />
-                                        </FormControl>
+                                        <FormLabel>Dung lượng</FormLabel>
+                                        <Select onValueChange={field.onChange} value={field.value}>
+                                            <FormControl>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Chọn dung lượng RAM" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                {config.ram.capacities.map((capacity) => (
+                                                    <SelectItem key={capacity} value={capacity}>
+                                                        {capacity}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
                                         <FormMessage />
                                     </FormItem>
                                 )}
@@ -219,10 +238,21 @@ const Page = ({ params }: { params: { id: string } }) => {
                                 name="speed"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Tốc độ (MHz)</FormLabel>
-                                        <FormControl>
-                                            <Input {...field} type="number" placeholder="Nhập tốc độ RAM" />
-                                        </FormControl>
+                                        <FormLabel>Tốc độ</FormLabel>
+                                        <Select onValueChange={field.onChange} value={field.value}>
+                                            <FormControl>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Chọn tốc độ RAM" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                {config.ram.speeds.map((speed) => (
+                                                    <SelectItem key={speed} value={speed}>
+                                                        {speed}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
                                         <FormMessage />
                                     </FormItem>
                                 )}

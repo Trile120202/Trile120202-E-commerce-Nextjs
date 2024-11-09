@@ -18,48 +18,80 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             if (!storage) {
                 return res.status(StatusCode.NOT_FOUND).json(transformResponse({
                     data: null,
-                    message: 'Hard drive not found.',
+                    message: 'Không tìm thấy ổ cứng.',
                     statusCode: StatusCode.NOT_FOUND,
                 }));
             }
 
             res.status(StatusCode.OK).json(transformResponse({
                 data: storage,
-                message: 'Hard drive retrieved successfully.',
+                message: 'Lấy thông tin ổ cứng thành công.',
                 statusCode: StatusCode.OK,
             }));
         } catch (error) {
             console.error(error);
             return res.status(StatusCode.INTERNAL_SERVER_ERROR).json(transformResponse({
                 data: null,
-                message: 'An error occurred while retrieving the hard drive.',
+                message: 'Đã xảy ra lỗi khi lấy thông tin ổ cứng.',
                 statusCode: StatusCode.INTERNAL_SERVER_ERROR,
             }));
         }
     } else if (req.method === 'PUT') {
         try {
-            const { name, type, capacity, interface: interfaceType, brand, status } = req.body;
+            const { name, type, capacity, interface: driveInterface, brand, status } = req.body;
 
-            if (!name || !type || !capacity || !interfaceType || !brand) {
+            if (!name || !type || !capacity || !driveInterface || !brand) {
                 return res.status(StatusCode.BAD_REQUEST).json(transformResponse({
                     data: null,
-                    message: 'All fields are required.',
+                    message: 'Tên ổ cứng, loại ổ cứng, dung lượng, giao diện và thương hiệu không được để trống.',
                     statusCode: StatusCode.BAD_REQUEST,
                 }));
             }
 
-            if (name.length > 100 || type.length > 50 || interfaceType.length > 50 || brand.length > 50) {
+            if (name.length > 100) {
                 return res.status(StatusCode.BAD_REQUEST).json(transformResponse({
                     data: null,
-                    message: 'Field length exceeds maximum allowed.',
+                    message: 'Tên ổ cứng không được vượt quá 100 ký tự.',
                     statusCode: StatusCode.BAD_REQUEST,
                 }));
             }
 
-            if (!Number.isInteger(capacity) || capacity <= 0) {
+            if (type.length > 50) {
                 return res.status(StatusCode.BAD_REQUEST).json(transformResponse({
                     data: null,
-                    message: 'Capacity must be a positive integer.',
+                    message: 'Loại ổ cứng không được vượt quá 50 ký tự.',
+                    statusCode: StatusCode.BAD_REQUEST,
+                }));
+            }
+
+            if (driveInterface.length > 50) {
+                return res.status(StatusCode.BAD_REQUEST).json(transformResponse({
+                    data: null,
+                    message: 'Giao diện không được vượt quá 50 ký tự.',
+                    statusCode: StatusCode.BAD_REQUEST,
+                }));
+            }
+
+            if (brand.length > 50) {
+                return res.status(StatusCode.BAD_REQUEST).json(transformResponse({
+                    data: null,
+                    message: 'Thương hiệu không được vượt quá 50 ký tự.',
+                    statusCode: StatusCode.BAD_REQUEST,
+                }));
+            }
+
+            if (capacity.length > 50) {
+                return res.status(StatusCode.BAD_REQUEST).json(transformResponse({
+                    data: null,
+                    message: 'Dung lượng không được vượt quá 50 ký tự.',
+                    statusCode: StatusCode.BAD_REQUEST,
+                }));
+            }
+
+            if (status !== undefined && (typeof status !== 'number' || ![0, 1].includes(status))) {
+                return res.status(StatusCode.BAD_REQUEST).json(transformResponse({
+                    data: null,
+                    message: 'Trạng thái không hợp lệ.',
                     statusCode: StatusCode.BAD_REQUEST,
                 }));
             }
@@ -70,7 +102,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     name,
                     type,
                     capacity,
-                    interface: interfaceType,
+                    interface: driveInterface,
                     brand,
                     status,
                     updated_at: db.fn.now(),
@@ -80,21 +112,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             if (!updatedStorage) {
                 return res.status(StatusCode.NOT_FOUND).json(transformResponse({
                     data: null,
-                    message: 'Hard drive not found.',
+                    message: 'Không tìm thấy ổ cứng.',
                     statusCode: StatusCode.NOT_FOUND,
                 }));
             }
 
             return res.status(StatusCode.OK).json(transformResponse({
                 data: updatedStorage,
-                message: 'Hard drive updated successfully.',
+                message: 'Cập nhật ổ cứng thành công.',
                 statusCode: StatusCode.OK,
             }));
         } catch (error) {
             console.error(error);
             return res.status(StatusCode.INTERNAL_SERVER_ERROR).json(transformResponse({
                 data: null,
-                message: 'An error occurred while updating the hard drive.',
+                message: 'Đã xảy ra lỗi khi cập nhật ổ cứng.',
                 statusCode: StatusCode.INTERNAL_SERVER_ERROR,
             }));
         }

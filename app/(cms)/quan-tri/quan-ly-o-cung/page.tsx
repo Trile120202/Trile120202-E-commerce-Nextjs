@@ -206,7 +206,7 @@ const Page = () => {
                                                     {row.status === 1 ? 'Hoạt động' : 'Không hoạt động'}
                                                 </span>
                                             ) : col.accessor === 'capacity' ? (
-                                                `${row[col.accessor]}GB`
+                                                `${row[col.accessor]}`
                                             ) : (
                                                 row[col.accessor as keyof Storage]
                                             )}

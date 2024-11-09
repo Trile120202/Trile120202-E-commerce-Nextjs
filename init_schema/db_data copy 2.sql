@@ -21,6 +21,8 @@ DROP TABLE IF EXISTS product_ram CASCADE;
 DROP TABLE IF EXISTS product_hard_drives CASCADE;
 DROP TABLE IF EXISTS cart_items CASCADE;
 DROP TABLE IF EXISTS carts CASCADE;
+DROP TABLE IF EXISTS banners CASCADE;
+DROP TABLE IF EXISTS banner_images CASCADE;
 
 DROP FUNCTION IF EXISTS update_modified_column() CASCADE;
 
@@ -384,7 +386,7 @@ CREATE TABLE hard_drives
     id         SERIAL PRIMARY KEY,
     name       VARCHAR(100) NOT NULL,
     type       VARCHAR(50) NOT NULL,
-    capacity   INT NOT NULL,
+    capacity   VARCHAR(50) NOT NULL,
     interface  VARCHAR(50) NOT NULL,
     brand      VARCHAR(50) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -470,6 +472,40 @@ CREATE INDEX idx_cart_items_product_id ON cart_items (product_id);
 CREATE INDEX idx_cart_items_created_at ON cart_items (created_at);
 CREATE INDEX idx_cart_items_updated_at ON cart_items (updated_at);
 CREATE INDEX idx_cart_items_status ON cart_items (status);
+
+CREATE TABLE banners
+(
+    id         SERIAL PRIMARY KEY,
+    name       VARCHAR(100) NOT NULL,
+    location   TEXT NOT NULL,
+    position   TEXT NOT NULL,
+    status     INT NOT NULL DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_banners_name ON banners (name);
+CREATE INDEX idx_banners_created_at ON banners (created_at);
+CREATE INDEX idx_banners_updated_at ON banners (updated_at);
+CREATE INDEX idx_banners_status ON banners (status);
+
+CREATE TABLE banner_images
+(
+    id         SERIAL PRIMARY KEY,
+    banner_id  INT NOT NULL,
+    image_id   INT NOT NULL,
+    status     INT NOT NULL DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (banner_id) REFERENCES banners (id) ON DELETE CASCADE,
+    FOREIGN KEY (image_id) REFERENCES images (id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_banner_images_banner_id ON banner_images (banner_id);
+CREATE INDEX idx_banner_images_image_id ON banner_images (image_id);
+CREATE INDEX idx_banner_images_created_at ON banner_images (created_at);
+CREATE INDEX idx_banner_images_updated_at ON banner_images (updated_at);
+CREATE INDEX idx_banner_images_status ON banner_images (status);
 
 
 CREATE OR REPLACE FUNCTION update_modified_column()

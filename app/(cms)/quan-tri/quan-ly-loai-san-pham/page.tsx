@@ -1,4 +1,5 @@
 'use client';
+
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -23,6 +24,8 @@ import {
 import { Card, CardHeader, CardTitle } from "@/components/ui/card"
 import useApi from '@/lib/useApi';
 import DataTable from "@/components/custom/datatable";
+import { useToast } from "@/hooks/use-toast";
+import { ChangeStatus } from "@/components/custom/ChangeStatus";
 
 interface Category {
     id: number;
@@ -52,10 +55,12 @@ interface ApiResponse {
 
 const Page = () => {
     const router = useRouter();
+    const { toast } = useToast();
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedStatus, setSelectedStatus] = useState<string>('all');
     const [searchKeyword, setSearchKeyword] = useState<string>('');
     const [limit, setLimit] = useState<number>(10);
+    const [selectedId, setSelectedId] = useState<number | null>(null);
 
     const { data, loading, error, fetchData } = useApi<ApiResponse>(`/api/categories?page=${currentPage}&limit=${limit}&search=${searchKeyword}${selectedStatus !== 'all' ? `&status=${selectedStatus}` : ''}`, {
         method: 'GET'
@@ -63,8 +68,7 @@ const Page = () => {
 
     useEffect(() => {
         fetchData();
-    }, [ currentPage, selectedStatus, searchKeyword, limit]);
-
+    }, [currentPage, selectedStatus, searchKeyword, limit]);
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
@@ -72,10 +76,6 @@ const Page = () => {
 
     const handleEdit = (id: number) => {
         router.push(`/quan-tri/quan-ly-loai-san-pham/${id}`);
-    };
-
-    const handleDelete = (id: number) => {
-        console.log(`Delete product category with id: ${id}`);
     };
 
     const getStatusColor = (status: number) => {
@@ -100,29 +100,45 @@ const Page = () => {
             label: 'Thao tác', 
             className: 'text-right',
             render: (row: Category) => (
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
-                            <BsThreeDots className="h-4 w-4" />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => handleEdit(row.id)}>
-                            <FaEdit className="mr-2 h-4 w-4" />
-                            <span>Sửa</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleDelete(row.id)}>
-                            <FaTrash className="mr-2 h-4 w-4" />
-                            <span>Xóa</span>
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                <>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="h-8 w-8 p-0">
+                                <span className="sr-only">Open menu</span>
+                                <BsThreeDots className="h-4 w-4" />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => handleEdit(row.id)}>
+                                <FaEdit className="mr-2 h-4 w-4" />
+                                <span>Sửa</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => setSelectedId(row.id)}>
+                                <FaTrash className="mr-2 h-4 w-4" />
+                                <span>Xóa</span>
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+
+                    <ChangeStatus
+                        id={row.id}
+                        isOpen={selectedId === row.id}
+                        onClose={() => setSelectedId(null)}
+                        onSuccess={fetchData}
+                        endpoint="/api/categories/update-status"
+                        status={-2}
+                        title="Xác nhận xóa loại sản phẩm"
+                        description="Bạn có chắc chắn muốn xóa loại sản phẩm này? Hành động này không thể hoàn tác."
+                        confirmText="Xóa"
+                        cancelText="Hủy"
+                        successMessage="Xóa loại sản phẩm thành công"
+                        errorMessage="Có lỗi xảy ra khi xóa loại sản phẩm"
+                    />
+                </>
             )
         },
     ];
 
-    // @ts-ignore
     return (
         <div className="flex flex-col h-full">
             <div className="sticky top-0 z-20 bg-white shadow-sm">
@@ -140,7 +156,7 @@ const Page = () => {
                     </CardHeader>
                 </Card>
             </div>
-            
+
             <div className="flex-1 overflow-auto">
                 <DataTable
                     data={data?.data || []}

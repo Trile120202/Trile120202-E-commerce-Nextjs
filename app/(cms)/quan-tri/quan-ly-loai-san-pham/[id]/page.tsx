@@ -9,20 +9,21 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useToast } from "@/hooks/use-toast";
-import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, ImageIcon, Save } from "lucide-react";
 import QuillComponent from "@/components/quill";
 import { cn } from "@/lib/utils";
 import MediaPopup from "@/components/custom/MediaPopup";
 import { Skeleton } from "@/components/ui/skeleton";
+import SelectStatus from "@/components/custom/SelectStatus";
+import { Status } from "@/lib/configs/enum.status";
 
 const formSchema = z.object({
     name: z.string().min(1, 'Vui lòng nhập tên loại sản phẩm'),
     slug: z.string().min(1, 'Vui lòng nhập slug'),
     content: z.string().optional(),
     image_id: z.string().optional(),
-    status: z.boolean().default(true)
+    status: z.number().default(Status.ACTIVE)
 });
 
 const Page = ({ params }: { params: { id: string } }) => {
@@ -41,7 +42,7 @@ const Page = ({ params }: { params: { id: string } }) => {
             slug: '',
             content: '',
             image_id: '',
-            status: true
+            status: Status.ACTIVE
         }
     });
 
@@ -62,7 +63,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                     slug: data.data.slug,
                     content: data.data.content || '',
                     image_id: data.data.image_id?.toString() || '',
-                    status: data.data.status === 1
+                    status: data.data.status
                 });
 
                 if (data.data.image_id) {
@@ -119,7 +120,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                     slug: values.slug.trim(),
                     content: values.content?.trim() || '',
                     image_id: values.image_id || null,
-                    status: values.status ? 1 : 0
+                    status: values.status
                 }),
             });
 
@@ -304,19 +305,16 @@ const Page = ({ params }: { params: { id: string } }) => {
                                         control={form.control}
                                         name="status"
                                         render={({ field }) => (
-                                            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 lg:p-6 shadow-sm">
-                                                <div className="space-y-0.5">
-                                                    <FormLabel className="text-base lg:text-lg">
-                                                        Trạng thái
-                                                    </FormLabel>
-                                                </div>
+                                            <FormItem>
+                                                <FormLabel className="text-base lg:text-lg">Trạng thái</FormLabel>
                                                 <FormControl>
-                                                    <Switch
-                                                        checked={field.value}
-                                                        onCheckedChange={field.onChange}
-                                                        className="scale-110 lg:scale-125"
+                                                    <SelectStatus
+                                                        value={field.value}
+                                                        onValueChange={field.onChange}
+                                                        options="basic"
                                                     />
                                                 </FormControl>
+                                                <FormMessage />
                                             </FormItem>
                                         )}
                                     />

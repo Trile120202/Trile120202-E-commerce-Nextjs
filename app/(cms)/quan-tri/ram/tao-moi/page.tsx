@@ -24,20 +24,26 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+
+import ramConfig from "@/lib/configs/config.json";
 
 const formSchema = z.object({
     name: z.string()
         .min(1, "Tên RAM không được để trống")
         .max(100, "Tên RAM không được vượt quá 100 ký tự"),
     type: z.string()
-        .min(1, "Loại RAM không được để trống")
-        .max(50, "Loại RAM không được vượt quá 50 ký tự"),
+        .min(1, "Loại RAM không được để trống"),
     capacity: z.string()
-        .min(1, "Dung lượng RAM không được để trống")
-        .refine((val) => !isNaN(Number(val)) && Number(val) > 0, "Dung lượng RAM phải là số dương"),
+        .min(1, "Dung lượng RAM không được để trống"),
     speed: z.string()
-        .min(1, "Bus RAM không được để trống")
-        .refine((val) => !isNaN(Number(val)) && Number(val) > 0, "Tốc độ RAM phải là số dương"),
+        .min(1, "Bus RAM không được để trống"),
     brand: z.string()
         .min(1, "Hãng sản xuất không được để trống")
         .max(50, "Thương hiệu không được vượt quá 50 ký tự"),
@@ -71,7 +77,7 @@ const Page = () => {
                 body: JSON.stringify({
                     ...values,
                     capacity: parseInt(values.capacity),
-                    speed: parseInt(values.speed),
+                    speed: parseInt(values.speed.replace("MHz", "")),
                     status: values.status ? 1 : 0
                 }),
             });
@@ -123,13 +129,20 @@ const Page = () => {
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel className="text-base lg:text-lg">Loại RAM</FormLabel>
-                                        <FormControl>
-                                            <Input 
-                                                placeholder="Nhập loại RAM" 
-                                                {...field}
-                                                className="focus:ring-2 h-10 lg:h-12 text-base lg:text-lg"
-                                            />
-                                        </FormControl>
+                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                            <FormControl>
+                                                <SelectTrigger className="focus:ring-2 h-10 lg:h-12 text-base lg:text-lg">
+                                                    <SelectValue placeholder="Chọn loại RAM" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                {ramConfig.ram.types.map((type) => (
+                                                    <SelectItem key={type} value={type}>
+                                                        {type}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
                                         <FormMessage />
                                     </FormItem>
                                 )}
@@ -141,14 +154,20 @@ const Page = () => {
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel className="text-base lg:text-lg">Dung lượng (GB)</FormLabel>
-                                        <FormControl>
-                                            <Input 
-                                                type="number"
-                                                placeholder="Nhập dung lượng RAM" 
-                                                {...field}
-                                                className="focus:ring-2 h-10 lg:h-12 text-base lg:text-lg"
-                                            />
-                                        </FormControl>
+                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                            <FormControl>
+                                                <SelectTrigger className="focus:ring-2 h-10 lg:h-12 text-base lg:text-lg">
+                                                    <SelectValue placeholder="Chọn dung lượng RAM" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                {ramConfig.ram.capacities.map((capacity) => (
+                                                    <SelectItem key={capacity} value={capacity.replace("GB", "")}>
+                                                        {capacity}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
                                         <FormMessage />
                                     </FormItem>
                                 )}
@@ -160,14 +179,20 @@ const Page = () => {
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel className="text-base lg:text-lg">Bus (MHz)</FormLabel>
-                                        <FormControl>
-                                            <Input 
-                                                type="number"
-                                                placeholder="Nhập bus RAM" 
-                                                {...field}
-                                                className="focus:ring-2 h-10 lg:h-12 text-base lg:text-lg"
-                                            />
-                                        </FormControl>
+                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                            <FormControl>
+                                                <SelectTrigger className="focus:ring-2 h-10 lg:h-12 text-base lg:text-lg">
+                                                    <SelectValue placeholder="Chọn bus RAM" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                {ramConfig.ram.speeds.map((speed) => (
+                                                    <SelectItem key={speed} value={speed}>
+                                                        {speed}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
                                         <FormMessage />
                                     </FormItem>
                                 )}
