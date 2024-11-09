@@ -53,6 +53,12 @@ const formSchema = z.object({
     specifications: z.string().optional(),
     categories: z.array(z.number())
         .min(1, "Phải chọn ít nhất một danh mục"),
+    ram_ids: z.array(z.number())
+        .min(1, "Phải chọn ít nhất một RAM"),
+    storage_ids: z.array(z.number())
+        .min(1, "Phải chọn ít nhất một ổ cứng"),
+    tag_ids: z.array(z.number())
+        .min(1, "Phải chọn ít nhất một tag"),
     status: z.number().default(Status.ACTIVE),
     thumbnail_id: z.number({
         required_error: "Vui lòng chọn ảnh đại diện"
@@ -79,6 +85,9 @@ const Page = () => {
             description: "",
             specifications: "",
             categories: [],
+            ram_ids: [],
+            storage_ids: [],
+            tag_ids: [],
             status: Status.ACTIVE,
             thumbnail_id: 0,
             images: []
@@ -324,7 +333,7 @@ const Page = () => {
                                                 <FormControl>
                                                     <SelectStatus
                                                         onValueChange={field.onChange}
-                                                        defaultValue={field.value}
+                                                        value={field.value}
                                                         options="basic"
                                                     />
                                                 </FormControl>
@@ -333,6 +342,66 @@ const Page = () => {
                                         )}
                                     />
                                 </div>
+
+                                <FormField
+                                    control={form.control}
+                                    name="ram_ids"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className="text-base lg:text-lg font-semibold">RAM</FormLabel>
+                                            <FormControl>
+                                                <SelectData
+                                                    endpoint="/api/ram/get-ram-date-id-name"
+                                                    multiple={true}
+                                                    placeholder="Chọn RAM"
+                                                    onSelect={(value) => field.onChange(value)}
+                                                    defaultValue={field.value}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+
+                                <FormField
+                                    control={form.control}
+                                    name="storage_ids"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className="text-base lg:text-lg font-semibold">Ổ cứng</FormLabel>
+                                            <FormControl>
+                                                <SelectData
+                                                    endpoint="/api/storages/get-storage-data-id-name"
+                                                    multiple={true}
+                                                    placeholder="Chọn ổ cứng"
+                                                    onSelect={(value) => field.onChange(value)}
+                                                    defaultValue={field.value}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+
+                                <FormField
+                                    control={form.control}
+                                    name="tag_ids"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className="text-base lg:text-lg font-semibold">Tags</FormLabel>
+                                            <FormControl>
+                                                <SelectData
+                                                    endpoint="/api/tag/get-tag-id-name"
+                                                    multiple={true}
+                                                    placeholder="Chọn tags"
+                                                    onSelect={(value) => field.onChange(value)}
+                                                    defaultValue={field.value}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
 
                                 <FormField
                                     control={form.control}

@@ -49,6 +49,12 @@ const formSchema = z.object({
     specifications: z.string().optional(),
     categories: z.array(z.number())
         .min(1, "Phải chọn ít nhất một danh mục"),
+    ram_ids: z.array(z.number())
+        .min(1, "Phải chọn ít nhất một RAM"),
+    storage_ids: z.array(z.number())
+        .min(1, "Phải chọn ít nhất một ổ cứng"),
+    tag_ids: z.array(z.number())
+        .min(1, "Phải chọn ít nhất một tag"),
     status: z.number().default(Status.ACTIVE),
     thumbnail_id: z.number({
         required_error: "Vui lòng chọn ảnh đại diện"
@@ -70,7 +76,21 @@ const Page = ({ params }: { params: { id: string } }) => {
     const [product, setProduct] = useState<any>(null);
 
     const form = useForm<z.infer<typeof formSchema>>({
-        resolver: zodResolver(formSchema)
+        resolver: zodResolver(formSchema),
+        defaultValues: {
+            name: "",
+            price: "",
+            stock_quantity: "",
+            description: "",
+            specifications: "",
+            categories: [],
+            ram_ids: [],
+            storage_ids: [], 
+            tag_ids: [],
+            status: Status.ACTIVE,
+            thumbnail_id: 0,
+            images: []
+        }
     });
 
     useEffect(() => {
@@ -110,19 +130,34 @@ const Page = ({ params }: { params: { id: string } }) => {
                 setSelectedImages(images);
                 setDescription(productData.description);
 
-                // Parse categories string into array of IDs
-                const categoryIds = productData.categories.split(',').map((cat: string) => parseInt(cat.trim()));
+                // Helper function to handle both string and array cases
+                const parseIds = (value: string | number[]) => {
+                    if (Array.isArray(value)) return value;
+                    if (typeof value === 'string' && value.trim() !== '') {
+                        return value.split(',').map(id => parseInt(id.trim()));
+                    }
+                    return [];
+                };
+
+                // Parse IDs using the helper function
+                const categoryIds = parseIds(productData.category_ids || []); // Add fallback empty array
+                const ramIds = parseIds(productData.ram_ids);
+                const storageIds = parseIds(productData.storage_ids);
+                const tagIds = parseIds(productData.tag_ids);
 
                 form.reset({
-                    name: productData.product_name,
-                    price: productData.price.toString(),
-                    stock_quantity: productData.stock_quantity.toString(),
-                    description: productData.description,
+                    name: productData.product_name || "",
+                    price: productData.price?.toString() || "",
+                    stock_quantity: productData.stock_quantity?.toString() || "",
+                    description: productData.description || "",
                     specifications: productData.specifications || "",
                     categories: categoryIds,
-                    status: productData.product_status,
-                    thumbnail_id: productData.thumbnail_id,
-                    images: productData.product_image_ids
+                    ram_ids: ramIds,
+                    storage_ids: storageIds,
+                    tag_ids: tagIds,
+                    status: productData.product_status || Status.ACTIVE,
+                    thumbnail_id: productData.thumbnail_id || 0,
+                    images: productData.product_image_ids || []
                 });
             } catch (error) {
                 console.error('Error fetching product:', error);
@@ -154,6 +189,22 @@ const Page = ({ params }: { params: { id: string } }) => {
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         try {
             setLoading(true);
+
+            // Validate specifications JSON if provided
+            let parsedSpecifications = null;
+            if (values.specifications) {
+                try {
+                    parsedSpecifications = JSON.parse(values.specifications);
+                } catch (e) {
+                    toast({
+                        variant: "destructive",
+                        title: "Lỗi",
+                        description: "Thông số kỹ thuật phải là JSON hợp lệ",
+                    });
+                    return;
+                }
+            }
+
             const response = await fetch(`/api/products/${params.id}`, {
                 method: 'PUT',
                 headers: {
@@ -163,7 +214,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                     ...values,
                     price: parseFloat(values.price),
                     stock_quantity: parseInt(values.stock_quantity),
-                    specifications: values.specifications ? JSON.parse(values.specifications) : null,
+                    specifications: parsedSpecifications,
                     description
                 }),
             });
@@ -416,6 +467,66 @@ const Page = ({ params }: { params: { id: string } }) => {
 
                             <FormField
                                 control={form.control}
+                                name="ram_ids"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className="text-base lg:text-lg font-semibold">RAM</FormLabel>
+                                        <FormControl>
+                                            <SelectData
+                                                endpoint="/api/ram/get-ram-date-id-name"
+                                                multiple={true}
+                                                placeholder="Chọn RAM"
+                                                onSelect={(value) => field.onChange(value)}
+                                                defaultValue={field.value}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={form.control}
+                                name="storage_ids"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className="text-base lg:text-lg font-semibold">Ổ cứng</FormLabel>
+                                        <FormControl>
+                                            <SelectData
+                                                endpoint="/api/storages/get-storage-data-id-name"
+                                                multiple={true}
+                                                placeholder="Chọn ổ cứng"
+                                                onSelect={(value) => field.onChange(value)}
+                                                defaultValue={field.value}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={form.control}
+                                name="tag_ids"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className="text-base lg:text-lg font-semibold">Tags</FormLabel>
+                                        <FormControl>
+                                            <SelectData
+                                                endpoint="/api/tag/get-tag-id-name"
+                                                multiple={true}
+                                                placeholder="Chọn tags"
+                                                onSelect={(value) => field.onChange(value)}
+                                                defaultValue={field.value}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={form.control}
                                 name="description"
                                 render={({ field }) => (
                                     <FormItem>
@@ -462,11 +573,11 @@ const Page = ({ params }: { params: { id: string } }) => {
                                 <Button 
                                     type="submit"
                                     disabled={loading}
-                                    className="w-[120px] lg:w-[140px] h-10 lg:h-12 text-base lg:text-lg"
+                                    className="w-[120px] lg:w-[140px] h-10 lg:h-12 text-base lg:text-lg bg-blue-600 hover:bg-blue-700"
                                 >
                                     {loading ? (
                                         <div className="flex items-center gap-2 lg:gap-3">
-                                            <div className="h-4 w-4 lg:h-5 lg:w-5 animate-spin rounded-full border-2 border-primary border-t-transparent"></div>
+                                            <div className="h-4 w-4 lg:h-5 lg:w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
                                             <span>Đang xử lý</span>
                                         </div>
                                     ) : (
