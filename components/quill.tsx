@@ -17,18 +17,19 @@ const QuillComponent: React.FC<QuillProps> = ({className, onChangeValue, title, 
     const [value, setValue] = useState(defaultValue || '');
 
     useEffect(() => {
-        onChangeValue(value);
-    }, [value, onChangeValue]);
-
-    useEffect(() => {
         if (defaultValue !== undefined) {
             setValue(defaultValue);
         }
     }, [defaultValue]);
 
+    const handleChange = (newValue: string) => {
+        setValue(newValue);
+        onChangeValue(newValue);
+    };
+
     return (
         <div className={className}>
-            <h3>{title ?? 'No title'}</h3>
+            {title && <h3>{title}</h3>}
             <ReactQuill
                 placeholder={placeholder || "Nhập vào nội dung..."}
                 modules={{
@@ -79,7 +80,7 @@ const QuillComponent: React.FC<QuillProps> = ({className, onChangeValue, title, 
                     'table', 'emoji', 'mention', 'hashtag', 'highlight'
                 ]}
 
-                theme="snow" value={value} onChange={setValue}/>
+                theme="snow" value={value} onChange={handleChange}/>
         </div>
     );
 };

@@ -1,165 +1,153 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { Check, ChevronsUpDown } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import {
-    Command,
-    CommandEmpty,
-    CommandGroup,
-    CommandInput,
-    CommandItem,
-} from "@/components/ui/command";
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover";
-import { Badge } from "@/components/ui/badge";
+import React, { useEffect, useState, useRef } from 'react';
+import { cn } from '@/lib/utils';
 import useApi from '@/lib/useApi';
 
 interface Item {
-    id: number;
-    name: string;
+  id: number;
+  name: string;
+}
+
+interface ApiResponse {
+  status: number;
+  message: string;
+  data: Item[];
 }
 
 interface SelectDataProps {
-    endpoint: string;
-    multiple?: boolean;
-    placeholder?: string;
-    onSelect: (value: number | number[]) => void;
-    defaultValue?: number | number[];
+  endpoint: string;
+  multiple?: boolean;
+  placeholder?: string;
+  onSelect: (value: number | number[]) => void;
+  defaultValue?: number | number[];
 }
 
-const SelectData = ({ 
-    endpoint,
-    multiple = false,
-    placeholder = "Select items...",
-    onSelect,
-    defaultValue
+const SelectData = ({
+  endpoint,
+  multiple = false,
+  placeholder = 'Select items...',
+  onSelect,
+  defaultValue,
 }: SelectDataProps) => {
-    const [open, setOpen] = useState(false);
-    const [items, setItems] = useState<Item[]>([]);
-    const [selectedItems, setSelectedItems] = useState<number[]>([]);
-    const [searchValue, setSearchValue] = useState("");
-    
-    const { get } = useApi();
+  const [items, setItems] = useState<Item[]>([]);
+  const [selectedItems, setSelectedItems] = useState<number[]>([]);
+  const [searchValue, setSearchValue] = useState('');
+  const [isOpen, setIsOpen] = useState(false);
+  const selectRef = useRef<HTMLDivElement>(null);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await get(endpoint);
-                if (response.data) {
-                    setItems(response.data);
-                }
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            }
-        };
+  const { data, loading, error, fetchData } = useApi<ApiResponse>(endpoint);
 
-        fetchData();
-    }, [endpoint]);
+  useEffect(() => {
+    fetchData();
+  }, [endpoint]);
 
-    useEffect(() => {
-        if (defaultValue) {
-            if (Array.isArray(defaultValue)) {
-                setSelectedItems(defaultValue);
-            } else {
-                setSelectedItems([defaultValue]);
-            }
-        }
-    }, [defaultValue]);
+  useEffect(() => {
+    if (data?.data) {
+      setItems(data.data);
+    }
+  }, [data]);
 
-    const handleSelect = (itemId: number) => {
-        let newSelectedItems: number[];
-        
-        if (multiple) {
-            if (selectedItems.includes(itemId)) {
-                newSelectedItems = selectedItems.filter(id => id !== itemId);
-            } else {
-                newSelectedItems = [...selectedItems, itemId];
-            }
-        } else {
-            newSelectedItems = [itemId];
-            setOpen(false);
-        }
-        
-        setSelectedItems(newSelectedItems);
-        onSelect(multiple ? newSelectedItems : itemId);
+  useEffect(() => {
+    if (defaultValue) {
+      const initialSelected = Array.isArray(defaultValue)
+        ? defaultValue
+        : [defaultValue];
+      setSelectedItems(initialSelected);
+    } else {
+      setSelectedItems([]);
+    }
+  }, [defaultValue]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (selectRef.current && !selectRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
     };
 
-    const getSelectedItemNames = () => {
-        return selectedItems
-            .map(id => items.find(item => item.id === id)?.name)
-            .filter(Boolean)
-            .join(", ");
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
     };
+  }, []);
 
-    const filteredItems = items.filter(item =>
-        item.name.toLowerCase().includes(searchValue.toLowerCase())
-    );
+  const handleSelect = (id: number) => {
+    if (multiple) {
+      const newSelected = selectedItems.includes(id)
+        ? selectedItems.filter(item => item !== id)
+        : [...selectedItems, id];
+      setSelectedItems(newSelected);
+      onSelect(newSelected);
+    } else {
+      setSelectedItems([id]);
+      onSelect(id);
+      setIsOpen(false);
+    }
+  };
 
-    return (
-        <Popover open={open} onOpenChange={setOpen}>
-            <PopoverTrigger asChild>
-                <Button
-                    variant="outline"
-                    role="combobox"
-                    aria-expanded={open}
-                    className="w-full justify-between"
-                >
-                    {selectedItems.length > 0 ? (
-                        <div className="flex flex-wrap gap-1">
-                            {multiple ? (
-                                selectedItems.map((id) => (
-                                    <Badge 
-                                        key={id} 
-                                        variant="secondary"
-                                        className="mr-1"
-                                    >
-                                        {items.find(item => item.id === id)?.name}
-                                    </Badge>
-                                ))
-                            ) : (
-                                <span>{getSelectedItemNames()}</span>
-                            )}
-                        </div>
-                    ) : (
-                        <span className="text-muted-foreground">{placeholder}</span>
-                    )}
-                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-full p-0">
-                <Command>
-                    <CommandInput 
-                        placeholder="Search..." 
-                        value={searchValue}
-                        onValueChange={setSearchValue}
-                    />
-                    <CommandEmpty>No items found.</CommandEmpty>
-                    <CommandGroup className="max-h-60 overflow-auto">
-                        {filteredItems.map((item) => (
-                            <CommandItem
-                                key={item.id}
-                                value={item.name}
-                                onSelect={() => handleSelect(item.id)}
-                            >
-                                <Check
-                                    className={cn(
-                                        "mr-2 h-4 w-4",
-                                        selectedItems.includes(item.id) ? "opacity-100" : "opacity-0"
-                                    )}
-                                />
-                                {item.name}
-                            </CommandItem>
-                        ))}
-                    </CommandGroup>
-                </Command>
-            </PopoverContent>
-        </Popover>
-    );
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchValue(e.target.value);
+    setIsOpen(true);
+  };
+
+  const filteredItems = items?.filter(item =>
+    item.name.toLowerCase().includes(searchValue.toLowerCase())
+  ) || [];
+
+  const getSelectedNames = () => {
+    return selectedItems
+      .map(id => items.find(item => item.id === id)?.name)
+      .filter(Boolean)
+      .join(', ');
+  };
+
+  if (loading) {
+    return <div className="text-center">Loading...</div>;
+  }
+
+  if (error) {
+    return <div className="text-center text-red-500">Error loading items</div>;
+  }
+
+  return (
+    <div className="relative" ref={selectRef}>
+      <input
+        type="text"
+        placeholder={placeholder}
+        value={searchValue}
+        onChange={handleSearch}
+        onFocus={() => setIsOpen(true)}
+        className="w-full px-3 py-2 border rounded-md"
+      />
+      {selectedItems.length > 0 && !searchValue && (
+        <div className="mt-1 text-sm text-gray-600">
+          {getSelectedNames()}
+        </div>
+      )}
+      
+      {isOpen && (
+        <div className="absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg max-h-60 overflow-auto">
+          {filteredItems.length > 0 ? (
+            filteredItems.map(item => (
+              <div
+                key={item.id}
+                onClick={() => handleSelect(item.id)}
+                className={cn(
+                  "px-3 py-2 cursor-pointer hover:bg-gray-100",
+                  selectedItems.includes(item.id) && "bg-blue-50"
+                )}
+              >
+                {item.name}
+              </div>
+            ))
+          ) : (
+            <div className="px-3 py-2 text-gray-500">No results found</div>
+          )}
+        </div>
+      )}
+    </div>
+  );
 };
 
 export default SelectData;

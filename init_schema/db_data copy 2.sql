@@ -46,8 +46,6 @@ CREATE TABLE products
     id             SERIAL PRIMARY KEY,
     name           VARCHAR(255)   NOT NULL,
     slug           VARCHAR(255)   NOT NULL UNIQUE,
-    brand          VARCHAR(100)   NOT NULL,
-    model          VARCHAR(100)   NOT NULL,
     price          DECIMAL(10, 2) NOT NULL,
     description    TEXT,
     specifications JSONB,
@@ -59,15 +57,11 @@ CREATE TABLE products
     FOREIGN KEY (thumbnail_id) REFERENCES images (id) ON DELETE SET NULL
 );
 
-CREATE INDEX idx_products_name ON products (name);
-CREATE INDEX idx_products_slug ON products (slug);
-CREATE INDEX idx_products_brand ON products (brand);
-CREATE INDEX idx_products_model ON products (model);
-CREATE INDEX idx_products_price ON products (price);
-CREATE INDEX idx_products_stock_quantity ON products (stock_quantity);
-CREATE INDEX idx_products_created_at ON products (created_at);
-CREATE INDEX idx_products_updated_at ON products (updated_at);
-CREATE INDEX idx_products_status ON products (status);
+CREATE INDEX idx_products_name_slug ON products (name, slug);
+CREATE INDEX idx_products_price_stock ON products (price, stock_quantity);
+CREATE INDEX idx_products_dates ON products (created_at, updated_at);
+CREATE INDEX idx_products_status_thumb ON products (status, thumbnail_id);
+CREATE INDEX idx_products_specs ON products USING GIN (specifications);
 
 CREATE TABLE product_images
 (

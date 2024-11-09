@@ -23,8 +23,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 .select(
                     'p.id AS product_id',
                     'p.name AS product_name',
-                    'p.brand',
-                    'p.model',
                     'p.price',
                     'p.slug',
                     'p.description',
@@ -92,7 +90,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
     } else if (req.method === 'POST') {
         try {
-            const { name, brand, model, price, description, specifications, stock_quantity, thumbnail_id, categories, images } = req.body;
+            const { name, price, description, specifications, stock_quantity, thumbnail_id, categories, images } = req.body;
 
             const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 
@@ -103,8 +101,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     .insert({
                         name,
                         slug,
-                        brand,
-                        model,
                         price,
                         description,
                         specifications,

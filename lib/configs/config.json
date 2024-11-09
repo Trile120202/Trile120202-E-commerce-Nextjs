@@ -111,5 +111,64 @@
       "Đã hủy",
       "Hoàn trả"
     ]
+  },
+  "brands": {
+    "names": [
+      "Apple",
+      "Samsung",
+      "Xiaomi",
+      "Oppo",
+      "Vivo",
+      "Realme",
+      "Nokia",
+      "Asus",
+      "Lenovo",
+      "HP",
+      "Dell",
+      "Acer",
+      "MSI",
+      "LG",
+      "Sony",
+      "Huawei",
+      "OnePlus",
+      "Google",
+      "Microsoft"
+    ]
+  },
+  "models": {
+    "phones": [
+      "iPhone 15 Pro Max",
+      "iPhone 15 Pro",
+      "iPhone 15 Plus",
+      "iPhone 15",
+      "iPhone 14 Pro Max",
+      "iPhone 14 Pro",
+      "Galaxy S23 Ultra",
+      "Galaxy S23+",
+      "Galaxy S23",
+      "Galaxy Z Fold5",
+      "Galaxy Z Flip5",
+      "Xiaomi 13T Pro",
+      "Redmi Note 12",
+      "OPPO Find N3 Flip",
+      "OPPO Reno10",
+      "Vivo V29e"
+    ],
+    "laptops": [
+      "MacBook Air M2",
+      "MacBook Pro 14",
+      "MacBook Pro 16",
+      "Dell XPS 13",
+      "Dell XPS 15",
+      "ThinkPad X1 Carbon",
+      "ROG Zephyrus G14",
+      "ROG Zephyrus G15",
+      "Legion Pro 7i",
+      "Legion Slim 7i",
+      "Razer Blade 14",
+      "Razer Blade 15",
+      "HP Spectre x360",
+      "HP Envy x360"
+    ]
   }
 }
