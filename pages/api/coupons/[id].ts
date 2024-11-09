@@ -13,6 +13,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         try {
             const coupon = await db('coupons')
                 .where('id', id)
+                .whereNot('status', -2)
                 .first();
 
             if (!coupon) {
@@ -69,6 +70,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             const existingCoupon = await db('coupons')
                 .where('code', code)
                 .whereNot('id', id)
+                .whereNot('status', -2)
                 .first();
 
             if (existingCoupon) {
@@ -81,6 +83,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
             const [updatedCoupon] = await db('coupons')
                 .where({ id })
+                .whereNot('status', -2)
                 .update({
                     code,
                     discount_type,

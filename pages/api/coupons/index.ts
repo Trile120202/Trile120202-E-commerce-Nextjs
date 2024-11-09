@@ -15,7 +15,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             const search = req.query.search as string;
             const status = req.query.status as string;
 
-            let query = db('coupons');
+            let query = db('coupons').whereNot('status', -2);
 
             if (search) {
                 query = query.where('code', 'ilike', `%${search}%`);
@@ -32,7 +32,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 .select('*')
                 .orderBy('created_at', 'desc')
                 .offset(offset)
-                .limit(limit);
+                .limit(limit)
+                .orderBy('created_at', 'desc');
 
             const totalPages = Math.ceil(totalItems / limit);
 

@@ -24,6 +24,8 @@ import {
 import { Card, CardHeader, CardTitle } from "@/components/ui/card"
 import useApi from '@/lib/useApi';
 import DataTable from "@/components/custom/datatable";
+import { useToast } from "@/hooks/use-toast";
+import { ChangeStatus } from "@/components/custom/ChangeStatus";
 
 interface Coupon {
     id: number;
@@ -36,6 +38,7 @@ interface Coupon {
     max_usage: number;
     max_discount_value: number;
     is_active: boolean;
+    status: number;
     created_at: string;
     updated_at: string;
 }
@@ -56,10 +59,12 @@ interface ApiResponse {
 
 const Page = () => {
     const router = useRouter();
+    const { toast } = useToast();
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedStatus, setSelectedStatus] = useState<string>('all');
     const [searchKeyword, setSearchKeyword] = useState<string>('');
     const [limit, setLimit] = useState<number>(10);
+    const [selectedId, setSelectedId] = useState<number | null>(null);
 
     const { data, loading, error, fetchData } = useApi<ApiResponse>(
         `/api/coupons?page=${currentPage}&limit=${limit}&search=${searchKeyword}${selectedStatus !== 'all' ? `&status=${selectedStatus}` : ''}`,
@@ -80,12 +85,8 @@ const Page = () => {
         router.push(`/quan-tri/quan-ly-khuyen-mai/${id}`);
     };
 
-    const handleDelete = (id: number) => {
-        console.log(`Delete coupon with id: ${id}`);
-    };
-
-    const getStatusColor = (isActive: boolean) => {
-        return isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
+    const getStatusColor = (status: number) => {
+        return status === 1 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
     };
 
     const columns = [
@@ -96,12 +97,12 @@ const Page = () => {
         { accessor: 'start_date', label: 'Ngày bắt đầu', render: (row: Coupon) => new Date(row.start_date).toLocaleDateString() },
         { accessor: 'end_date', label: 'Ngày kết thúc', render: (row: Coupon) => new Date(row.end_date).toLocaleDateString() },
         { 
-            accessor: 'is_active', 
+            accessor: 'status', 
             label: 'Trạng thái', 
             className: 'text-center hidden md:table-cell',
             render: (row: Coupon) => (
-                <span className={`hidden md:inline-block px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(row.is_active)}`}>
-                    {row.is_active ? 'Hoạt động' : 'Không hoạt động'}
+                <span className={`hidden md:inline-block px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(row.status)}`}>
+                    {row.status === 1 ? 'Hoạt động' : 'Không hoạt động'}
                 </span>
             )
         },
@@ -110,24 +111,41 @@ const Page = () => {
             label: 'Thao tác', 
             className: 'text-right',
             render: (row: Coupon) => (
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
-                            <BsThreeDots className="h-4 w-4" />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => handleEdit(row.id)}>
-                            <FaEdit className="mr-2 h-4 w-4" />
-                            <span>Sửa</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleDelete(row.id)}>
-                            <FaTrash className="mr-2 h-4 w-4" />
-                            <span>Xóa</span>
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                <>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="h-8 w-8 p-0">
+                                <span className="sr-only">Open menu</span>
+                                <BsThreeDots className="h-4 w-4" />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => handleEdit(row.id)}>
+                                <FaEdit className="mr-2 h-4 w-4" />
+                                <span>Sửa</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => setSelectedId(row.id)}>
+                                <FaTrash className="mr-2 h-4 w-4" />
+                                <span>Xóa</span>
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+
+                    <ChangeStatus
+                        id={row.id}
+                        isOpen={selectedId === row.id}
+                        onClose={() => setSelectedId(null)}
+                        onSuccess={fetchData}
+                        endpoint="/api/coupons/update-status"
+                        status={-2}
+                        title="Xác nhận xóa khuyến mãi"
+                        description="Bạn có chắc chắn muốn xóa khuyến mãi này? Hành động này không thể hoàn tác."
+                        confirmText="Xóa"
+                        cancelText="Hủy"
+                        successMessage="Xóa khuyến mãi thành công"
+                        errorMessage="Có lỗi xảy ra khi xóa khuyến mãi"
+                    />
+                </>
             )
         },
     ];
