@@ -1,24 +1,19 @@
 'use client';
 
-import React, { useState } from 'react';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table"
+import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
     Pagination,
     PaginationContent,
+    PaginationEllipsis,
     PaginationItem,
     PaginationLink,
     PaginationNext,
     PaginationPrevious,
 } from "@/components/ui/pagination"
 import { Button } from "@/components/ui/button"
-import { FaEdit, FaTrash, FaPlus, FaSearch } from 'react-icons/fa'
+import { FaEdit, FaTrash, FaPlus } from 'react-icons/fa'
 import { BsThreeDots } from 'react-icons/bs'
 import {
     DropdownMenu,
@@ -26,179 +21,294 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardHeader, CardTitle } from "@/components/ui/card"
+import useApi from '@/lib/useApi';
+import DataTable from "@/components/custom/datatable";
+import { useToast } from "@/hooks/use-toast";
+import { ChangeStatus } from "@/components/custom/ChangeStatus";
+
+interface Banner {
+    id: number;
+    name: string;
+    location: string;
+    position: number;
+    created_at: string;
+    updated_at: string;
+    status: number;
+    images: any[];
+}
+
+interface Pagination {
+    currentPage: number;
+    pageSize: number;
+    totalItems: string;
+    totalPages: number;
+}
+
+interface ApiResponse {
+    status: number;
+    message: string;
+    data: Banner[];
+    pagination: Pagination;
+}
 
 const Page = () => {
-    const bannersData = [
-        { id: 1, name: 'Banner Trang chủ', position: 'Trang chủ', startDate: '2023-01-01', endDate: '2023-12-31', status: 'Đang hiển thị' },
-        { id: 2, name: 'Banner Khuyến mãi', position: 'Trang khuyến mãi', startDate: '2023-02-01', endDate: '2023-03-01', status: 'Đã kết thúc' },
-        { id: 3, name: 'Banner Sản phẩm mới', position: 'Trang sản phẩm', startDate: '2023-03-15', endDate: '2023-06-15', status: 'Đang hiển thị' },
-        { id: 4, name: 'Banner Mùa hè', position: 'Trang chủ', startDate: '2023-06-01', endDate: '2023-08-31', status: 'Chưa bắt đầu' },
-        { id: 5, name: 'Banner Black Friday', position: 'Trang khuyến mãi', startDate: '2023-11-24', endDate: '2023-11-26', status: 'Chưa bắt đầu' },
-    ];
-
-    const columns = [
-        { accessor: 'id', label: 'ID', className: 'font-medium' },
-        { accessor: 'name', label: 'Tên banner', className: 'font-medium' },
-        { accessor: 'position', label: 'Vị trí', className: 'text-center' },
-        { accessor: 'startDate', label: 'Ngày bắt đầu', className: 'text-center' },
-        { accessor: 'endDate', label: 'Ngày kết thúc', className: 'text-center' },
-        { accessor: 'status', label: 'Trạng thái', className: 'text-center' },
-        { accessor: 'actions', label: 'Thao tác', className: 'text-right' },
-    ];
-
+    const router = useRouter();
+    const { toast } = useToast();
     const [currentPage, setCurrentPage] = useState(1);
-    const totalPages = 5;
     const [selectedStatus, setSelectedStatus] = useState<string>('all');
+    const [selectedLocation, setSelectedLocation] = useState<string>('all');
     const [searchKeyword, setSearchKeyword] = useState<string>('');
+    const [limit, setLimit] = useState<number>(10);
+    const [selectedId, setSelectedId] = useState<number | null>(null);
+
+    const { data, loading, error, fetchData } = useApi<ApiResponse>(
+        `/api/banner?page=${currentPage}&limit=${limit}&search=${searchKeyword}${selectedStatus !== 'all' ? `&status=${selectedStatus}` : ''}${selectedLocation !== 'all' ? `&location=${selectedLocation}` : ''}`,
+        {
+            method: 'GET'
+        }
+    );
+
+    useEffect(() => {
+        fetchData();
+    }, [currentPage, selectedStatus, selectedLocation, searchKeyword, limit]);
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
     };
 
     const handleEdit = (id: number) => {
-        console.log(`Edit banner with id: ${id}`);
+        router.push(`/quan-tri/quan-ly-banner/${id}`);
     };
 
-    const handleDelete = (id: number) => {
-        console.log(`Delete banner with id: ${id}`);
-    };
+    const handleDelete = async (id: number) => {
+        try {
+            const response = await fetch(`/api/banner`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ id }),
+            });
 
-    const handleCreate = () => {
-        console.log('Create new banner');
-    };
+            const result = await response.json();
 
-    const getStatusColor = (status: string) => {
-        switch (status) {
-            case 'Đang hiển thị':
-                return 'bg-green-100 text-green-800';
-            case 'Đã kết thúc':
-                return 'bg-red-100 text-red-800';
-            case 'Chưa bắt đầu':
-                return 'bg-yellow-100 text-yellow-800';
-            default:
-                return 'bg-gray-100 text-gray-800';
+            if (!response.ok) {
+                throw new Error(result.message || 'Có lỗi xảy ra khi xóa banner');
+            }
+
+            toast({
+                title: "Thành công",
+                description: "Xóa banner thành công",
+            });
+
+            fetchData();
+
+        } catch (error) {
+            console.error('Error deleting banner:', error);
+            toast({
+                variant: "destructive",
+                title: "Lỗi",
+                description: (error as Error).message || "Có lỗi xảy ra khi xóa banner",
+            });
         }
     };
 
-    const filteredBanners = bannersData.filter(banner => 
-        (selectedStatus === 'all' || banner.status === selectedStatus) &&
-        (searchKeyword === '' || banner.name.toLowerCase().includes(searchKeyword.toLowerCase()))
-    );
+    const getStatusColor = (status: number) => {
+        return status === 1 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
+    };
+
+    const columns = [
+        { accessor: 'id', label: 'ID', className: 'font-medium' },
+        { accessor: 'name', label: 'Tên banner', className: 'font-medium' },
+        { accessor: 'location', label: 'Vị trí', className: 'font-medium' },
+        { accessor: 'position', label: 'Thứ tự', className: 'text-center' },
+        { 
+            accessor: 'status', 
+            label: 'Trạng thái', 
+            className: 'text-center hidden md:table-cell',
+            render: (row: Banner) => (
+                <span className={`hidden md:inline-block px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(row.status)}`}>
+                    {row.status === 1 ? 'Hoạt động' : 'Không hoạt động'}
+                </span>
+            )
+        },
+        { 
+            accessor: 'actions', 
+            label: 'Thao tác', 
+            className: 'text-right',
+            render: (row: Banner) => (
+                <>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="h-8 w-8 p-0">
+                                <span className="sr-only">Open menu</span>
+                                <BsThreeDots className="h-4 w-4" />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => handleEdit(row.id)}>
+                                <FaEdit className="mr-2 h-4 w-4" />
+                                <span>Sửa</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => setSelectedId(row.id)}>
+                                <FaTrash className="mr-2 h-4 w-4" />
+                                <span>Xóa</span>
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                    
+                    <ChangeStatus
+                        id={row.id}
+                        isOpen={selectedId === row.id}
+                        onClose={() => setSelectedId(null)}
+                        onSuccess={fetchData}
+                        endpoint="/api/banner/update-status"
+                        status={-2}
+                        title="Xác nhận xóa banner"
+                        description="Bạn có chắc chắn muốn xóa banner này? Hành động này không thể hoàn tác."
+                        confirmText="Xóa"
+                        cancelText="Hủy"
+                        successMessage="Xóa banner thành công"
+                        errorMessage="Có lỗi xảy ra khi xóa banner"
+                    />
+                </>
+            )
+        },
+    ];
 
     return (
-        <Card className="w-full shadow-lg">
-            <CardHeader className="bg-gradient-to-r from-blue-500 to-purple-600 text-white">
-                <div className="flex justify-between items-center">
-                    <CardTitle className="text-2xl font-bold">Quản lý banner</CardTitle>
-                    <Button onClick={handleCreate} className="bg-green-500 hover:bg-green-600 transition duration-300">
-                        <FaPlus className="mr-2 h-4 w-4" />
-                        Tạo mới
-                    </Button>
-                </div>
-            </CardHeader>
-            <CardContent className="pt-6">
-                <div className="flex space-x-4 mb-6">
-                    <div className="relative">
-                        <Select onValueChange={setSelectedStatus} defaultValue="all">
-                            <SelectTrigger className="w-[200px] border-2 border-gray-300 rounded-lg">
-                                <SelectValue placeholder="Chọn trạng thái" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="all">Tất cả</SelectItem>
-                                <SelectItem value="Đang hiển thị">Đang hiển thị</SelectItem>
-                                <SelectItem value="Đã kết thúc">Đã kết thúc</SelectItem>
-                                <SelectItem value="Chưa bắt đầu">Chưa bắt đầu</SelectItem>
-                            </SelectContent>
-                        </Select>
+        <div className="flex flex-col h-full">
+            <div className="sticky top-0 z-20 bg-white shadow-sm">
+                <Card className="rounded-none shadow-none border-0">
+                    <CardHeader className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-4 md:p-6">
+                        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 md:gap-0">
+                            <CardTitle className="text-xl md:text-2xl font-bold">Quản lý banner</CardTitle>
+                            <Link href="/quan-tri/quan-ly-banner/tao-moi" className="w-full md:w-auto">
+                                <Button className="w-full md:w-auto bg-green-500 hover:bg-green-600 transition duration-300">
+                                    <FaPlus className="mr-2 h-4 w-4" />
+                                    Tạo mới
+                                </Button>
+                            </Link>
+                        </div>
+                    </CardHeader>
+                </Card>
+            </div>
+
+            <div className="flex-1 overflow-auto">
+                <DataTable
+                    data={data?.data || []}
+                    columns={columns}
+                    loading={loading}
+                    error={error ? new Error(error) : null}
+                    filters={{
+                        status: {
+                            value: selectedStatus,
+                            onChange: setSelectedStatus,
+                            options: [
+                                { label: 'Tất cả', value: 'all' },
+                                { label: 'Hoạt động', value: '1' },
+                                { label: 'Không hoạt động', value: '0' },
+                            ]
+                        },
+                        location: {
+                            value: selectedLocation,
+                            onChange: setSelectedLocation,
+                            options: [
+                                { label: 'Tất cả', value: 'all' },
+                                { label: 'Trang chủ', value: 'home' },
+                                { label: 'Sản phẩm', value: 'products' },
+                                { label: 'Tin tức', value: 'news' },
+                            ]
+                        },
+                        search: {
+                            value: searchKeyword,
+                            onChange: setSearchKeyword,
+                            placeholder: "Tìm kiếm banner"
+                        },
+                        limit: {
+                            value: limit,
+                            onChange: setLimit,
+                            options: [4, 10, 20, 50, 100]
+                        }
+                    }}
+                />
+            </div>
+
+            <div className="sticky bottom-0 bg-white border-t z-10">
+                {data?.pagination && (
+                    <div className="p-4">
+                        <Pagination>
+                            <PaginationContent>
+                                <PaginationItem>
+                                    <PaginationPrevious 
+                                        onClick={() => handlePageChange(data.pagination.currentPage - 1)}
+                                        className={data.pagination.currentPage === 1 ? 'pointer-events-none opacity-50' : ''}
+                                    />
+                                </PaginationItem>
+                                
+                                {[...Array(data.pagination.totalPages)].map((_, index) => {
+                                    if (index === 0) return (
+                                        <PaginationItem key={index}>
+                                            <PaginationLink 
+                                                onClick={() => handlePageChange(index + 1)}
+                                                isActive={data.pagination.currentPage === index + 1}
+                                            >
+                                                {index + 1}
+                                            </PaginationLink>
+                                        </PaginationItem>
+                                    )
+                                    
+                                    if (
+                                        index === data.pagination.currentPage - 1 ||
+                                        index === data.pagination.currentPage - 2 ||
+                                        index === data.pagination.currentPage
+                                    ) return (
+                                        <PaginationItem key={index}>
+                                            <PaginationLink 
+                                                onClick={() => handlePageChange(index + 1)}
+                                                isActive={data.pagination.currentPage === index + 1}
+                                            >
+                                                {index + 1}
+                                            </PaginationLink>
+                                        </PaginationItem>
+                                    )
+                                    
+                                    if (index === data.pagination.totalPages - 1) return (
+                                        <PaginationItem key={index}>
+                                            <PaginationLink 
+                                                onClick={() => handlePageChange(index + 1)}
+                                                isActive={data.pagination.currentPage === index + 1}
+                                            >
+                                                {index + 1}
+                                            </PaginationLink>
+                                        </PaginationItem>
+                                    )
+                                    
+                                    if (
+                                        index === 1 ||
+                                        index === data.pagination.totalPages - 2
+                                    ) return (
+                                        <PaginationItem key={index}>
+                                            <PaginationEllipsis />
+                                        </PaginationItem>
+                                    )
+                                    
+                                    return null
+                                })}
+
+                                <PaginationItem>
+                                    <PaginationNext 
+                                        onClick={() => handlePageChange(data.pagination.currentPage + 1)}
+                                        className={data.pagination.currentPage === data.pagination.totalPages ? 'pointer-events-none opacity-50' : ''}
+                                    />
+                                </PaginationItem>
+                            </PaginationContent>
+                        </Pagination>
                     </div>
-                    <div className="relative w-64">
-                        <Input
-                            placeholder="Tìm kiếm banner"
-                            value={searchKeyword}
-                            onChange={(e) => setSearchKeyword(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2 border-2 border-gray-300 rounded-lg"
-                        />
-                        <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                    </div>
-                </div>
-                <div className="overflow-x-auto">
-                    <Table className="w-full">
-                        <TableHeader>
-                            <TableRow className="bg-gray-100">
-                                {columns.map((col, index) => (
-                                    <TableHead key={index} className={`${col.className} py-3`}>
-                                        {col.label}
-                                    </TableHead>
-                                ))}
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {filteredBanners.map((row, index) => (
-                                <TableRow key={index} className="hover:bg-gray-50 transition duration-150">
-                                    {columns.map((col, colIndex) => (
-                                        <TableCell 
-                                            key={colIndex} 
-                                            className={`${col.className} py-4`}
-                                        >
-                                            {col.accessor === 'actions' ? (
-                                                <DropdownMenu>
-                                                    <DropdownMenuTrigger asChild>
-                                                        <Button variant="ghost" className="h-8 w-8 p-0">
-                                                            <span className="sr-only">Open menu</span>
-                                                            <BsThreeDots className="h-4 w-4" />
-                                                        </Button>
-                                                    </DropdownMenuTrigger>
-                                                    <DropdownMenuContent align="end">
-                                                        <DropdownMenuItem onClick={() => handleEdit(row.id)}>
-                                                            <FaEdit className="mr-2 h-4 w-4" />
-                                                            <span>Sửa</span>
-                                                        </DropdownMenuItem>
-                                                        <DropdownMenuItem onClick={() => handleDelete(row.id)}>
-                                                            <FaTrash className="mr-2 h-4 w-4" />
-                                                            <span>Xóa</span>
-                                                        </DropdownMenuItem>
-                                                    </DropdownMenuContent>
-                                                </DropdownMenu>
-                                            ) : col.accessor === 'status' ? (
-                                                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(row.status)}`}>
-                                                    {row.status}
-                                                </span>
-                                            ) : (
-                                                row[col.accessor as keyof typeof row]
-                                            )}
-                                        </TableCell>
-                                    ))}
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </div>
-                <Pagination className="mt-6">
-                    <PaginationContent>
-                        <PaginationItem>
-                            <PaginationPrevious href="#" onClick={() => handlePageChange(currentPage - 1)} />
-                        </PaginationItem>
-                        {[...Array(totalPages)].map((_, index) => (
-                            <PaginationItem key={index}>
-                                <PaginationLink 
-                                    href="#"
-                                    onClick={() => handlePageChange(index + 1)}
-                                    isActive={currentPage === index + 1}
-                                >
-                                    {index + 1}
-                                </PaginationLink>
-                            </PaginationItem>
-                        ))}
-                        <PaginationItem>
-                            <PaginationNext href="#" onClick={() => handlePageChange(currentPage + 1)} />
-                        </PaginationItem>
-                    </PaginationContent>
-                </Pagination>
-            </CardContent>
-        </Card>
+                )}
+            </div>
+        </div>
     );
 };
 
