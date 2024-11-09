@@ -90,8 +90,68 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 statusCode: StatusCode.INTERNAL_SERVER_ERROR,
             }));
         }
+    } else if (req.method === 'POST') {
+        try {
+            const { name, brand, model, price, description, specifications, stock_quantity, thumbnail_id, categories, images } = req.body;
+
+            const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+
+            const trx = await db.transaction();
+
+            try {
+                const [product] = await trx('products')
+                    .insert({
+                        name,
+                        slug,
+                        brand,
+                        model,
+                        price,
+                        description,
+                        specifications,
+                        stock_quantity,
+                        thumbnail_id,
+                        status: 1
+                    })
+                    .returning('*');
+
+                if (categories && categories.length > 0) {
+                    const categoryRecords = categories.map((categoryId: number) => ({
+                        product_id: product.id,
+                        category_id: categoryId
+                    }));
+                    await trx('product_categories').insert(categoryRecords);
+                }
+
+                if (images && images.length > 0) {
+                    const imageRecords = images.map((imageId: number, index: number) => ({
+                        product_id: product.id,
+                        image_id: imageId,
+                        display_order: index + 1
+                    }));
+                    await trx('product_images').insert(imageRecords);
+                }
+
+                await trx.commit();
+
+                res.status(StatusCode.CREATED).json(transformResponse({
+                    data: product,
+                    message: 'Product created successfully.',
+                    statusCode: StatusCode.CREATED
+                }));
+            } catch (error) {
+                await trx.rollback();
+                throw error;
+            }
+        } catch (error) {
+            console.error(error);
+            return res.status(StatusCode.INTERNAL_SERVER_ERROR).json(transformResponse({
+                data: null,
+                message: 'An error occurred while creating the product.',
+                statusCode: StatusCode.INTERNAL_SERVER_ERROR
+            }));
+        }
     } else {
-        res.setHeader('Allow', ['GET']);
+        res.setHeader('Allow', ['GET', 'POST']);
         return res.status(StatusCode.METHOD_NOT_ALLOWED).end(`Method ${req.method} Not Allowed`);
     }
 }
