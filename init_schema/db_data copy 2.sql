@@ -522,3 +522,7 @@ CREATE TRIGGER update_images_modtime
     ON images
     FOR EACH ROW
 EXECUTE FUNCTION update_modified_column();
+
+CREATE INDEX idx_products_name ON products(name);
+CREATE INDEX idx_products_status ON products(status);
+CREATE INDEX idx_products_created_at ON products(created_at);
