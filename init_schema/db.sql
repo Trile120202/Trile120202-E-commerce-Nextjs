@@ -25,6 +25,13 @@ DROP TABLE IF EXISTS banners CASCADE;
 DROP TABLE IF EXISTS banner_images CASCADE;
 DROP TABLE IF EXISTS product_graphics_cards CASCADE;
 DROP TABLE IF EXISTS graphics_cards CASCADE;
+DROP TABLE IF EXISTS displays CASCADE;
+DROP TABLE IF EXISTS product_displays CASCADE;
+DROP TABLE IF EXISTS cpus CASCADE;
+DROP TABLE IF EXISTS product_cpus CASCADE;
+DROP TABLE IF EXISTS graphics_cards CASCADE;
+DROP TABLE IF EXISTS product_graphics_cards CASCADE;
+
 
 DROP FUNCTION IF EXISTS update_modified_column() CASCADE;
 
@@ -132,6 +139,9 @@ CREATE TABLE roles
     status      INT DEFAULT 1
 );
 
+INSERT INTO roles (name, description) VALUES ('admin', 'Administrator role');
+INSERT INTO roles (name, description) VALUES ('user', 'User role');
+
 CREATE TABLE users
 (
     id         SERIAL PRIMARY KEY,
@@ -143,7 +153,7 @@ CREATE TABLE users
     phone      VARCHAR(20),
     address    TEXT,
     avatar_id  INT,
-    role_id    INT          NOT NULL DEFAULT 3,
+    role_id    INT DEFAULT 2,
     status     INT                   DEFAULT 1,
     created_at TIMESTAMP             DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP             DEFAULT CURRENT_TIMESTAMP,

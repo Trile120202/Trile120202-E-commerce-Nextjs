@@ -1,0 +1,100 @@
+import { NextResponse } from 'next/server';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import knexConfig from '../../../../knexfile';
+import knex from 'knex';
+import { log } from 'console';
+
+const db = knex(knexConfig);
+
+export async function POST(request: Request) {
+  try {
+    const { username, password } = await request.json();
+
+    if (!username || !password) {
+      return NextResponse.json(
+        { error: 'Vui lòng nhập tên đăng nhập và mật khẩu' },
+        { status: 400 }
+      );
+    }
+
+    const user = await db('users').where({ username }).first();
+    if (!user) {
+      return NextResponse.json(
+        { error: 'Tên đăng nhập hoặc mật khẩu không đúng' },
+        { status: 400 }
+      );
+    }
+
+    const validPassword = await bcrypt.compare(password, user.password);
+    console.log(validPassword); // So sánh mật khẩu đã nhập với mật khẩu đã được mã hóa trong database
+    if (!validPassword) {
+      return NextResponse.json(
+        { error: 'Tên đăng nhập hoặc mật khẩu không đúng' },
+        { status: 400 }
+      );
+    }
+
+    // Tạo JWT token
+    const token = jwt.sign(
+      { 
+        userId: user.id,
+        username: user.username,
+        email: user.email,
+        firstName: user.first_name,
+        lastName: user.last_name,
+        roleId: user.role_id
+      },
+      process.env.JWT_SECRET || 'your-secret-key',
+      { expiresIn: '1d' }
+    );
+
+    // Log để debug
+    console.log('User data:', user);
+    console.log('Token payload:', { 
+      userId: user.id, 
+      username: user.username,
+      email: user.email,
+      firstName: user.first_name,
+      lastName: user.last_name,
+      roleId: user.role_id
+    });
+
+    // Tạo response với cookie
+    const response = NextResponse.json({
+      message: 'Đăng nhập thành công',
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        firstName: user.first_name,
+        lastName: user.last_name,
+        phone: user.phone,
+        address: user.address,
+        avatarId: user.avatar_id,
+        roleId: user.role_id,
+        status: user.status
+      }
+    });
+
+    // Thêm httpOnly cookie
+    response.cookies.set({
+      name: 'token',
+      value: token,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      path: '/',
+      maxAge: 60 * 60 * 24 // 1 day
+    });
+
+    return response;
+
+  } catch (error) {
+    console.error('Lỗi đăng nhập:', error);
+    return NextResponse.json(
+      { error: 'Có lỗi xảy ra khi đăng nhập' },
+      { status: 500 }
+    );
+  }
+}

@@ -9,6 +9,16 @@ const db = knex(knexConfig);
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method === 'GET') {
         try {
+            const token = req.cookies.token;
+
+            if (!token) {
+                return res.status(StatusCode.UNAUTHORIZED).json(transformResponse({
+                    data: null,
+                    message: 'Unauthorized - No token provided',
+                    statusCode: StatusCode.UNAUTHORIZED
+                }));
+            }
+
             const page = parseInt(req.query.page as string) || 1;
             const limit = parseInt(req.query.limit as string) || 10;
             const search = req.query.search as string;

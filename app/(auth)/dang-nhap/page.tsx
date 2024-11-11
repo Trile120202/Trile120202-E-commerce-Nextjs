@@ -8,14 +8,51 @@ import { Label } from "@/components/ui/label";
 import { FiUser, FiLock } from 'react-icons/fi';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 
 const Page = () => {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+    const router = useRouter();
+    const [formData, setFormData] = useState({
+        username: '',
+        password: ''
+    });
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
 
-    const handleLogin = (e: React.FormEvent) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { id, value } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [id]: value
+        }));
+    };
+
+    const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
-        console.log('Đăng nhập với:', email, password);
+        setLoading(true);
+        setError('');
+
+        try {
+            const res = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                throw new Error(data.error || 'Có lỗi xảy ra khi đăng nhập');
+            }
+
+            router.push('/');
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Có lỗi xảy ra khi đăng nhập');
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -32,15 +69,15 @@ const Page = () => {
                     <CardContent className="p-6">
                         <form onSubmit={handleLogin} className="space-y-4">
                             <div className="space-y-2">
-                                <Label htmlFor="email" className="text-gray-700 font-medium">Email</Label>
+                                <Label htmlFor="username" className="text-gray-700 font-medium">Tên đăng nhập</Label>
                                 <div className="relative">
                                     <FiUser className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                                     <Input
-                                        id="email"
-                                        type="email"
-                                        placeholder="name@example.com"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
+                                        id="username"
+                                        type="text"
+                                        placeholder="Nhập tên đăng nhập"
+                                        value={formData.username}
+                                        onChange={handleChange}
                                         className="pl-10 border-2 border-gray-300 focus:border-blue-500 transition-all duration-300"
                                         required
                                     />
@@ -54,16 +91,23 @@ const Page = () => {
                                         id="password"
                                         type="password"
                                         placeholder="••••••••"
-                                        value={password}
-                                        onChange={(e) => setPassword(e.target.value)}
+                                        value={formData.password}
+                                        onChange={handleChange}
                                         className="pl-10 border-2 border-gray-300 focus:border-blue-500 transition-all duration-300"
                                         required
                                     />
                                 </div>
                             </div>
-                            <Button type="submit" className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold py-2 px-4 rounded-full transition-all duration-300 transform hover:scale-105">
-                                Đăng nhập
+                            <Button 
+                                type="submit" 
+                                className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold py-2 px-4 rounded-full transition-all duration-300 transform hover:scale-105"
+                                disabled={loading}
+                            >
+                                {loading ? 'Đang xử lý...' : 'Đăng nhập'}
                             </Button>
+                            {error && (
+                                <div className="text-red-500 text-sm text-center">{error}</div>
+                            )}
                         </form>
                         <div className="mt-6 text-center text-sm">
                             <Link href="/quen-mat-khau" className="text-blue-600 hover:text-blue-800 transition-colors duration-300">Quên mật khẩu?</Link>
