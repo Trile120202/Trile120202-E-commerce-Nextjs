@@ -42,13 +42,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         try {
 
             const token = req.cookies.token;
+            if (!token) {
+                return res.status(StatusCode.UNAUTHORIZED).json(transformResponse({
+                    data: null,
+                    message: 'Unauthorized - No token provided',
+                    statusCode: StatusCode.UNAUTHORIZED
+                }));
+            }
 
             const verified = await jwtVerify(
-                token,
+                token as string,
                 new TextEncoder().encode(process.env.JWT_SECRET || 'your-secret-key')
             );
 
-            if (!token && verified.payload.roleId) {
+            if (!token && verified.payload.roleId===1) {
                 return res.status(StatusCode.UNAUTHORIZED).json(transformResponse({
                     data: null,
                     message: 'Unauthorized - No token provided',

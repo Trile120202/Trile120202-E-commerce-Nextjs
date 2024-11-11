@@ -3,6 +3,7 @@ import knex from 'knex';
 import knexConfig from '../../../knexfile';
 import { StatusCode } from "@/lib/statusCodes";
 import { transformResponse } from "@/lib/interceptors/transformInterceptor";
+import {jwtVerify} from "jose";
 
 const db = knex(knexConfig);
 
@@ -13,6 +14,27 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     switch (method) {
         case 'GET':
             try {
+                const token = req.cookies.token;
+                if (!token) {
+                    return res.status(StatusCode.UNAUTHORIZED).json(transformResponse({
+                        data: null,
+                        message: 'Unauthorized - No token provided',
+                        statusCode: StatusCode.UNAUTHORIZED
+                    }));
+                }
+
+                const verified = await jwtVerify(
+                    token as string,
+                    new TextEncoder().encode(process.env.JWT_SECRET || 'your-secret-key')
+                );
+
+                if (!token && verified.payload.roleId===1) {
+                    return res.status(StatusCode.UNAUTHORIZED).json(transformResponse({
+                        data: null,
+                        message: 'Unauthorized - No token provided',
+                        statusCode: StatusCode.UNAUTHORIZED
+                    }));
+                }
                 const user = await db('users')
                     .select('users.*', 'images.url as avatar_url')
                     .leftJoin('images', 'users.avatar_id', 'images.id')
@@ -47,6 +69,27 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
         case 'PUT':
             try {
+                const token = req.cookies.token;
+                if (!token) {
+                    return res.status(StatusCode.UNAUTHORIZED).json(transformResponse({
+                        data: null,
+                        message: 'Unauthorized - No token provided',
+                        statusCode: StatusCode.UNAUTHORIZED
+                    }));
+                }
+
+                const verified = await jwtVerify(
+                    token as string,
+                    new TextEncoder().encode(process.env.JWT_SECRET || 'your-secret-key')
+                );
+
+                if (!token && verified.payload.roleId===1) {
+                    return res.status(StatusCode.UNAUTHORIZED).json(transformResponse({
+                        data: null,
+                        message: 'Unauthorized - No token provided',
+                        statusCode: StatusCode.UNAUTHORIZED
+                    }));
+                }
                 const { username, email, first_name, last_name, avatar_id, status, role_id } = req.body;
 
                 const existingUser = await db('users')

@@ -3,6 +3,7 @@ import knex from 'knex';
 import knexConfig from '../../../knexfile';
 import { StatusCode } from "@/lib/statusCodes";
 import { transformResponse } from "@/lib/interceptors/transformInterceptor";
+import {jwtVerify} from "jose";
 
 const db = knex(knexConfig);
 
@@ -13,6 +14,27 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     try {
+        const token = req.cookies.token;
+        if (!token) {
+            return res.status(StatusCode.UNAUTHORIZED).json(transformResponse({
+                data: null,
+                message: 'Unauthorized - No token provided',
+                statusCode: StatusCode.UNAUTHORIZED
+            }));
+        }
+
+        const verified = await jwtVerify(
+            token as string,
+            new TextEncoder().encode(process.env.JWT_SECRET || 'your-secret-key')
+        );
+
+        if (!token && verified.payload.roleId===1) {
+            return res.status(StatusCode.UNAUTHORIZED).json(transformResponse({
+                data: null,
+                message: 'Unauthorized - No token provided',
+                statusCode: StatusCode.UNAUTHORIZED
+            }));
+        }
         const { id, status } = req.body;
 
         if (!id || status === undefined) {
