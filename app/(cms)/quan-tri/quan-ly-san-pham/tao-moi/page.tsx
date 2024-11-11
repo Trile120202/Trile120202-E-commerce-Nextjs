@@ -30,7 +30,6 @@ import { Status } from "@/lib/configs/enum.status";
 import MediaPopup from "@/components/custom/MediaPopup";
 import QuillComponent from "@/components/quill";
 
-
 interface Image {
     id: number;
     url: string;
@@ -59,6 +58,12 @@ const formSchema = z.object({
         .min(1, "Phải chọn ít nhất một ổ cứng"),
     tag_ids: z.array(z.number())
         .min(1, "Phải chọn ít nhất một tag"),
+    display_id: z.number()
+        .min(1, "Phải chọn một màn hình"),
+    cpu_id: z.number()
+        .min(1, "Phải chọn một CPU"),
+    graphics_card_ids: z.array(z.number())
+        .min(1, "Phải chọn ít nhất một card đồ họa"),
     status: z.number().default(Status.ACTIVE),
     thumbnail_id: z.number({
         required_error: "Vui lòng chọn ảnh đại diện"
@@ -88,6 +93,9 @@ const Page = () => {
             ram_ids: [],
             storage_ids: [],
             tag_ids: [],
+            display_id: 0,
+            cpu_id: 0,
+            graphics_card_ids: [],
             status: Status.ACTIVE,
             thumbnail_id: 0,
             images: []
@@ -139,37 +147,37 @@ const Page = () => {
     };
 
     return (
-        <div className="flex flex-col min-h-screen bg-gray-50">
-            <div className="sticky top-0 z-20 bg-white shadow">
+        <div className="flex flex-col min-h-screen bg-gray-100">
+            <div className="sticky top-0 z-20 bg-white shadow-md">
                 <Card className="rounded-none border-0">
-                    <CardHeader className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
-                        <div className="container mx-auto px-4 py-6">
-                            <CardTitle className="text-2xl md:text-3xl font-bold">Thêm sản phẩm mới</CardTitle>
+                    <CardHeader className="bg-gradient-to-r from-blue-700 to-indigo-700 text-white">
+                        <div className="container mx-auto px-6 py-8">
+                            <CardTitle className="text-3xl md:text-4xl font-bold tracking-tight">Thêm sản phẩm mới</CardTitle>
                         </div>
                     </CardHeader>
                 </Card>
             </div>
 
-            <div className="flex-1 container mx-auto px-4 py-8">
-                <Card className="shadow-lg">
-                    <CardContent className="p-6">
+            <div className="flex-1 container mx-auto px-6 py-10">
+                <Card className="shadow-xl rounded-xl border-0">
+                    <CardContent className="p-8">
                         <Form {...form}>
-                            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                                     <FormField
                                         control={form.control}
                                         name="name"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel className="text-base lg:text-lg font-semibold">Tên sản phẩm</FormLabel>
+                                                <FormLabel className="text-lg font-semibold text-gray-800">Tên sản phẩm</FormLabel>
                                                 <FormControl>
                                                     <Input 
                                                         placeholder="Nhập tên sản phẩm" 
                                                         {...field}
-                                                        className="focus:ring-2 h-10 lg:h-12 text-base lg:text-lg"
+                                                        className="h-12 text-lg rounded-lg border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                                     />
                                                 </FormControl>
-                                                <FormMessage />
+                                                <FormMessage className="text-red-500" />
                                             </FormItem>
                                         )}
                                     />
@@ -179,7 +187,7 @@ const Page = () => {
                                         name="categories"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel className="text-base lg:text-lg font-semibold">Danh mục</FormLabel>
+                                                <FormLabel className="text-lg font-semibold text-gray-800">Danh mục</FormLabel>
                                                 <FormControl>
                                                     <SelectData
                                                         endpoint="/api/categories/all-category"
@@ -187,21 +195,22 @@ const Page = () => {
                                                         placeholder="Chọn danh mục"
                                                         onSelect={(value) => field.onChange(value)}
                                                         defaultValue={field.value}
+                                                        className="rounded-lg"
                                                     />
                                                 </FormControl>
-                                                <FormMessage />
+                                                <FormMessage className="text-red-500" />
                                             </FormItem>
                                         )}
                                     />
                                 </div>
 
-                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                                     <FormField
                                         control={form.control}
                                         name="thumbnail_id"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel className="text-base lg:text-lg font-semibold">Ảnh đại diện</FormLabel>
+                                                <FormLabel className="text-lg font-semibold text-gray-800">Ảnh đại diện</FormLabel>
                                                 <FormControl>
                                                     <div>
                                                         {selectedThumbnail ? (
@@ -209,7 +218,7 @@ const Page = () => {
                                                                 <img
                                                                     src={selectedThumbnail.url}
                                                                     alt={selectedThumbnail.alt_text}
-                                                                    className="w-full h-[200px] object-cover rounded-lg"
+                                                                    className="w-full h-[250px] object-cover rounded-xl shadow-md transition-transform duration-300 group-hover:scale-[1.02]"
                                                                 />
                                                                 <button
                                                                     type="button"
@@ -217,7 +226,7 @@ const Page = () => {
                                                                         setSelectedThumbnail(null);
                                                                         field.onChange(0);
                                                                     }}
-                                                                    className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                                    className="absolute top-3 right-3 bg-red-500 text-white rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                                                                 >
                                                                     ×
                                                                 </button>
@@ -227,15 +236,15 @@ const Page = () => {
                                                                 type="button"
                                                                 variant="outline"
                                                                 onClick={() => setOpenThumbnailPopup(true)}
-                                                                className="w-full h-[200px] flex flex-col items-center justify-center gap-2"
+                                                                className="w-full h-[250px] rounded-xl border-2 border-dashed border-gray-300 hover:border-blue-500 transition-colors duration-300 flex flex-col items-center justify-center gap-4"
                                                             >
-                                                                <ImagePlus className="h-8 w-8" />
-                                                                <span>Chọn ảnh đại diện</span>
+                                                                <ImagePlus className="h-12 w-12 text-gray-400" />
+                                                                <span className="text-lg text-gray-600">Chọn ảnh đại diện</span>
                                                             </Button>
                                                         )}
                                                     </div>
                                                 </FormControl>
-                                                <FormMessage />
+                                                <FormMessage className="text-red-500" />
                                             </FormItem>
                                         )}
                                     />
@@ -245,7 +254,7 @@ const Page = () => {
                                         name="images"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel className="text-base lg:text-lg font-semibold">Ảnh sản phẩm</FormLabel>
+                                                <FormLabel className="text-lg font-semibold text-gray-800">Ảnh sản phẩm</FormLabel>
                                                 <FormControl>
                                                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                                                         {selectedImages.map((image) => (
@@ -253,7 +262,7 @@ const Page = () => {
                                                                 <img
                                                                     src={image.url}
                                                                     alt={image.alt_text}
-                                                                    className="w-full h-[100px] object-cover rounded-lg"
+                                                                    className="w-full h-[120px] object-cover rounded-lg shadow-md transition-transform duration-300 group-hover:scale-[1.05]"
                                                                 />
                                                                 <button
                                                                     type="button"
@@ -262,7 +271,7 @@ const Page = () => {
                                                                         setSelectedImages(newImages);
                                                                         field.onChange(newImages.map(img => img.id));
                                                                     }}
-                                                                    className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                                    className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                                                                 >
                                                                     ×
                                                                 </button>
@@ -272,35 +281,35 @@ const Page = () => {
                                                             type="button"
                                                             variant="outline"
                                                             onClick={() => setOpenImagesPopup(true)}
-                                                            className="h-[100px] flex flex-col items-center justify-center gap-2"
+                                                            className="h-[120px] rounded-lg border-2 border-dashed border-gray-300 hover:border-blue-500 transition-colors duration-300 flex flex-col items-center justify-center gap-2"
                                                         >
-                                                            <ImagePlus className="h-8 w-8" />
-                                                            <span>Thêm ảnh</span>
+                                                            <ImagePlus className="h-8 w-8 text-gray-400" />
+                                                            <span className="text-gray-600">Thêm ảnh</span>
                                                         </Button>
                                                     </div>
                                                 </FormControl>
-                                                <FormMessage />
+                                                <FormMessage className="text-red-500" />
                                             </FormItem>
                                         )}
                                     />
                                 </div>
 
-                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                                     <FormField
                                         control={form.control}
                                         name="price"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel className="text-base lg:text-lg font-semibold">Giá</FormLabel>
+                                                <FormLabel className="text-lg font-semibold text-gray-800">Giá</FormLabel>
                                                 <FormControl>
                                                     <Input 
                                                         type="number"
                                                         placeholder="Nhập giá" 
                                                         {...field}
-                                                        className="focus:ring-2 h-10 lg:h-12 text-base lg:text-lg"
+                                                        className="h-12 text-lg rounded-lg border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                                     />
                                                 </FormControl>
-                                                <FormMessage />
+                                                <FormMessage className="text-red-500" />
                                             </FormItem>
                                         )}
                                     />
@@ -310,16 +319,16 @@ const Page = () => {
                                         name="stock_quantity"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel className="text-base lg:text-lg font-semibold">Số lượng tồn kho</FormLabel>
+                                                <FormLabel className="text-lg font-semibold text-gray-800">Số lượng tồn kho</FormLabel>
                                                 <FormControl>
                                                     <Input 
                                                         type="number"
                                                         placeholder="Nhập số lượng" 
                                                         {...field}
-                                                        className="focus:ring-2 h-10 lg:h-12 text-base lg:text-lg"
+                                                        className="h-12 text-lg rounded-lg border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                                     />
                                                 </FormControl>
-                                                <FormMessage />
+                                                <FormMessage className="text-red-500" />
                                             </FormItem>
                                         )}
                                     />
@@ -329,15 +338,16 @@ const Page = () => {
                                         name="status"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel className="text-base lg:text-lg font-semibold">Trạng thái</FormLabel>
+                                                <FormLabel className="text-lg font-semibold text-gray-800">Trạng thái</FormLabel>
                                                 <FormControl>
                                                     <SelectStatus
                                                         onValueChange={field.onChange}
                                                         value={field.value}
                                                         options="basic"
+                                                        className="rounded-lg"
                                                     />
                                                 </FormControl>
-                                                <FormMessage />
+                                                <FormMessage className="text-red-500" />
                                             </FormItem>
                                         )}
                                     />
@@ -348,7 +358,7 @@ const Page = () => {
                                     name="ram_ids"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className="text-base lg:text-lg font-semibold">RAM</FormLabel>
+                                            <FormLabel className="text-lg font-semibold text-gray-800">RAM</FormLabel>
                                             <FormControl>
                                                 <SelectData
                                                     endpoint="/api/ram/get-ram-date-id-name"
@@ -356,9 +366,10 @@ const Page = () => {
                                                     placeholder="Chọn RAM"
                                                     onSelect={(value) => field.onChange(value)}
                                                     defaultValue={field.value}
+                                                    className="rounded-lg"
                                                 />
                                             </FormControl>
-                                            <FormMessage />
+                                            <FormMessage className="text-red-500" />
                                         </FormItem>
                                     )}
                                 />
@@ -368,7 +379,7 @@ const Page = () => {
                                     name="storage_ids"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className="text-base lg:text-lg font-semibold">Ổ cứng</FormLabel>
+                                            <FormLabel className="text-lg font-semibold text-gray-800">Ổ cứng</FormLabel>
                                             <FormControl>
                                                 <SelectData
                                                     endpoint="/api/storages/get-storage-data-id-name"
@@ -376,9 +387,10 @@ const Page = () => {
                                                     placeholder="Chọn ổ cứng"
                                                     onSelect={(value) => field.onChange(value)}
                                                     defaultValue={field.value}
+                                                    className="rounded-lg"
                                                 />
                                             </FormControl>
-                                            <FormMessage />
+                                            <FormMessage className="text-red-500" />
                                         </FormItem>
                                     )}
                                 />
@@ -388,7 +400,7 @@ const Page = () => {
                                     name="tag_ids"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className="text-base lg:text-lg font-semibold">Tags</FormLabel>
+                                            <FormLabel className="text-lg font-semibold text-gray-800">Tags</FormLabel>
                                             <FormControl>
                                                 <SelectData
                                                     endpoint="/api/tag/get-tag-id-name"
@@ -396,9 +408,73 @@ const Page = () => {
                                                     placeholder="Chọn tags"
                                                     onSelect={(value) => field.onChange(value)}
                                                     defaultValue={field.value}
+                                                    className="rounded-lg"
                                                 />
                                             </FormControl>
-                                            <FormMessage />
+                                            <FormMessage className="text-red-500" />
+                                        </FormItem>
+                                    )}
+                                />
+
+                                <FormField
+                                    control={form.control}
+                                    name="display_id"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className="text-lg font-semibold text-gray-800">Màn hình</FormLabel>
+                                            <FormControl>
+                                                <SelectData
+                                                    endpoint="/api/displays/get-display-id-name"
+                                                    multiple={false}
+                                                    placeholder="Chọn màn hình"
+                                                    onSelect={(value) => field.onChange(value)}
+                                                    defaultValue={field.value}
+                                                    className="rounded-lg"
+                                                />
+                                            </FormControl>
+                                            <FormMessage className="text-red-500" />
+                                        </FormItem>
+                                    )}
+                                />
+
+                                <FormField
+                                    control={form.control}
+                                    name="cpu_id"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className="text-lg font-semibold text-gray-800">CPU</FormLabel>
+                                            <FormControl>
+                                                <SelectData
+                                                    endpoint="/api/cpus/get-cpu-id-name"
+                                                    multiple={false}
+                                                    placeholder="Chọn CPU"
+                                                    onSelect={(value) => field.onChange(value)}
+                                                    defaultValue={field.value}
+                                                    className="rounded-lg"
+                                                />
+                                            </FormControl>
+                                            <FormMessage className="text-red-500" />
+                                        </FormItem>
+                                    )}
+                                />
+
+                                <FormField
+                                    control={form.control}
+                                    name="graphics_card_ids"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className="text-lg font-semibold text-gray-800">Card đồ họa</FormLabel>
+                                            <FormControl>
+                                                <SelectData
+                                                    endpoint="/api/graphics_cards/get-graphics-card-id-name"
+                                                    multiple={true}
+                                                    placeholder="Chọn card đồ họa"
+                                                    onSelect={(value) => field.onChange(value)}
+                                                    defaultValue={field.value}
+                                                    className="rounded-lg"
+                                                />
+                                            </FormControl>
+                                            <FormMessage className="text-red-500" />
                                         </FormItem>
                                     )}
                                 />
@@ -408,15 +484,16 @@ const Page = () => {
                                     name="description"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className="text-base lg:text-lg font-semibold">Mô tả</FormLabel>
+                                            <FormLabel className="text-lg font-semibold text-gray-800">Mô tả</FormLabel>
                                             <FormControl>
                                                 <QuillComponent
                                                     value={description}
                                                     onChangeValue={setDescription}
                                                     placeholder="Nhập mô tả sản phẩm"
+                                                    className="min-h-[200px] rounded-lg"
                                                 />
                                             </FormControl>
-                                            <FormMessage />
+                                            <FormMessage className="text-red-500" />
                                         </FormItem>
                                     )}
                                 />
@@ -426,41 +503,41 @@ const Page = () => {
                                     name="specifications"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className="text-base lg:text-lg font-semibold">Thông số kỹ thuật (JSON)</FormLabel>
+                                            <FormLabel className="text-lg font-semibold text-gray-800">Thông số kỹ thuật (JSON)</FormLabel>
                                             <FormControl>
                                                 <Textarea 
                                                     placeholder="Nhập thông số kỹ thuật dạng JSON (không bắt buộc)" 
                                                     {...field}
-                                                    className="focus:ring-2 min-h-[100px] text-base lg:text-lg"
+                                                    className="min-h-[150px] text-lg rounded-lg border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                                 />
                                             </FormControl>
-                                            <FormMessage />
+                                            <FormMessage className="text-red-500" />
                                         </FormItem>
                                     )}
                                 />
 
-                                <div className="flex justify-end gap-4 lg:gap-6 pt-6">
+                                <div className="flex justify-end gap-6 pt-8">
                                     <Button
                                         type="button"
                                         variant="outline"
                                         onClick={() => router.back()}
-                                        className="w-[120px] lg:w-[140px] h-10 lg:h-12 text-base lg:text-lg"
+                                        className="w-[160px] h-12 text-lg font-medium rounded-lg hover:bg-gray-100"
                                     >
                                         Hủy
                                     </Button>
                                     <Button 
                                         type="submit"
                                         disabled={loading}
-                                        className="w-[120px] lg:w-[140px] h-10 lg:h-12 text-base lg:text-lg bg-blue-600 hover:bg-blue-700"
+                                        className="w-[160px] h-12 text-lg font-medium rounded-lg bg-blue-600 hover:bg-blue-700 text-white shadow-lg transition duration-300 ease-in-out transform hover:-translate-y-1"
                                     >
                                         {loading ? (
-                                            <div className="flex items-center gap-2 lg:gap-3">
-                                                <div className="h-4 w-4 lg:h-5 lg:w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                                            <div className="flex items-center gap-3">
+                                                <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
                                                 <span>Đang xử lý</span>
                                             </div>
                                         ) : (
-                                            <div className="flex items-center gap-2 lg:gap-3">
-                                                <Save className="h-4 w-4 lg:h-5 lg:w-5" />
+                                            <div className="flex items-center gap-3">
+                                                <Save className="h-5 w-5" />
                                                 <span>Lưu</span>
                                             </div>
                                         )}

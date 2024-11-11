@@ -48,6 +48,7 @@ const DataTable = <T extends object>({
                                          error,
                                          filters
                                      }: DataTableProps<T>) => {
+    // @ts-ignore
     return (
         <Card className="rounded-none shadow-none border-0">
             {filters && (

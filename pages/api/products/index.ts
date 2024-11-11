@@ -36,6 +36,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 .leftJoin('hard_drives as s', 'phd.hard_id', 's.id')
                 .leftJoin('product_tags as pt', 'p.id', 'pt.product_id')
                 .leftJoin('tags as t', 'pt.tag_id', 't.id')
+                .leftJoin('product_displays as pd', 'p.id', 'pd.product_id')
+                .leftJoin('displays as d', 'pd.display_id', 'd.id')
+                .leftJoin('product_cpus as pc2', 'p.id', 'pc2.product_id')
+                .leftJoin('cpus as cpu', 'pc2.cpu_id', 'cpu.id')
+                .leftJoin('product_graphics_cards as pgc', 'p.id', 'pgc.product_id')
+                .leftJoin('graphics_cards as gc', 'pgc.graphics_card_id', 'gc.id')
                 .where('p.status', 1)
                 .select(
                     'p.id AS product_id',
@@ -59,7 +65,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     db.raw('STRING_AGG(DISTINCT s.name, \', \') AS storage_names'),
                     db.raw('ARRAY_AGG(DISTINCT s.id) FILTER (WHERE s.id IS NOT NULL) AS storage_ids'),
                     db.raw('STRING_AGG(DISTINCT t.name, \', \') AS tags'),
-                    db.raw('ARRAY_AGG(DISTINCT t.id) FILTER (WHERE t.id IS NOT NULL) AS tag_ids')
+                    db.raw('ARRAY_AGG(DISTINCT t.id) FILTER (WHERE t.id IS NOT NULL) AS tag_ids'),
+                    db.raw('STRING_AGG(DISTINCT d.name, \', \') AS display_names'),
+                    db.raw('ARRAY_AGG(DISTINCT d.id) FILTER (WHERE d.id IS NOT NULL) AS display_ids'),
+                    db.raw('STRING_AGG(DISTINCT cpu.name, \', \') AS cpu_names'),
+                    db.raw('ARRAY_AGG(DISTINCT cpu.id) FILTER (WHERE cpu.id IS NOT NULL) AS cpu_ids'),
+                    db.raw('STRING_AGG(DISTINCT gc.name, \', \') AS graphics_card_names'),
+                    db.raw('ARRAY_AGG(DISTINCT gc.id) FILTER (WHERE gc.id IS NOT NULL) AS graphics_card_ids')
                 )
                 .groupBy('p.id', 'i.id');
         
@@ -98,6 +110,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 product.ram_ids = product.ram_ids || [];
                 product.storage_ids = product.storage_ids || [];
                 product.tag_ids = product.tag_ids || [];
+                product.display_ids = product.display_ids || [];
+                product.cpu_ids = product.cpu_ids || [];
+                product.graphics_card_ids = product.graphics_card_ids || [];
             });
         
             res.status(StatusCode.OK).json(transformResponse({
@@ -146,7 +161,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 }));
             }
 
-            const { name, price, description, specifications, stock_quantity, thumbnail_id, categories, images, ram_ids, storage_ids, tag_ids } = req.body;
+            const { name, price, description, specifications, stock_quantity, thumbnail_id, categories, images, ram_ids, storage_ids, tag_ids, display_ids, cpu_ids, graphics_card_ids } = req.body;
 
             const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 
@@ -205,6 +220,30 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                         tag_id: tagId
                     }));
                     await trx('product_tags').insert(tagRecords);
+                }
+
+                if (display_ids && display_ids.length > 0) {
+                    const displayRecords = display_ids.map((displayId: number) => ({
+                        product_id: product.id,
+                        display_id: displayId
+                    }));
+                    await trx('product_displays').insert(displayRecords);
+                }
+
+                if (cpu_ids && cpu_ids.length > 0) {
+                    const cpuRecords = cpu_ids.map((cpuId: number) => ({
+                        product_id: product.id,
+                        cpu_id: cpuId
+                    }));
+                    await trx('product_cpus').insert(cpuRecords);
+                }
+
+                if (graphics_card_ids && graphics_card_ids.length > 0) {
+                    const graphicsCardRecords = graphics_card_ids.map((graphicsCardId: number) => ({
+                        product_id: product.id,
+                        graphics_card_id: graphicsCardId
+                    }));
+                    await trx('product_graphics_cards').insert(graphicsCardRecords);
                 }
 
                 await trx.commit();

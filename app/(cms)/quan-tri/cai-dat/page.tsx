@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -9,9 +9,39 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { FiSettings, FiLock, FiBell, FiEye } from 'react-icons/fi';
 import { motion } from 'framer-motion';
+import useApi from "@/lib/useApi";
+
+interface Setting {
+    name: string;
+    value: string | boolean;
+}
+
+interface Pagination {
+    currentPage: number;
+    pageSize: number;
+    totalItems: string;
+    totalPages: number;
+}
+
+interface ApiResponse {
+    status: number;
+    message: string;
+    data: Setting[];
+    pagination: Pagination;
+}
 
 const Page = () => {
     const [activeTab, setActiveTab] = useState("general");
+    const { data, loading, error, fetchData } = useApi<ApiResponse>(
+        `/api/settings`,
+        {
+            method: 'GET'
+        }
+    );
+
+    useEffect(() => {
+        fetchData();
+    }, []);
 
     const handleSave = () => {
         console.log("Saving settings...");

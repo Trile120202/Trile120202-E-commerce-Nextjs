@@ -30,6 +30,20 @@ interface Product {
     thumbnail_alt_text: string;
     ram_names: string;
     storage_names: string;
+    cpu_names: string;
+    graphics_card_names: string;
+    display_names: string;
+    tags: string;
+    description: string;
+    specifications: string;
+    product_image_urls: string[];
+    product_image_ids: number[];
+    ram_ids: number[];
+    storage_ids: number[];
+    tag_ids: number[];
+    display_ids: number[];
+    cpu_ids: number[];
+    graphics_card_ids: number[];
 }
 
 interface ApiResponse {
@@ -48,13 +62,12 @@ const Page = () => {
     const router = useRouter();
     const { toast } = useToast();
     const [currentPage, setCurrentPage] = useState(1);
-    const [selectedStatus, setSelectedStatus] = useState('all');
     const [searchKeyword, setSearchKeyword] = useState('');
     const [limit, setLimit] = useState(10);
     const [selectedId, setSelectedId] = useState<number | null>(null);
 
     const { data, loading, error, fetchData } = useApi<ApiResponse>(
-        `/api/products?page=${currentPage}&limit=${limit}&search=${encodeURIComponent(searchKeyword)}${selectedStatus !== 'all' ? `&status=${selectedStatus}` : ''}`,
+        `/api/products?page=${currentPage}&limit=${limit}&search=${encodeURIComponent(searchKeyword)}`,
         { method: 'GET' }
     );
 
@@ -69,7 +82,7 @@ const Page = () => {
                 description: "Có lỗi xảy ra khi tải dữ liệu sản phẩm"
             });
         }
-    }, [currentPage, selectedStatus, searchKeyword, limit]);
+    }, [currentPage, searchKeyword, limit]);
 
     const handleEdit = (id: number) => {
         router.push(`/quan-tri/quan-ly-san-pham/${id}`);
@@ -80,10 +93,6 @@ const Page = () => {
             style: 'currency',
             currency: 'VND'
         }).format(parseFloat(price));
-    };
-
-    const getStatusColor = (status: number) => {
-        return status === 1 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
     };
 
     const columns = [
@@ -116,7 +125,7 @@ const Page = () => {
                             </span>
                         ))}
                     </div>
-                    <div className="flex gap-4 text-sm text-gray-600">
+                    <div className="flex flex-col gap-2 text-sm text-gray-600">
                         {row.ram_names && (
                             <span className="flex items-center gap-1">
                                 <span className="font-medium">RAM:</span> {row.ram_names}
@@ -125,6 +134,16 @@ const Page = () => {
                         {row.storage_names && (
                             <span className="flex items-center gap-1">
                                 <span className="font-medium">Bộ nhớ:</span> {row.storage_names}
+                            </span>
+                        )}
+                        {row.cpu_names && (
+                            <span className="flex items-center gap-1">
+                                <span className="font-medium">CPU:</span> {row.cpu_names}
+                            </span>
+                        )}
+                        {row.graphics_card_names && (
+                            <span className="flex items-center gap-1">
+                                <span className="font-medium">Card đồ họa:</span> {row.graphics_card_names}
                             </span>
                         )}
                     </div>
@@ -148,16 +167,6 @@ const Page = () => {
             render: (row: Product) => (
                 <span className="font-medium">
                     {row.stock_quantity.toLocaleString()}
-                </span>
-            )
-        },
-        {
-            accessor: 'product_status',
-            label: 'Trạng thái',
-            className: 'text-center',
-            render: (row: Product) => (
-                <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(row.product_status)}`}>
-                    {row.product_status === 1 ? 'Còn hàng' : 'Hết hàng'}
                 </span>
             )
         },
@@ -254,15 +263,6 @@ const Page = () => {
                             loading={loading}
                             error={error ? new Error(error) : null}
                             filters={{
-                                status: {
-                                    value: selectedStatus,
-                                    onChange: setSelectedStatus,
-                                    options: [
-                                        { label: 'Tất cả', value: 'all' },
-                                        { label: 'Còn hàng', value: '1' },
-                                        { label: 'Hết hàng', value: '0' },
-                                    ]
-                                },
                                 search: {
                                     value: searchKeyword,
                                     onChange: setSearchKeyword,
@@ -273,6 +273,13 @@ const Page = () => {
                                     onChange: setLimit,
                                     options: [4, 10, 20, 50, 100]
                                 }
+                            }}
+                            pagination={{
+                                currentPage: data?.pagination?.currentPage || 1,
+                                pageSize: data?.pagination?.pageSize || 10,
+                                totalItems: parseInt(data?.pagination?.totalItems || '0'),
+                                totalPages: data?.pagination?.totalPages || 1,
+                                onPageChange: setCurrentPage
                             }}
                         />
                     </div>

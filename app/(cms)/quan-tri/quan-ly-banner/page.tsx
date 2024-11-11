@@ -81,39 +81,6 @@ const Page = () => {
         router.push(`/quan-tri/quan-ly-banner/${id}`);
     };
 
-    const handleDelete = async (id: number) => {
-        try {
-            const response = await fetch(`/api/banner`, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ id }),
-            });
-
-            const result = await response.json();
-
-            if (!response.ok) {
-                throw new Error(result.message || 'Có lỗi xảy ra khi xóa banner');
-            }
-
-            toast({
-                title: "Thành công",
-                description: "Xóa banner thành công",
-            });
-
-            fetchData();
-
-        } catch (error) {
-            console.error('Error deleting banner:', error);
-            toast({
-                variant: "destructive",
-                title: "Lỗi",
-                description: (error as Error).message || "Có lỗi xảy ra khi xóa banner",
-            });
-        }
-    };
-
     const getStatusColor = (status: number) => {
         return status === 1 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
     };
