@@ -27,7 +27,7 @@ export async function POST(request: Request) {
     }
 
     const validPassword = await bcrypt.compare(password, user.password);
-    console.log(validPassword); // So sánh mật khẩu đã nhập với mật khẩu đã được mã hóa trong database
+    console.log(validPassword);
     if (!validPassword) {
       return NextResponse.json(
         { error: 'Tên đăng nhập hoặc mật khẩu không đúng' },
@@ -35,7 +35,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Tạo JWT token
     const token = jwt.sign(
       { 
         userId: user.id,
@@ -49,7 +48,6 @@ export async function POST(request: Request) {
       { expiresIn: '1d' }
     );
 
-    // Log để debug
     console.log('User data:', user);
     console.log('Token payload:', { 
       userId: user.id, 
@@ -60,7 +58,6 @@ export async function POST(request: Request) {
       roleId: user.role_id
     });
 
-    // Tạo response với cookie
     const response = NextResponse.json({
       message: 'Đăng nhập thành công',
       user: {
@@ -77,7 +74,6 @@ export async function POST(request: Request) {
       }
     });
 
-    // Thêm httpOnly cookie
     response.cookies.set({
       name: 'token',
       value: token,
@@ -85,7 +81,7 @@ export async function POST(request: Request) {
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
       path: '/',
-      maxAge: 60 * 60 * 24 // 1 day
+      maxAge: 60 * 60 * 24
     });
 
     return response;

@@ -31,7 +31,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Check if email exists
     const existingEmail = await db('users').where({ email }).first();
     if (existingEmail) {
       return NextResponse.json(
@@ -40,7 +39,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Check if username exists
     const existingUsername = await db('users').where({ username }).first();
     if (existingUsername) {
       return NextResponse.json(
@@ -49,7 +47,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Check if role exists
     const role = await db('roles').where({ id: 2 }).first();
     if (!role) {
       return NextResponse.json(
@@ -58,16 +55,14 @@ export async function POST(request: Request) {
       );
     }
 
-    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create new user
     const [newUser] = await db('users')
       .insert({
         username,
         email,
         password: hashedPassword,
-        role_id: 2, // Default role for new users
+        role_id: 2,
         status: 1,
         created_at: db.fn.now(),
         updated_at: db.fn.now()

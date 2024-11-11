@@ -16,7 +16,6 @@ export async function GET() {
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
     
-    // Log để debug
     console.log('Decoded token:', decoded);
     
     return NextResponse.json({ user: decoded });

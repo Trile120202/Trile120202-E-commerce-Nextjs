@@ -8,7 +8,6 @@ export async function POST() {
       message: 'Đăng xuất thành công' 
     });
 
-    // Xóa cookie token
     response.cookies.delete({
       name: 'token',
       path: '/',
@@ -16,7 +15,6 @@ export async function POST() {
       sameSite: 'strict'
     });
 
-    // Xóa tất cả các cookie khác nếu có
     const allCookies = cookieStore.getAll();
     allCookies.forEach(cookie => {
       response.cookies.delete({
@@ -27,7 +25,6 @@ export async function POST() {
       });
     });
 
-    // Thêm header để clear cache
     response.headers.set('Clear-Site-Data', '"cache", "cookies", "storage"');
     
     return response;
