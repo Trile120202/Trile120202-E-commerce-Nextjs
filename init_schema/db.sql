@@ -31,6 +31,7 @@ DROP TABLE IF EXISTS cpus CASCADE;
 DROP TABLE IF EXISTS product_cpus CASCADE;
 DROP TABLE IF EXISTS graphics_cards CASCADE;
 DROP TABLE IF EXISTS product_graphics_cards CASCADE;
+DROP TABLE IF EXISTS settings CASCADE;
 
 
 DROP FUNCTION IF EXISTS update_modified_column() CASCADE;
@@ -608,6 +609,45 @@ CREATE TABLE product_graphics_cards
     FOREIGN KEY (product_id) REFERENCES products (id) ON DELETE CASCADE,
     FOREIGN KEY (graphics_card_id) REFERENCES graphics_cards (id) ON DELETE CASCADE
 );
+
+CREATE TABLE settings
+(
+    id         SERIAL PRIMARY KEY,
+    name       VARCHAR(100) NOT NULL,
+    value      TEXT,
+    status     INT NOT NULL DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_settings_name ON settings(name);
+CREATE INDEX idx_settings_status ON settings(status);
+CREATE INDEX idx_settings_created_at ON settings(created_at);
+
+INSERT INTO settings (name, value) VALUES
+('site_name', 'Laptop Store'),
+('site_description', 'Cửa hàng laptop chính hãng'),
+('contact_email', 'contact@laptopstore.com'),
+('contact_phone', '0123456789'),
+('contact_address', 'Hà Nội, Việt Nam'),
+('social_facebook', 'https://facebook.com/laptopstore'),
+('social_instagram', 'https://instagram.com/laptopstore'),
+('social_twitter', 'https://twitter.com/laptopstore'),
+('maintenance_mode', 'false'),
+('currency', 'VND');
+
+INSERT INTO settings (name, value) VALUES
+('security_login_attempts', '5'),
+('security_lockout_duration', '30'),
+('security_password_expiry', '90'),
+('security_password_length', '8'),
+('security_password_complexity', 'true'),
+('security_session_timeout', '60'),
+('security_2fa_enabled', 'false'),
+('security_ip_whitelist', ''),
+('security_ssl_required', 'true'),
+('security_jwt_expiry', '24');
+
 
 
 
