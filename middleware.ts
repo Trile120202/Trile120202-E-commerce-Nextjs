@@ -9,7 +9,6 @@ export async function middleware(request: NextRequest) {
       const token = cookieStore.get('token')?.value;
 
       if (!token) {
-        console.log('No token found');
         return NextResponse.redirect(new URL('/', request.url));
       }
 
@@ -18,11 +17,9 @@ export async function middleware(request: NextRequest) {
           new TextEncoder().encode(process.env.JWT_SECRET || 'your-secret-key')
       );
 
-      console.log('Token payload:', verified.payload);
 
       const payload = verified.payload as any;
       if (!payload.roleId || payload.roleId !== 1) {
-        console.log('Not admin role:', payload.roleId);
         return NextResponse.redirect(new URL('/', request.url));
       }
 

@@ -3,6 +3,7 @@ import knex from 'knex';
 import knexConfig from '../../../knexfile';
 import { StatusCode } from "@/lib/statusCodes";
 import { transformResponse } from "@/lib/interceptors/transformInterceptor";
+import {jwtVerify} from "jose";
 
 const db = knex(knexConfig);
 
@@ -40,6 +41,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     case 'PUT':
       try {
+        const token = req.cookies.token;
+
+        const verified = await jwtVerify(
+            token,
+            new TextEncoder().encode(process.env.JWT_SECRET || 'your-secret-key')
+        );
+
+        if (!token && verified.payload.roleId) {
+          return res.status(StatusCode.UNAUTHORIZED).json(transformResponse({
+            data: null,
+            message: 'Unauthorized - No token provided',
+            statusCode: StatusCode.UNAUTHORIZED
+          }));
+        }
         const { name, description, status } = req.body;
 
         const existingRole = await db('roles').where({ id }).first();

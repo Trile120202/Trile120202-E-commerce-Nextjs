@@ -160,11 +160,9 @@ const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
 };
 
 const SectionProductHome: React.FC = () => {
-    const { data, loading, error } = useFetch<ApiResponse>('/api/products');
-
+    const { data, loading, error } = useFetch<ApiResponse>('/api/products/get-data');
     if (loading) return <Loading/>;
     if (error) return <div className="text-black">Error: {error}</div>;
-
     return (
         <section className="container mx-auto px-4 py-12">
             <div className="flex items-center justify-between mb-8">

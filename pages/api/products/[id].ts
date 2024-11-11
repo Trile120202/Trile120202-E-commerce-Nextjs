@@ -3,6 +3,7 @@ import knex from 'knex';
 import knexConfig from '../../../knexfile';
 import { StatusCode } from "@/lib/statusCodes";
 import { transformResponse } from "@/lib/interceptors/transformInterceptor";
+import {jwtVerify} from "jose";
 
 const db = knex(knexConfig);
 
@@ -61,7 +62,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 }));
             }
 
-            // Convert null arrays to empty arrays
             product.product_image_ids = product.product_image_ids || [];
             product.product_image_urls = product.product_image_urls || [];
             product.ram_ids = product.ram_ids || [];
@@ -84,6 +84,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
     } else if (req.method === 'PUT') {
         try {
+
+            const token = req.cookies.token;
+
+            const verified = await jwtVerify(
+                token,
+                new TextEncoder().encode(process.env.JWT_SECRET || 'your-secret-key')
+            );
+
+            if (!token && verified.payload.roleId) {
+                return res.status(StatusCode.UNAUTHORIZED).json(transformResponse({
+                    data: null,
+                    message: 'Unauthorized - No token provided',
+                    statusCode: StatusCode.UNAUTHORIZED
+                }));
+            }
+
             const { name, price, stock_quantity, description, specifications, categories, status, thumbnail_id, images, ram_ids, storage_ids, tag_ids } = req.body;
 
             if (!name || !price || !stock_quantity || !description || !categories || !thumbnail_id || !images) {
