@@ -37,6 +37,7 @@ DROP TABLE IF EXISTS settings CASCADE;
 DROP TABLE IF EXISTS wards CASCADE;
 DROP TABLE IF EXISTS districts CASCADE;
 DROP TABLE IF EXISTS provinces CASCADE;
+DROP TABLE IF EXISTS payment_methods CASCADE;
 
 
 DROP FUNCTION IF EXISTS update_modified_column() CASCADE;
@@ -212,6 +213,33 @@ CREATE INDEX idx_role_permissions_created_at ON role_permissions (created_at);
 CREATE INDEX idx_role_permissions_updated_at ON role_permissions (updated_at);
 CREATE INDEX idx_role_permissions_status ON role_permissions (status);
 
+CREATE TABLE payment_methods (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    code VARCHAR(50) NOT NULL UNIQUE,
+    description TEXT,
+    is_active BOOLEAN DEFAULT true,
+    icon_url VARCHAR(255),
+    provider VARCHAR(100),
+    config JSONB,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status INT DEFAULT 1
+);
+
+CREATE INDEX idx_payment_methods_code ON payment_methods (code);
+CREATE INDEX idx_payment_methods_is_active ON payment_methods (is_active);
+CREATE INDEX idx_payment_methods_created_at ON payment_methods (created_at);
+CREATE INDEX idx_payment_methods_updated_at ON payment_methods (updated_at);
+CREATE INDEX idx_payment_methods_status ON payment_methods (status);
+
+INSERT INTO payment_methods (name, code, description, provider) VALUES
+('Cash on Delivery', 'cod', 'Pay when you receive the items', 'internal'),
+('Bank Transfer', 'bank_transfer', 'Transfer money to our bank account', 'internal'),
+('Credit Card', 'credit_card', 'Pay with credit card', 'stripe'),
+('Momo Wallet', 'momo', 'Pay with Momo e-wallet', 'momo'),
+('ZaloPay', 'zalopay', 'Pay with ZaloPay e-wallet', 'zalopay');
+
 CREATE TABLE orders
 (
     id               SERIAL PRIMARY KEY,
@@ -219,11 +247,12 @@ CREATE TABLE orders
     order_date       TIMESTAMP                                                                                    DEFAULT CURRENT_TIMESTAMP,
     total_amount     DECIMAL(10, 2) NOT NULL,
     shipping_address TEXT,
-    payment_method   VARCHAR(50),
+    payment_method_id INT,
     created_at       TIMESTAMP                                                                                    DEFAULT CURRENT_TIMESTAMP,
     updated_at       TIMESTAMP                                                                                    DEFAULT CURRENT_TIMESTAMP,
     status           INT                                                                                          DEFAULT 1,
-    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE SET NULL
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE SET NULL,
+    FOREIGN KEY (payment_method_id) REFERENCES payment_methods (id) ON DELETE SET NULL
 );
 
 CREATE INDEX idx_orders_user_id ON orders (user_id);
@@ -232,6 +261,7 @@ CREATE INDEX idx_orders_total_amount ON orders (total_amount);
 CREATE INDEX idx_orders_created_at ON orders (created_at);
 CREATE INDEX idx_orders_updated_at ON orders (updated_at);
 CREATE INDEX idx_orders_status ON orders (status);
+CREATE INDEX idx_orders_payment_method ON orders (payment_method_id);
 
 CREATE TABLE order_items
 (

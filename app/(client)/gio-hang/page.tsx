@@ -4,6 +4,8 @@ import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Loading from "@/components/Loading";
 import useSWR, { mutate } from 'swr';
+import { useRouter } from 'next/navigation';
+import { FaTrash } from 'react-icons/fa';
 
 interface CartItem {
   cart_id: number;
@@ -28,6 +30,7 @@ interface CartResponse {
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
 export default function CartPage() {
+  const router = useRouter();
   const { data, error, isLoading } = useSWR<CartResponse>('/api/carts', fetcher);
 
   const cartItems = data?.data?.filter(item => item.product_id !== null) || [];
@@ -155,9 +158,9 @@ export default function CartPage() {
                 <button 
                   onClick={() => item.cart_id && item.cart_item_id && item.product_id && 
                     removeItem(item.cart_id, item.cart_item_id, item.product_id)}
-                  className="ml-4 text-red-500"
+                  className="ml-4 text-red-500 hover:text-red-700"
                 >
-                  Remove
+                  <FaTrash size={18} />
                 </button>
               </div>
             </motion.div>
@@ -171,7 +174,10 @@ export default function CartPage() {
             <p className="text-xl font-semibold text-black">
               Tổng cộng: {totalPrice.toLocaleString('vi-VN')} ₫
             </p>
-            <button className="mt-4 px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">
+            <button 
+              onClick={() => router.push('/thanh-toan')}
+              className="mt-4 px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+            >
               Thanh toán
             </button>
           </motion.div>
