@@ -15,10 +15,29 @@ DROP TABLE IF EXISTS categories CASCADE;
 DROP TABLE IF EXISTS product_images CASCADE;
 DROP TABLE IF EXISTS products CASCADE;
 DROP TABLE IF EXISTS images CASCADE;
+DROP TABLE IF EXISTS ram CASCADE;
+DROP TABLE IF EXISTS hard_drives CASCADE;
+DROP TABLE IF EXISTS product_ram CASCADE;
+DROP TABLE IF EXISTS product_hard_drives CASCADE;
+DROP TABLE IF EXISTS cart_items CASCADE;
+DROP TABLE IF EXISTS carts CASCADE;
+DROP TABLE IF EXISTS banners CASCADE;
+DROP TABLE IF EXISTS banner_images CASCADE;
+DROP TABLE IF EXISTS product_graphics_cards CASCADE;
+DROP TABLE IF EXISTS graphics_cards CASCADE;
+DROP TABLE IF EXISTS displays CASCADE;
+DROP TABLE IF EXISTS product_displays CASCADE;
+DROP TABLE IF EXISTS cpus CASCADE;
+DROP TABLE IF EXISTS product_cpus CASCADE;
+DROP TABLE IF EXISTS graphics_cards CASCADE;
+DROP TABLE IF EXISTS product_graphics_cards CASCADE;
+DROP TABLE IF EXISTS settings CASCADE;
+DROP TABLE IF EXISTS wards CASCADE;
+DROP TABLE IF EXISTS districts CASCADE;
+DROP TABLE IF EXISTS provinces CASCADE;
 
 
 DROP FUNCTION IF EXISTS update_modified_column() CASCADE;
-
 
 CREATE TABLE images
 (
@@ -30,29 +49,6 @@ CREATE TABLE images
     status     INT                   DEFAULT 1
 );
 
--- Function to generate random data for the images table
-CREATE OR REPLACE FUNCTION generate_image_data(num_records INTEGER)
-RETURNS VOID AS $$
-DECLARE
-    i INTEGER;
-BEGIN
-    FOR i IN 1..num_records LOOP
-        INSERT INTO images (url, alt_text, status)
-        VALUES (
-            'https://picsum.photos/2000/2000?random=' || (random() * 1000)::INT,
-            'Random image ' || i,
-            (random() * 2 + 1)::INT
-        );
-    END LOOP;
-END;
-$$ LANGUAGE plpgsql;
-
--- Execute the function to generate 100 random image records
-SELECT generate_image_data(100);
-
--- Example usage: Generate 100 random image records
--- SELECT generate_image_data(100);
-
 CREATE INDEX idx_images_url ON images (url);
 CREATE INDEX idx_images_created_at ON images (created_at);
 CREATE INDEX idx_images_updated_at ON images (updated_at);
@@ -62,8 +58,7 @@ CREATE TABLE products
 (
     id             SERIAL PRIMARY KEY,
     name           VARCHAR(255)   NOT NULL,
-    brand          VARCHAR(100)   NOT NULL,
-    model          VARCHAR(100)   NOT NULL,
+    slug           VARCHAR(255)   NOT NULL UNIQUE,
     price          DECIMAL(10, 2) NOT NULL,
     description    TEXT,
     specifications JSONB,
@@ -75,14 +70,11 @@ CREATE TABLE products
     FOREIGN KEY (thumbnail_id) REFERENCES images (id) ON DELETE SET NULL
 );
 
-CREATE INDEX idx_products_name ON products (name);
-CREATE INDEX idx_products_brand ON products (brand);
-CREATE INDEX idx_products_model ON products (model);
-CREATE INDEX idx_products_price ON products (price);
-CREATE INDEX idx_products_stock_quantity ON products (stock_quantity);
-CREATE INDEX idx_products_created_at ON products (created_at);
-CREATE INDEX idx_products_updated_at ON products (updated_at);
-CREATE INDEX idx_products_status ON products (status);
+CREATE INDEX idx_products_name_slug ON products (name, slug);
+CREATE INDEX idx_products_price_stock ON products (price, stock_quantity);
+CREATE INDEX idx_products_dates ON products (created_at, updated_at);
+CREATE INDEX idx_products_status_thumb ON products (status, thumbnail_id);
+CREATE INDEX idx_products_specs ON products USING GIN (specifications);
 
 CREATE TABLE product_images
 (
@@ -108,51 +100,17 @@ CREATE TABLE categories
 (
     id         SERIAL PRIMARY KEY,
     name       VARCHAR(100) NOT NULL,
+    slug       VARCHAR(100) NOT NULL UNIQUE,
     content    TEXT,
-    parent_id  INT,
-    image_id   INT,
+    image_id   INT null,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     status     INT       DEFAULT 1,
-    FOREIGN KEY (parent_id) REFERENCES categories (id) ON DELETE SET NULL,
     FOREIGN KEY (image_id) REFERENCES images (id) ON DELETE SET NULL
 );
 
--- Function to generate random categories
-CREATE OR REPLACE FUNCTION generate_random_categories(n INTEGER) RETURNS VOID AS $$
-DECLARE
-    i INTEGER;
-    random_name VARCHAR(100);
-    random_content TEXT;
-    random_parent_id INT;
-    random_image_id INT;
-BEGIN
-    FOR i IN 1..n LOOP
-        random_name := 'Category ' || i;
-        random_content := 'Content for category ' || i;
-        
-        -- Randomly decide if this category should have a parent
-        IF i > 1 AND random() < 0.3 THEN
-            random_parent_id := floor(random() * (i - 1) + 1)::INT;
-        ELSE
-            random_parent_id := NULL;
-        END IF;
-        
-        -- Assume we have some images already in the images table
-        -- You might need to adjust this based on your actual data
-        random_image_id := floor(random() * 10 + 1)::INT;
-        
-        INSERT INTO categories (name, content, parent_id, image_id)
-        VALUES (random_name, random_content, random_parent_id, random_image_id);
-    END LOOP;
-END;
-$$ LANGUAGE plpgsql;
-
--- Call the function to generate 50 random categories
-SELECT generate_random_categories(50);
-
 CREATE INDEX idx_categories_name ON categories (name);
-CREATE INDEX idx_categories_parent_id ON categories (parent_id);
+CREATE INDEX idx_categories_slug ON categories (slug);
 CREATE INDEX idx_categories_created_at ON categories (created_at);
 CREATE INDEX idx_categories_updated_at ON categories (updated_at);
 CREATE INDEX idx_categories_status ON categories (status);
@@ -184,10 +142,9 @@ CREATE TABLE roles
     updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     status      INT DEFAULT 1
 );
-INSERT INTO roles (name, description, created_at)
-VALUES ('admin', 'Administrator with full access', CURRENT_TIMESTAMP),
-       ('manager', 'Manager with elevated privileges', CURRENT_TIMESTAMP),
-       ('user', 'Regular user with standard access', CURRENT_TIMESTAMP);
+
+INSERT INTO roles (name, description) VALUES ('admin', 'Administrator role');
+INSERT INTO roles (name, description) VALUES ('user', 'User role');
 
 CREATE TABLE users
 (
@@ -200,7 +157,7 @@ CREATE TABLE users
     phone      VARCHAR(20),
     address    TEXT,
     avatar_id  INT,
-    role_id    INT          NOT NULL DEFAULT 3,
+    role_id    INT DEFAULT 2,
     status     INT                   DEFAULT 1,
     created_at TIMESTAMP             DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP             DEFAULT CURRENT_TIMESTAMP,
@@ -325,6 +282,7 @@ CREATE TABLE coupons
     end_date            DATE,
     min_purchase_amount DECIMAL(10, 2),
     max_usage           INT,
+    max_discount_value  DECIMAL(10, 2),
     is_active           BOOLEAN DEFAULT TRUE,
     created_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -367,22 +325,6 @@ CREATE TABLE tags
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     status     INT       DEFAULT 1
 );
-
--- Function to create sample data for tags
-CREATE OR REPLACE FUNCTION create_sample_tags(num_tags INTEGER)
-RETURNS VOID AS $$
-DECLARE
-    tag_names TEXT[] := ARRAY['Electronics', 'Clothing', 'Books', 'Home & Garden', 'Sports', 'Toys', 'Beauty', 'Automotive', 'Food', 'Health'];
-    i INTEGER;
-BEGIN
-    FOR i IN 1..LEAST(num_tags, array_length(tag_names, 1)) LOOP
-        INSERT INTO tags (name) VALUES (tag_names[i]);
-    END LOOP;
-END;
-$$ LANGUAGE plpgsql;
-
--- Execute the function to create sample tags (e.g., create 5 tags)
-SELECT create_sample_tags(30);
 
 CREATE INDEX idx_tags_name ON tags (name);
 CREATE INDEX idx_tags_created_at ON tags (created_at);
@@ -427,14 +369,327 @@ CREATE INDEX idx_product_specifications_created_at ON product_specifications (cr
 CREATE INDEX idx_product_specifications_updated_at ON product_specifications (updated_at);
 CREATE INDEX idx_product_specifications_status ON product_specifications (status);
 
+CREATE TABLE ram
+(
+    id         SERIAL PRIMARY KEY,
+    name       VARCHAR(100) NOT NULL,
+    type       VARCHAR(50) NOT NULL,
+    capacity   INT NOT NULL,
+    speed      INT NOT NULL,
+    brand      VARCHAR(50) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status     INT DEFAULT 1
+);
+
+CREATE INDEX idx_ram_name ON ram (name);
+CREATE INDEX idx_ram_type ON ram (type);
+CREATE INDEX idx_ram_capacity ON ram (capacity);
+CREATE INDEX idx_ram_speed ON ram (speed);
+CREATE INDEX idx_ram_brand ON ram (brand);
+CREATE INDEX idx_ram_created_at ON ram (created_at);
+CREATE INDEX idx_ram_updated_at ON ram (updated_at);
+CREATE INDEX idx_ram_status ON ram (status);
+
+CREATE TABLE hard_drives
+(
+    id         SERIAL PRIMARY KEY,
+    name       VARCHAR(100) NOT NULL,
+    type       VARCHAR(50) NOT NULL,
+    capacity   VARCHAR(50) NOT NULL,
+    interface  VARCHAR(50) NOT NULL,
+    brand      VARCHAR(50) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status     INT DEFAULT 1
+);
+
+CREATE INDEX idx_hard_drives_name ON hard_drives (name);
+CREATE INDEX idx_hard_drives_type ON hard_drives (type);
+CREATE INDEX idx_hard_drives_capacity ON hard_drives (capacity);
+CREATE INDEX idx_hard_drives_interface ON hard_drives (interface);
+CREATE INDEX idx_hard_drives_brand ON hard_drives (brand);
+CREATE INDEX idx_hard_drives_created_at ON hard_drives (created_at);
+CREATE INDEX idx_hard_drives_updated_at ON hard_drives (updated_at);
+CREATE INDEX idx_hard_drives_status ON hard_drives (status);
+
+CREATE TABLE product_ram
+(
+    product_id INT,
+    ram_id     INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status     INT DEFAULT 1,
+    PRIMARY KEY (product_id, ram_id),
+    FOREIGN KEY (product_id) REFERENCES products (id) ON DELETE CASCADE,
+    FOREIGN KEY (ram_id) REFERENCES ram (id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_product_ram_product_id ON product_ram (product_id);
+CREATE INDEX idx_product_ram_ram_id ON product_ram (ram_id);
+CREATE INDEX idx_product_ram_created_at ON product_ram (created_at);
+CREATE INDEX idx_product_ram_updated_at ON product_ram (updated_at);
+CREATE INDEX idx_product_ram_status ON product_ram (status);
+
+CREATE TABLE product_hard_drives
+(
+    product_id INT,
+    hard_id    INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status     INT DEFAULT 1,
+    PRIMARY KEY (product_id, hard_id),
+    FOREIGN KEY (product_id) REFERENCES products (id) ON DELETE CASCADE,
+    FOREIGN KEY (hard_id) REFERENCES hard_drives (id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_product_hard_product_id ON product_hard_drives (product_id);
+CREATE INDEX idx_product_hard_hard_id ON product_hard_drives (hard_id);
+CREATE INDEX idx_product_hard_created_at ON product_hard_drives (created_at);
+CREATE INDEX idx_product_hard_updated_at ON product_hard_drives (updated_at);
+CREATE INDEX idx_product_hard_status ON product_hard_drives (status);
+
+CREATE TABLE carts
+(
+    id         SERIAL PRIMARY KEY,
+    user_id    INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status     INT DEFAULT 1,
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_carts_user_id ON carts (user_id);
+CREATE INDEX idx_carts_created_at ON carts (created_at);
+CREATE INDEX idx_carts_updated_at ON carts (updated_at);
+CREATE INDEX idx_carts_status ON carts (status);
+
+CREATE TABLE cart_items
+(
+    id         SERIAL PRIMARY KEY,
+    cart_id    INT NOT NULL,
+    product_id INT NOT NULL,
+    quantity   INT NOT NULL DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status     INT DEFAULT 1,
+    FOREIGN KEY (cart_id) REFERENCES carts (id) ON DELETE CASCADE,
+    FOREIGN KEY (product_id) REFERENCES products (id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_cart_items_cart_id ON cart_items (cart_id);
+CREATE INDEX idx_cart_items_product_id ON cart_items (product_id);
+CREATE INDEX idx_cart_items_created_at ON cart_items (created_at);
+CREATE INDEX idx_cart_items_updated_at ON cart_items (updated_at);
+CREATE INDEX idx_cart_items_status ON cart_items (status);
+
+CREATE TABLE banners
+(
+    id         SERIAL PRIMARY KEY,
+    name       VARCHAR(100) NOT NULL,
+    location   TEXT NOT NULL,
+    position   TEXT NOT NULL,
+    status     INT NOT NULL DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_banners_name ON banners (name);
+CREATE INDEX idx_banners_created_at ON banners (created_at);
+CREATE INDEX idx_banners_updated_at ON banners (updated_at);
+CREATE INDEX idx_banners_status ON banners (status);
+
+CREATE TABLE banner_images
+(
+    id         SERIAL PRIMARY KEY,
+    banner_id  INT NOT NULL,
+    image_id   INT NOT NULL,
+    status     INT NOT NULL DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (banner_id) REFERENCES banners (id) ON DELETE CASCADE,
+    FOREIGN KEY (image_id) REFERENCES images (id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_banner_images_banner_id ON banner_images (banner_id);
+CREATE INDEX idx_banner_images_image_id ON banner_images (image_id);
+CREATE INDEX idx_banner_images_created_at ON banner_images (created_at);
+CREATE INDEX idx_banner_images_updated_at ON banner_images (updated_at);
+CREATE INDEX idx_banner_images_status ON banner_images (status);
+
+
+CREATE TABLE displays
+(
+    id          SERIAL PRIMARY KEY,
+    name        VARCHAR(100) NOT NULL,
+    size        VARCHAR(50),
+    resolution  VARCHAR(50),
+    panel_type  VARCHAR(50),
+    refresh_rate VARCHAR(20),
+    status      INT NOT NULL DEFAULT 1,
+    created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_displays_name ON displays (name);
+CREATE INDEX idx_displays_status ON displays (status);
+CREATE INDEX idx_displays_created_at ON displays (created_at);
+CREATE INDEX idx_displays_updated_at ON displays (updated_at);
+
+CREATE TABLE cpus
+(
+    id          SERIAL PRIMARY KEY,
+    name        VARCHAR(100) NOT NULL,
+    brand       VARCHAR(50),
+    model       VARCHAR(50),
+    cores       INT,
+    threads     INT,
+    base_clock  VARCHAR(20),
+    boost_clock VARCHAR(20),
+    cache       VARCHAR(50),
+    status      INT NOT NULL DEFAULT 1,
+    created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_cpus_name ON cpus (name);
+CREATE INDEX idx_cpus_brand ON cpus (brand);
+CREATE INDEX idx_cpus_status ON cpus (status);
+CREATE INDEX idx_cpus_created_at ON cpus (created_at);
+CREATE INDEX idx_cpus_updated_at ON cpus (updated_at);
+
+CREATE TABLE graphics_cards
+(
+    id          SERIAL PRIMARY KEY,
+    name        VARCHAR(100) NOT NULL,
+    brand       VARCHAR(50),
+    memory_size VARCHAR(20),
+    memory_type VARCHAR(20),
+    clock_speed VARCHAR(20),
+    status      INT NOT NULL DEFAULT 1,
+    created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_graphics_cards_name ON graphics_cards (name);
+CREATE INDEX idx_graphics_cards_brand ON graphics_cards (brand);
+CREATE INDEX idx_graphics_cards_status ON graphics_cards (status);
+CREATE INDEX idx_graphics_cards_created_at ON graphics_cards (created_at);
+CREATE INDEX idx_graphics_cards_updated_at ON graphics_cards (updated_at);
+
+CREATE TABLE product_displays
+(
+    id          SERIAL PRIMARY KEY,
+    product_id  INT NOT NULL,
+    display_id  INT NOT NULL,
+    status      INT NOT NULL DEFAULT 1,
+    created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (product_id) REFERENCES products (id) ON DELETE CASCADE,
+    FOREIGN KEY (display_id) REFERENCES displays (id) ON DELETE CASCADE
+);
+
+CREATE TABLE product_cpus
+(
+    id          SERIAL PRIMARY KEY,
+    product_id  INT NOT NULL,
+    cpu_id      INT NOT NULL,
+    status      INT NOT NULL DEFAULT 1,
+    created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (product_id) REFERENCES products (id) ON DELETE CASCADE,
+    FOREIGN KEY (cpu_id) REFERENCES cpus (id) ON DELETE CASCADE
+);
+
+CREATE TABLE product_graphics_cards
+(
+    id               SERIAL PRIMARY KEY,
+    product_id       INT NOT NULL,
+    graphics_card_id INT NOT NULL,
+    status           INT NOT NULL DEFAULT 1,
+    created_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (product_id) REFERENCES products (id) ON DELETE CASCADE,
+    FOREIGN KEY (graphics_card_id) REFERENCES graphics_cards (id) ON DELETE CASCADE
+);
+
+CREATE TABLE settings
+(
+    id         SERIAL PRIMARY KEY,
+    name       VARCHAR(100) NOT NULL,
+    value      TEXT,
+    status     INT NOT NULL DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_settings_name ON settings(name);
+CREATE INDEX idx_settings_status ON settings(status);
+CREATE INDEX idx_settings_created_at ON settings(created_at);
+
+INSERT INTO settings (name, value) VALUES
+('site_name', 'Laptop Store'),
+('site_description', 'Cửa hàng laptop chính hãng'),
+('contact_email', 'contact@laptopstore.com'),
+('contact_phone', '0123456789'),
+('contact_address', 'Hà Nội, Việt Nam'),
+('social_facebook', 'https://facebook.com/laptopstore'),
+('social_instagram', 'https://instagram.com/laptopstore'),
+('social_twitter', 'https://twitter.com/laptopstore'),
+('maintenance_mode', 'false'),
+('currency', 'VND');
+
+INSERT INTO settings (name, value) VALUES
+('security_login_attempts', '5'),
+('security_lockout_duration', '30'),
+('security_password_expiry', '90'),
+('security_password_length', '8'),
+('security_password_complexity', 'true'),
+('security_session_timeout', '60'),
+('security_2fa_enabled', 'false'),
+('security_ip_whitelist', ''),
+('security_ssl_required', 'true'),
+('security_jwt_expiry', '24');
+
+CREATE TABLE provinces
+(
+    id            SERIAL PRIMARY KEY,
+    name          TEXT    NOT NULL,
+    code          INTEGER NOT NULL,
+    division_type TEXT    NOT NULL,
+    codename      TEXT    NOT NULL,
+    phone_code    INTEGER NOT NULL,
+    districts     JSONB DEFAULT '[]'
+);
+CREATE TABLE districts
+(
+    id            SERIAL PRIMARY KEY,
+    name          TEXT    NOT NULL,
+    code          INTEGER NOT NULL,
+    division_type TEXT    NOT NULL,
+    codename      TEXT    NOT NULL,
+    province_code INTEGER NOT NULL,
+    wards         JSONB DEFAULT '[]'
+
+);
+CREATE TABLE wards
+(
+    id            SERIAL PRIMARY KEY,
+    name          TEXT    NOT NULL,
+    code          INTEGER NOT NULL,
+    division_type TEXT    NOT NULL,
+    codename      TEXT    NOT NULL,
+    district_code INTEGER NOT NULL
+);
+
 CREATE OR REPLACE FUNCTION update_modified_column()
     RETURNS TRIGGER AS
-$$
+$func$
 BEGIN
     NEW.updated_at = now();
     RETURN NEW;
 END;
-$$ language 'plpgsql';
+$func$ language 'plpgsql';
 
 CREATE TRIGGER update_product_modtime
     BEFORE UPDATE
@@ -447,3 +702,7 @@ CREATE TRIGGER update_images_modtime
     ON images
     FOR EACH ROW
 EXECUTE FUNCTION update_modified_column();
+
+CREATE INDEX idx_products_name ON products(name);
+CREATE INDEX idx_products_status ON products(status);
+CREATE INDEX idx_products_created_at ON products(created_at);

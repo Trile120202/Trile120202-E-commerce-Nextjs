@@ -32,6 +32,9 @@ DROP TABLE IF EXISTS product_cpus CASCADE;
 DROP TABLE IF EXISTS graphics_cards CASCADE;
 DROP TABLE IF EXISTS product_graphics_cards CASCADE;
 DROP TABLE IF EXISTS settings CASCADE;
+DROP TABLE IF EXISTS wards CASCADE;
+DROP TABLE IF EXISTS districts CASCADE;
+DROP TABLE IF EXISTS provinces CASCADE;
 
 
 DROP FUNCTION IF EXISTS update_modified_column() CASCADE;
@@ -648,8 +651,36 @@ INSERT INTO settings (name, value) VALUES
 ('security_ssl_required', 'true'),
 ('security_jwt_expiry', '24');
 
+CREATE TABLE provinces
+(
+    id            SERIAL PRIMARY KEY,
+    name          TEXT    NOT NULL,
+    code          INTEGER NOT NULL,
+    division_type TEXT    NOT NULL,
+    codename      TEXT    NOT NULL,
+    phone_code    INTEGER NOT NULL,
+    districts     JSONB DEFAULT '[]'
+);
+CREATE TABLE districts
+(
+    id            SERIAL PRIMARY KEY,
+    name          TEXT    NOT NULL,
+    code          INTEGER NOT NULL,
+    division_type TEXT    NOT NULL,
+    codename      TEXT    NOT NULL,
+    province_code INTEGER NOT NULL,
+    wards         JSONB DEFAULT '[]'
 
-
+);
+CREATE TABLE wards
+(
+    id            SERIAL PRIMARY KEY,
+    name          TEXT    NOT NULL,
+    code          INTEGER NOT NULL,
+    division_type TEXT    NOT NULL,
+    codename      TEXT    NOT NULL,
+    district_code INTEGER NOT NULL
+);
 
 CREATE OR REPLACE FUNCTION update_modified_column()
     RETURNS TRIGGER AS

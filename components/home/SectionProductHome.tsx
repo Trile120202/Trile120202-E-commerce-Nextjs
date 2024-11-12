@@ -6,6 +6,7 @@ import useFetch from "@/lib/useFetch";
 import {FaCreditCard, FaShoppingCart} from "react-icons/fa";
 import Loading from "@/components/Loading";
 import { motion, AnimatePresence } from "framer-motion";
+import { useToast } from "@/hooks/use-toast";
 
 interface Specification {
     weight?: string;
@@ -51,10 +52,43 @@ interface ApiResponse {
 
 const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
     const [isAnimating, setIsAnimating] = useState(false);
+    const { toast } = useToast();
 
-    const handleAddToCart = () => {
-        setIsAnimating(true);
-        setTimeout(() => setIsAnimating(false), 1000);
+    const handleAddToCart = async () => {
+        try {
+            const response = await fetch('/api/carts', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    product_id: product.product_id,
+                    quantity: 1
+                }),
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                setIsAnimating(true);
+                setTimeout(() => setIsAnimating(false), 1000);
+                toast({
+                    description: 'Đã thêm sản phẩm vào giỏ hàng!',
+                    variant: "success"
+                });
+            } else {
+                toast({
+                    description: result.message || 'Có lỗi xảy ra khi thêm vào giỏ hàng',
+                    variant: "destructive"
+                });
+            }
+        } catch (error) {
+            toast({
+                description: 'Có lỗi xảy ra khi thêm vào giỏ hàng',
+                variant: "destructive"
+            });
+            console.error('Error adding to cart:', error);
+        }
     };
 
     return (
@@ -110,15 +144,25 @@ const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
             <div className="flex justify-between p-5 mt-auto gap-3">
                 <motion.button 
                     onClick={handleAddToCart}
-                    className="flex-1 flex items-center justify-center bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-700 transition-colors duration-300 text-sm font-medium"
-                    whileTap={{ scale: 0.95 }}
+                    disabled={product.stock_quantity <= 0}
+                    className={`flex-1 flex items-center justify-center px-4 py-3 rounded-lg transition-colors duration-300 text-sm font-medium ${
+                        product.stock_quantity <= 0 
+                        ? 'bg-gray-400 cursor-not-allowed' 
+                        : 'bg-blue-600 hover:bg-blue-700 text-white'
+                    }`}
+                    whileTap={product.stock_quantity > 0 ? { scale: 0.95 } : {}}
                 >
                     <FaShoppingCart className="sm:mr-2" />
                     <span className="hidden sm:inline">Thêm vào giỏ</span>
                 </motion.button>
                 <motion.button 
-                    className="flex-1 flex items-center justify-center bg-green-600 text-white px-4 py-3 rounded-lg hover:bg-green-700 transition-colors duration-300 text-sm font-medium"
-                    whileTap={{ scale: 0.95 }}
+                    disabled={product.stock_quantity <= 0}
+                    className={`flex-1 flex items-center justify-center px-4 py-3 rounded-lg transition-colors duration-300 text-sm font-medium ${
+                        product.stock_quantity <= 0 
+                        ? 'bg-gray-400 cursor-not-allowed' 
+                        : 'bg-green-600 hover:bg-green-700 text-white'
+                    }`}
+                    whileTap={product.stock_quantity > 0 ? { scale: 0.95 } : {}}
                 >
                     <FaCreditCard className="sm:mr-2" />
                     <span className="hidden sm:inline">Mua ngay</span>
