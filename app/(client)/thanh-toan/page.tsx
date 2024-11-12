@@ -35,12 +35,14 @@ interface Province {
 
 interface District {
     province_code: string;
+    code: string;
     name: string;
     id: number;
 }
 
 interface Ward {
     district_code: string;
+    code: string;
     name: string;
     id: number;
 }
@@ -324,7 +326,7 @@ const Page = () => {
                             >
                                 <option value="">Chọn quận/huyện</option>
                                 {districtData?.data?.map(district => (
-                                    <option key={district.id} value={district.province_code}>
+                                    <option key={district.id} value={district.code}>
                                         {district.name}
                                     </option>
                                 ))}
@@ -341,7 +343,7 @@ const Page = () => {
                             >
                                 <option value="">Chọn phường/xã</option>
                                 {wardData?.data?.map(ward => (
-                                    <option key={ward.id} value={ward.district_code}>
+                                    <option key={ward.id} value={ward.code}>
                                         {ward.name}
                                     </option>
                                 ))}
