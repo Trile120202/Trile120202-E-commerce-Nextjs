@@ -207,54 +207,73 @@ const Page = () => {
             return;
         }
 
-        const confirmed = window.confirm("Bạn có chắc chắn muốn đặt hàng?");
-        if (!confirmed) return;
+        toast({
+            title: "Xác nhận đặt hàng",
+            description: "Bạn có chắc chắn muốn đặt hàng?",
+            variant: "default",
+            action: (
+                <div className="flex gap-2">
+                    <button
+                        onClick={async () => {
+                            try {
+                                const orderData = {
+                                    items: items.map(item => ({
+                                        product_id: item.product_id,
+                                        quantity: item.quantity,
+                                        price: item.price
+                                    })),
+                                    shipping_address: `${selectedLocation.address}, ${getWardName(selectedLocation.ward_code)}, ${getDistrictName(selectedLocation.district_code)}, ${getProvinceName(selectedLocation.province_code)}`,
+                                    payment_method_id: parseInt(paymentMethod),
+                                    total_amount: total + 30000, 
+                                    delivery_address_id: selectedLocation.id,
+                                    note: ''
+                                };
 
-        try {
-            const orderData = {
-                items: items.map(item => ({
-                    product_id: item.product_id,
-                    quantity: item.quantity,
-                    price: item.price
-                })),
-                shipping_address: `${selectedLocation.address}, ${getWardName(selectedLocation.ward_code)}, ${getDistrictName(selectedLocation.district_code)}, ${getProvinceName(selectedLocation.province_code)}`,
-                payment_method_id: parseInt(paymentMethod),
-                total_amount: total + 30000, 
-                delivery_address_id: selectedLocation.id,
-                note: ''
-            };
+                                const response = await fetch('/api/orders/', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                    },
+                                    body: JSON.stringify(orderData),
+                                });
 
-            const response = await fetch('/api/orders/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(orderData),
-            });
-
-            if (response.ok) {
-                toast({
-                    title: "Thành công",
-                    description: "Đặt hàng thành công!",
-                    variant: "default"
-                });
-                router.push('/don-hang'); 
-            } else {
-                const error = await response.json();
-                toast({
-                    title: "Lỗi",
-                    description: error.message || "Có lỗi xảy ra khi đặt hàng",
-                    variant: "destructive"
-                });
-            }
-        } catch (error) {
-            console.error('Error creating order:', error);
-            toast({
-                title: "Lỗi",
-                description: "Có lỗi xảy ra khi đặt hàng",
-                variant: "destructive"
-            });
-        }
+                                if (response.ok) {
+                                    toast({
+                                        title: "Thành công",
+                                        description: "Đặt hàng thành công!",
+                                        variant: "default"
+                                    });
+                                    router.push('/don-hang'); 
+                                } else {
+                                    const error = await response.json();
+                                    toast({
+                                        title: "Lỗi",
+                                        description: error.message || "Có lỗi xảy ra khi đặt hàng",
+                                        variant: "destructive"
+                                    });
+                                }
+                            } catch (error) {
+                                console.error('Error creating order:', error);
+                                toast({
+                                    title: "Lỗi",
+                                    description: "Có lỗi xảy ra khi đặt hàng",
+                                    variant: "destructive"
+                                });
+                            }
+                        }}
+                        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                    >
+                        Xác nhận
+                    </button>
+                    <button
+                        onClick={() => {}}
+                        className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+                    >
+                        Hủy
+                    </button>
+                </div>
+            ),
+        });
     };
 
     useEffect(() => {
