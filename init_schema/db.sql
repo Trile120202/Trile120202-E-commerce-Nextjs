@@ -277,7 +277,7 @@ CREATE TABLE order_items
     order_id   INT,
     product_id INT,
     quantity   INT            NOT NULL,
-    price      DECIMAL(10, 2) NOT NULL,
+    price      TEXT NOT NULL,
     created_at TIMESTAMP      DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP      DEFAULT CURRENT_TIMESTAMP,
     status     INT            DEFAULT 1,
