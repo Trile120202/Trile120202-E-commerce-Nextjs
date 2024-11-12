@@ -74,7 +74,6 @@ const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
                 setTimeout(() => setIsAnimating(false), 1000);
                 toast({
                     description: 'Đã thêm sản phẩm vào giỏ hàng!',
-                    variant: "success"
                 });
             } else {
                 toast({

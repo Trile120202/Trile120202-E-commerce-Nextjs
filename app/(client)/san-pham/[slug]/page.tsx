@@ -5,6 +5,8 @@ import Image from 'next/image';
 import useFetch from "@/lib/useFetch";
 import { motion } from 'framer-motion';
 import Loading from "@/components/Loading";
+import { useCart } from '@/hooks/useCart';
+import { useToast } from '@/hooks/use-toast';
 
 interface Product {
   id: number;
@@ -48,6 +50,8 @@ export default function ProductPage({ params }: ProductPageProps) {
   const { slug } = params;
   const { data, loading, error } = useFetch<ApiResponse>(`/api/products/get-product-with-slug?slug=${slug}`);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const { addItem } = useCart();
+  const { toast } = useToast();
 
   if (loading) return <Loading/>;
   if (error) return notFound();
@@ -58,6 +62,41 @@ export default function ProductPage({ params }: ProductPageProps) {
 
   const handleThumbnailClick = (index: number) => {
     setCurrentImageIndex(index);
+  };
+
+  const handleAddToCart = async () => {
+    try {
+      const response = await fetch('/api/carts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          product_id: product.id,
+          quantity: 1
+        }),
+      });
+
+      const result = await response.json();
+
+
+      if (response.ok) {
+        toast({
+          description: 'Đã thêm sản phẩm vào giỏ hàng!',
+        });
+      } else {
+        toast({
+          description: result.message || 'Có lỗi xảy ra khi thêm vào giỏ hàng',
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      toast({
+        description: 'Có lỗi xảy ra khi thêm vào giỏ hàng',
+        variant: "destructive"
+      });
+      console.error('Error adding to cart:', error);
+    }
   };
 
   return (
@@ -111,10 +150,6 @@ export default function ProductPage({ params }: ProductPageProps) {
         >
           <h1 className="text-4xl font-bold mb-4">{product.name}</h1>
           <p className="text-2xl font-semibold mb-4 text-blue-600">{parseFloat(product.price).toLocaleString('vi-VN')} ₫</p>
-          <div 
-            className="mb-6 text-gray-600"
-            dangerouslySetInnerHTML={{ __html: product.description }}
-          />
           <motion.div 
             className="mb-6 bg-gray-100 p-4 rounded-lg"
             initial={{ y: 20, opacity: 0 }}
@@ -172,6 +207,10 @@ export default function ProductPage({ params }: ProductPageProps) {
               </div>
             </div>
           </motion.div>
+          <div 
+            className="mb-6 text-gray-600"
+            dangerouslySetInnerHTML={{ __html: product.description }}
+          />
           <motion.div 
             className="mb-6"
             initial={{ y: 20, opacity: 0 }}
@@ -185,6 +224,7 @@ export default function ProductPage({ params }: ProductPageProps) {
             className="bg-blue-500 text-white px-6 py-3 rounded-full text-lg font-semibold hover:bg-blue-600 transition-colors transform hover:scale-105"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
+            onClick={handleAddToCart}
           >
             Thêm vào giỏ hàng
           </motion.button>

@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { FaShoppingCart, FaClipboardList } from 'react-icons/fa';
 
 const URLS = {
   HOME: '/',
@@ -9,6 +10,7 @@ const URLS = {
   CONTACT: '/lien-he', 
   LOGIN: '/dang-nhap',
   CART: '/gio-hang',
+  ORDERS: '/don-hang',
   SEARCH: '/tim-kiem',
   AUTH_ME: '/api/auth/me',
   AUTH_LOGOUT: '/api/auth/logout'
@@ -102,14 +104,20 @@ export default function Header() {
             <Link href={URLS.LOGIN} className="text-white hover:text-yellow-300 transition duration-300">Đăng nhập</Link>
           )}
         </li>
-        <li>
-          <Link href={URLS.CART} className="flex items-center justify-center text-white hover:text-yellow-300 transition duration-300">
-            <svg className="w-6 h-6 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-            </svg>
-            Giỏ hàng
-          </Link>
-        </li>
+        {user && (
+          <>
+            <li>
+              <Link href={URLS.CART} className="flex items-center justify-center w-10 h-10 bg-blue-600 hover:bg-blue-500 rounded-lg transition duration-300">
+                <FaShoppingCart className="w-5 h-5" />
+              </Link>
+            </li>
+            <li>
+              <Link href={URLS.ORDERS} className="flex items-center justify-center w-10 h-10 bg-blue-600 hover:bg-blue-500 rounded-lg transition duration-300">
+                <FaClipboardList className="w-5 h-5" />
+              </Link>
+            </li>
+          </>
+        )}
       </ul>
     </nav>
   );
@@ -161,14 +169,28 @@ export default function Header() {
             </Link>
           )}
         </li>
-        <li className="w-full">
-          <Link href={URLS.CART} onClick={() => setIsMenuOpen(false)} className="flex items-center justify-center text-white hover:text-yellow-300 transition duration-300 block">
-            <svg className="w-6 h-6 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-            </svg>
-            Giỏ hàng
-          </Link>
-        </li>
+        {user && (
+          <>
+            <li className="w-full">
+              <Link 
+                href={URLS.CART} 
+                onClick={() => setIsMenuOpen(false)} 
+                className="flex items-center justify-center bg-blue-600 hover:bg-blue-500 text-white w-10 h-10 rounded transition duration-300 mx-auto"
+              >
+                <FaShoppingCart className="w-5 h-5" />
+              </Link>
+            </li>
+            <li className="w-full">
+              <Link 
+                href={URLS.ORDERS} 
+                onClick={() => setIsMenuOpen(false)} 
+                className="flex items-center justify-center bg-blue-600 hover:bg-blue-500 text-white w-10 h-10 rounded transition duration-300 mx-auto"
+              >
+                <FaClipboardList className="w-5 h-5" />
+              </Link>
+            </li>
+          </>
+        )}
       </ul>
     </div>
   );
