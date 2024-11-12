@@ -26,26 +26,43 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
             const userId = verified.payload.userId;
 
-            const orders = await db('orders')
+            const orders = await db
                 .select(
                     'orders.*',
-                    db.raw('json_agg(json_build_object(' +
-                        "'product_id', products.id, " +
-                        "'product_name', products.name, " +
-                        "'quantity', order_items.quantity, " +
-                        "'price', products.price, " +
-                        "'thumbnail_url', products.thumbnail_url" +
-                        ')) as items')
+                    'payment_methods.name as payment_method_name',
+                    'payment_methods.icon_url as payment_method_icon',
+                    'delivery_addresses.address as delivery_address',
+                    'delivery_addresses.phone_number as delivery_phone'
                 )
-                .leftJoin('order_items', 'orders.id', 'order_items.order_id')
-                .leftJoin('products', 'order_items.product_id', 'products.id')
+                .from('orders')
+                .leftJoin('payment_methods', 'orders.payment_method_id', 'payment_methods.id')
+                .leftJoin('delivery_addresses', 'orders.delivery_address_id', 'delivery_addresses.id')
                 .where('orders.user_id', userId)
-                .groupBy('orders.id')
                 .orderBy('orders.created_at', 'desc');
 
-            res.status(StatusCode.OK).json(transformResponse({
+            for (let order of orders) {
+                const items = await db
+                    .select(
+                        'order_items.*',
+                        'products.name as product_name',
+                        'products.description',
+                        'products.slug',
+                        'images.url as thumbnail_url',
+                        'categories.id as category_id'
+                    )
+                    .from('order_items')
+                    .leftJoin('products', 'order_items.product_id', 'products.id')
+                    .leftJoin('images', 'products.thumbnail_id', 'images.id')
+                    .leftJoin('product_categories', 'products.id', 'product_categories.product_id')
+                    .leftJoin('categories', 'product_categories.category_id', 'categories.id')
+                    .where('order_items.order_id', order.id);
+
+                order.items = items;
+            }
+
+            return res.status(StatusCode.OK).json(transformResponse({
                 data: orders,
-                message: 'Orders retrieved successfully.',
+                message: 'Orders retrieved successfully',
                 statusCode: StatusCode.OK
             }));
         } catch (error) {
@@ -73,7 +90,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             );
 
             const userId = verified.payload.userId;
-            const { items, shipping_address, payment_method, total_amount } = req.body;
+            const { items, shipping_address, payment_method_id, total_amount, delivery_address_id, note } = req.body;
 
             if (!shipping_address) {
                 return res.status(StatusCode.BAD_REQUEST).json(transformResponse({
@@ -83,10 +100,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 }));
             }
 
-            if (!payment_method) {
+            if (!payment_method_id) {
                 return res.status(StatusCode.BAD_REQUEST).json(transformResponse({
                     data: null,
                     message: 'Payment method is required',
+                    statusCode: StatusCode.BAD_REQUEST
+                }));
+            }
+
+            if (!delivery_address_id) {
+                return res.status(StatusCode.BAD_REQUEST).json(transformResponse({
+                    data: null,
+                    message: 'Delivery address is required',
                     statusCode: StatusCode.BAD_REQUEST
                 }));
             }
@@ -99,33 +124,66 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 }));
             }
 
-            const [newOrder] = await db('orders').insert({
-                user_id: userId,
-                total_amount,
-                status: 1,
-                shipping_address,
-                payment_method,
-                created_at: db.fn.now(),
-                updated_at: db.fn.now()
-            }).returning('*');
+            await db.transaction(async trx => {
+                for (const item of items) {
+                    const product = await trx('products')
+                        .where('id', item.product_id)
+                        .first();
+                        
+                    if (!product || product.stock_quantity < item.quantity) {
+                        throw new Error(`Insufficient stock for product ID ${item.product_id}`);
+                    }
+                }
 
-            const orderItems = items.map(item => ({
-                order_id: newOrder.id,
-                product_id: item.product_id,
-                quantity: item.quantity,
-                price: item.price,
-                status: 1,
-                created_at: db.fn.now(),
-                updated_at: db.fn.now()
-            }));
+                const [newOrder] = await trx('orders').insert({
+                    user_id: userId,
+                    total_amount,
+                    status: 1,
+                    shipping_address,
+                    payment_method_id,
+                    delivery_address_id,
+                    note,
+                    order_date: trx.fn.now(),
+                    created_at: trx.fn.now(),
+                    updated_at: trx.fn.now()
+                }).returning('*');
 
-            await db('order_items').insert(orderItems);
+                const orderItems = items.map(item => ({
+                    order_id: newOrder.id,
+                    product_id: item.product_id,
+                    quantity: item.quantity,
+                    price: item.price,
+                    status: 1,
+                    created_at: trx.fn.now(),
+                    updated_at: trx.fn.now()
+                }));
 
-            res.status(StatusCode.CREATED).json(transformResponse({
-                data: newOrder,
-                message: 'Order created successfully',
-                statusCode: StatusCode.CREATED
-            }));
+                await trx('order_items').insert(orderItems);
+
+                const [cart] = await trx('carts')
+                    .where('user_id', userId as number)
+                    .where('status', 1);
+
+                if (cart) {
+                    await trx('cart_items')
+                        .where('cart_id', cart.id)
+                        .whereIn('product_id', items.map(item => item.product_id))
+                        .delete();
+                }
+
+                for (const item of items) {
+                    await trx('products')
+                        .where('id', item.product_id)
+                        .decrement('stock_quantity', item.quantity);
+                }
+
+                res.status(StatusCode.CREATED).json(transformResponse({
+                    data: newOrder,
+                    message: 'Order created successfully',
+                    statusCode: StatusCode.CREATED
+                }));
+            });
+
         } catch (error) {
             console.error('Error creating order:', error);
             return res.status(StatusCode.INTERNAL_SERVER_ERROR).json(transformResponse({

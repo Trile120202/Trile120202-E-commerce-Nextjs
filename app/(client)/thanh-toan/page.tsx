@@ -5,6 +5,9 @@ import Image from 'next/image';
 import { FaMapMarkerAlt, FaTag, FaCreditCard, FaTrash, FaPlus, FaPencilAlt } from 'react-icons/fa';
 import { useCart } from '@/hooks/useCart';
 import useSWR from 'swr';
+import { usePaymentMethods } from '@/hooks/useMethod';
+import { useRouter } from 'next/navigation';
+import { useToast } from '@/hooks/use-toast';
 
 interface Location {
     id: number;
@@ -50,6 +53,8 @@ interface Ward {
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
 const Page = () => {
+    const router = useRouter();
+    const { toast } = useToast();
     const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
     const [showAddForm, setShowAddForm] = useState(false);
     const [editingLocation, setEditingLocation] = useState<Location | null>(null);
@@ -64,8 +69,9 @@ const Page = () => {
         is_default: false
     });
     const [promoCode, setPromoCode] = useState('');
-    const [paymentMethod, setPaymentMethod] = useState('cod');
+    const [paymentMethod, setPaymentMethod] = useState('');
     const { items, total, updateQuantity, removeItem } = useCart();
+    const { paymentMethods, isLoading: isLoadingPayments } = usePaymentMethods();
     
     const { data: locationData, error: locationError, mutate: mutateLocations } = useSWR<LocationResponse>('/api/locations', fetcher);
     const { data: provinceData } = useSWR<{data: Province[]}>('/api/locations/p', fetcher);
@@ -182,12 +188,87 @@ const Page = () => {
         }
     };
 
+    const handleCreateOrder = async () => {
+        if (!selectedLocation) {
+            toast({
+                title: "Lỗi",
+                description: "Vui lòng chọn địa chỉ giao hàng",
+                variant: "destructive"
+            });
+            return;
+        }
+
+        if (!paymentMethod) {
+            toast({
+                title: "Lỗi", 
+                description: "Vui lòng chọn phương thức thanh toán",
+                variant: "destructive"
+            });
+            return;
+        }
+
+        const confirmed = window.confirm("Bạn có chắc chắn muốn đặt hàng?");
+        if (!confirmed) return;
+
+        try {
+            const orderData = {
+                items: items.map(item => ({
+                    product_id: item.product_id,
+                    quantity: item.quantity,
+                    price: item.price
+                })),
+                shipping_address: `${selectedLocation.address}, ${getWardName(selectedLocation.ward_code)}, ${getDistrictName(selectedLocation.district_code)}, ${getProvinceName(selectedLocation.province_code)}`,
+                payment_method_id: parseInt(paymentMethod),
+                total_amount: total + 30000, 
+                delivery_address_id: selectedLocation.id,
+                note: ''
+            };
+
+            const response = await fetch('/api/orders/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(orderData),
+            });
+
+            if (response.ok) {
+                toast({
+                    title: "Thành công",
+                    description: "Đặt hàng thành công!",
+                    variant: "default"
+                });
+                router.push('/don-hang'); 
+            } else {
+                const error = await response.json();
+                toast({
+                    title: "Lỗi",
+                    description: error.message || "Có lỗi xảy ra khi đặt hàng",
+                    variant: "destructive"
+                });
+            }
+        } catch (error) {
+            console.error('Error creating order:', error);
+            toast({
+                title: "Lỗi",
+                description: "Có lỗi xảy ra khi đặt hàng",
+                variant: "destructive"
+            });
+        }
+    };
+
     useEffect(() => {
         if (locationData?.data?.length > 0) {
             const defaultLocation = locationData.data.find(loc => loc.is_default);
             setSelectedLocation(defaultLocation || locationData.data[0]);
         }
     }, [locationData]);
+
+    useEffect(() => {
+        if (paymentMethods.length > 0) {
+            setPaymentMethod(paymentMethods[0].id.toString());
+        }
+    }, [paymentMethods]);
 
     // Helper functions to get names from codes
     const getProvinceName = (code: string) => {
@@ -457,26 +538,29 @@ const Page = () => {
                     <h2 className="text-xl font-semibold">Phương thức thanh toán</h2>
                 </div>
                 <div className="space-y-3">
-                    <label className="flex items-center space-x-3">
-                        <input
-                            type="radio"
-                            value="cod"
-                            checked={paymentMethod === 'cod'}
-                            onChange={(e) => setPaymentMethod(e.target.value)}
-                            className="form-radio"
-                        />
-                        <span>Thanh toán khi nhận hàng (COD)</span>
-                    </label>
-                    <label className="flex items-center space-x-3">
-                        <input
-                            type="radio"
-                            value="banking"
-                            checked={paymentMethod === 'banking'}
-                            onChange={(e) => setPaymentMethod(e.target.value)}
-                            className="form-radio"
-                        />
-                        <span>Chuyển khoản ngân hàng</span>
-                    </label>
+                    {paymentMethods.map((method) => (
+                        <label key={method.id} className="flex items-center space-x-3">
+                            <input
+                                type="radio"
+                                value={method.id}
+                                checked={paymentMethod === method.id.toString()}
+                                onChange={(e) => setPaymentMethod(e.target.value)}
+                                className="form-radio"
+                            />
+                            <div className="flex items-center">
+                                {method.icon_url && (
+                                    <Image 
+                                        src={method.icon_url}
+                                        alt={method.name}
+                                        width={24}
+                                        height={24}
+                                        className="mr-2"
+                                    />
+                                )}
+                                <span>{method.name}</span>
+                            </div>
+                        </label>
+                    ))}
                 </div>
             </div>
 
@@ -494,7 +578,10 @@ const Page = () => {
                     <span className="font-semibold">Tổng thanh toán:</span>
                     <span className="text-xl text-red-500 font-bold">{(total + 30000).toLocaleString()} ₫</span>
                 </div>
-                <button className="w-full bg-red-500 text-white py-3 rounded-md hover:bg-red-600 font-semibold">
+                <button 
+                    onClick={handleCreateOrder}
+                    className="w-full bg-red-500 text-white py-3 rounded-md hover:bg-red-600 font-semibold"
+                >
                     Đặt hàng
                 </button>
             </div>

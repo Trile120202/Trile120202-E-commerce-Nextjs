@@ -232,25 +232,28 @@ CREATE TABLE payment_methods (
     status INT DEFAULT 1
 );
 
+INSERT INTO payment_methods (name, code, description, is_active, icon_url, provider, config) VALUES
+('Thanh toán khi nhận hàng', 'cod', 'Thanh toán tiền mặt khi nhận hàng', true, '/icons/cod.png', 'internal', '{"fee": 0}'),
+('Chuyển khoản ngân hàng', 'bank_transfer', 'Chuyển khoản qua tài khoản ngân hàng', true, '/icons/bank.png', 'internal', '{"bank_name": "Vietcombank", "account_number": "1234567890", "account_name": "CÔNG TY TNHH ABC"}'),
+('Ví điện tử MoMo', 'momo', 'Thanh toán qua ví MoMo', true, '/icons/momo.png', 'momo', '{"partner_code": "MOMO123", "access_key": "abc123"}'),
+('ZaloPay', 'zalopay', 'Thanh toán qua ZaloPay', true, '/icons/zalopay.png', 'zalopay', '{"app_id": "zalo123", "key1": "key123"}'),
+('VNPay', 'vnpay', 'Thanh toán qua cổng VNPay', true, '/icons/vnpay.png', 'vnpay', '{"terminal_id": "vnp123", "secret_key": "vnpsecret123"}');
+
 CREATE INDEX idx_payment_methods_code ON payment_methods (code);
 CREATE INDEX idx_payment_methods_is_active ON payment_methods (is_active);
 CREATE INDEX idx_payment_methods_created_at ON payment_methods (created_at);
 CREATE INDEX idx_payment_methods_updated_at ON payment_methods (updated_at);
 CREATE INDEX idx_payment_methods_status ON payment_methods (status);
 
-INSERT INTO payment_methods (name, code, description, provider) VALUES
-('Cash on Delivery', 'cod', 'Pay when you receive the items', 'internal'),
-('Bank Transfer', 'bank_transfer', 'Transfer money to our bank account', 'internal'),
-('Credit Card', 'credit_card', 'Pay with credit card', 'stripe'),
-('Momo Wallet', 'momo', 'Pay with Momo e-wallet', 'momo'),
-('ZaloPay', 'zalopay', 'Pay with ZaloPay e-wallet', 'zalopay');
 
 CREATE TABLE orders
 (
     id               SERIAL PRIMARY KEY,
     user_id          INT,
+    delivery_address_id INT NOT NULL,
+    note TEXT,
     order_date       TIMESTAMP                                                                                    DEFAULT CURRENT_TIMESTAMP,
-    total_amount     DECIMAL(10, 2) NOT NULL,
+    total_amount     TEXT,
     shipping_address TEXT,
     payment_method_id INT,
     created_at       TIMESTAMP                                                                                    DEFAULT CURRENT_TIMESTAMP,
