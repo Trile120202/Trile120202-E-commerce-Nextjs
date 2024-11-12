@@ -9,6 +9,8 @@ DROP TABLE IF EXISTS orders CASCADE;
 DROP TABLE IF EXISTS role_permissions CASCADE;
 DROP TABLE IF EXISTS permissions CASCADE;
 DROP TABLE IF EXISTS roles CASCADE;
+DROP TABLE IF EXISTS delivery_addresses CASCADE;
+DROP TABLE IF EXISTS user_delivery_addresses CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
 DROP TABLE IF EXISTS product_categories CASCADE;
 DROP TABLE IF EXISTS categories CASCADE;
@@ -681,6 +683,31 @@ CREATE TABLE wards
     codename      TEXT    NOT NULL,
     district_code INTEGER NOT NULL
 );
+
+CREATE TABLE user_delivery_addresses (
+    id               SERIAL PRIMARY KEY,
+    user_id          INT NOT NULL,
+    delivery_addresses_id INTEGER NOT NULL,
+    is_default       BOOLEAN DEFAULT FALSE,
+    status           INT NOT NULL DEFAULT 1,
+    created_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE delivery_addresses
+(
+    id               SERIAL PRIMARY KEY,
+    user_id          INT NOT NULL,
+    province_code    INT NOT NULL,
+    district_code    INTEGER NOT NULL,
+    ward_code        INTEGER NOT NULL,
+    postal_code      TEXT,
+    phone_number     TEXT,
+    status INT DEFAULT 1,
+    created_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 
 CREATE OR REPLACE FUNCTION update_modified_column()
     RETURNS TRIGGER AS

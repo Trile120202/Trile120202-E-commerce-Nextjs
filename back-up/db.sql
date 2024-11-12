@@ -9,6 +9,8 @@ DROP TABLE IF EXISTS orders CASCADE;
 DROP TABLE IF EXISTS role_permissions CASCADE;
 DROP TABLE IF EXISTS permissions CASCADE;
 DROP TABLE IF EXISTS roles CASCADE;
+DROP TABLE IF EXISTS delivery_addresses CASCADE;
+DROP TABLE IF EXISTS user_delivery_addresses CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
 DROP TABLE IF EXISTS product_categories CASCADE;
 DROP TABLE IF EXISTS categories CASCADE;
@@ -628,28 +630,28 @@ CREATE INDEX idx_settings_status ON settings(status);
 CREATE INDEX idx_settings_created_at ON settings(created_at);
 
 INSERT INTO settings (name, value) VALUES
-('site_name', 'Laptop Store'),
-('site_description', 'Cửa hàng laptop chính hãng'),
-('contact_email', 'contact@laptopstore.com'),
-('contact_phone', '0123456789'),
-('contact_address', 'Hà Nội, Việt Nam'),
-('social_facebook', 'https://facebook.com/laptopstore'),
-('social_instagram', 'https://instagram.com/laptopstore'),
-('social_twitter', 'https://twitter.com/laptopstore'),
-('maintenance_mode', 'false'),
-('currency', 'VND');
+                                       ('site_name', 'Laptop Store'),
+                                       ('site_description', 'Cửa hàng laptop chính hãng'),
+                                       ('contact_email', 'contact@laptopstore.com'),
+                                       ('contact_phone', '0123456789'),
+                                       ('contact_address', 'Hà Nội, Việt Nam'),
+                                       ('social_facebook', 'https://facebook.com/laptopstore'),
+                                       ('social_instagram', 'https://instagram.com/laptopstore'),
+                                       ('social_twitter', 'https://twitter.com/laptopstore'),
+                                       ('maintenance_mode', 'false'),
+                                       ('currency', 'VND');
 
 INSERT INTO settings (name, value) VALUES
-('security_login_attempts', '5'),
-('security_lockout_duration', '30'),
-('security_password_expiry', '90'),
-('security_password_length', '8'),
-('security_password_complexity', 'true'),
-('security_session_timeout', '60'),
-('security_2fa_enabled', 'false'),
-('security_ip_whitelist', ''),
-('security_ssl_required', 'true'),
-('security_jwt_expiry', '24');
+                                       ('security_login_attempts', '5'),
+                                       ('security_lockout_duration', '30'),
+                                       ('security_password_expiry', '90'),
+                                       ('security_password_length', '8'),
+                                       ('security_password_complexity', 'true'),
+                                       ('security_session_timeout', '60'),
+                                       ('security_2fa_enabled', 'false'),
+                                       ('security_ip_whitelist', ''),
+                                       ('security_ssl_required', 'true'),
+                                       ('security_jwt_expiry', '24');
 
 CREATE TABLE provinces
 (
@@ -681,6 +683,31 @@ CREATE TABLE wards
     codename      TEXT    NOT NULL,
     district_code INTEGER NOT NULL
 );
+
+CREATE TABLE user_delivery_addresses (
+                                         id               SERIAL PRIMARY KEY,
+                                         user_id          INT NOT NULL,
+                                         delivery_addresses_id INTEGER NOT NULL,
+                                         is_default       BOOLEAN DEFAULT FALSE,
+                                         status           INT NOT NULL DEFAULT 1,
+                                         created_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                         updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE delivery_addresses
+(
+    id               SERIAL PRIMARY KEY,
+    user_id          INT NOT NULL,
+    province_code    INT NOT NULL,
+    district_code    INTEGER NOT NULL,
+    ward_code        INTEGER NOT NULL,
+    postal_code      TEXT,
+    phone_number     TEXT,
+    status INT DEFAULT 1,
+    created_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 
 CREATE OR REPLACE FUNCTION update_modified_column()
     RETURNS TRIGGER AS
