@@ -55,6 +55,12 @@ const formSchema = z.object({
         .min(1, "Phải chọn ít nhất một ổ cứng"),
     tag_ids: z.array(z.number())
         .min(1, "Phải chọn ít nhất một tag"),
+    display_ids: z.array(z.number())
+        .min(1, "Phải chọn ít nhất một màn hình"),
+    cpu_ids: z.array(z.number())
+        .min(1, "Phải chọn ít nhất một CPU"),
+    graphics_card_ids: z.array(z.number())
+        .min(1, "Phải chọn ít nhất một card đồ họa"),
     status: z.number().default(Status.ACTIVE),
     thumbnail_id: z.number({
         required_error: "Vui lòng chọn ảnh đại diện"
@@ -87,6 +93,9 @@ const Page = ({ params }: { params: { id: string } }) => {
             ram_ids: [],
             storage_ids: [], 
             tag_ids: [],
+            display_ids: [],
+            cpu_ids: [],
+            graphics_card_ids: [],
             status: Status.ACTIVE,
             thumbnail_id: 0,
             images: []
@@ -105,6 +114,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                 }
 
                 const productData = data.data;
+                console.log("Product Data:", productData); // Log để kiểm tra dữ liệu
 
                 // Transform image data
                 const thumbnail = {
@@ -131,7 +141,8 @@ const Page = ({ params }: { params: { id: string } }) => {
                 setDescription(productData.description);
 
                 // Helper function to handle both string and array cases
-                const parseIds = (value: string | number[]) => {
+                const parseIds = (value: string | number[] | null | undefined) => {
+                    if (!value) return [];
                     if (Array.isArray(value)) return value;
                     if (typeof value === 'string' && value.trim() !== '') {
                         return value.split(',').map(id => parseInt(id.trim()));
@@ -140,10 +151,16 @@ const Page = ({ params }: { params: { id: string } }) => {
                 };
 
                 // Parse IDs using the helper function
-                const categoryIds = parseIds(productData.category_ids || []); // Add fallback empty array
+                const categoryIds = parseIds(productData.category_ids);
                 const ramIds = parseIds(productData.ram_ids);
                 const storageIds = parseIds(productData.storage_ids);
                 const tagIds = parseIds(productData.tag_ids);
+                const displayIds = parseIds(productData.display_ids);
+                const cpuIds = parseIds(productData.cpu_ids);
+                const graphicsCardIds = parseIds(productData.graphics_card_ids);
+
+                console.log("CPU IDs:", cpuIds); // Log để kiểm tra CPU IDs
+                console.log("Display IDs:", displayIds); // Log để kiểm tra Display IDs
 
                 form.reset({
                     name: productData.product_name || "",
@@ -155,6 +172,9 @@ const Page = ({ params }: { params: { id: string } }) => {
                     ram_ids: ramIds,
                     storage_ids: storageIds,
                     tag_ids: tagIds,
+                    display_ids: displayIds,
+                    cpu_ids: cpuIds,
+                    graphics_card_ids: graphicsCardIds,
                     status: productData.product_status || Status.ACTIVE,
                     thumbnail_id: productData.thumbnail_id || 0,
                     images: productData.product_image_ids || []
@@ -474,10 +494,10 @@ const Page = ({ params }: { params: { id: string } }) => {
                                         <FormControl>
                                             <SelectData
                                                 endpoint="/api/ram/get-ram-date-id-name"
-                                                multiple={true}
+                                                multiple={false}
                                                 placeholder="Chọn RAM"
-                                                onSelect={(value) => field.onChange(value)}
-                                                defaultValue={field.value}
+                                                onSelect={(value) => field.onChange([value])}
+                                                defaultValue={field.value[0]}
                                             />
                                         </FormControl>
                                         <FormMessage />
@@ -516,6 +536,66 @@ const Page = ({ params }: { params: { id: string } }) => {
                                                 endpoint="/api/tag/get-tag-id-name"
                                                 multiple={true}
                                                 placeholder="Chọn tags"
+                                                onSelect={(value) => field.onChange(value)}
+                                                defaultValue={field.value}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={form.control}
+                                name="display_ids"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className="text-base lg:text-lg font-semibold">Màn hình</FormLabel>
+                                        <FormControl>
+                                            <SelectData
+                                                endpoint="/api/displays/get-display-id-name"
+                                                multiple={true}
+                                                placeholder="Chọn màn hình"
+                                                onSelect={(value) => field.onChange(value)}
+                                                defaultValue={field.value}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={form.control}
+                                name="cpu_ids"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className="text-base lg:text-lg font-semibold">CPU</FormLabel>
+                                        <FormControl>
+                                            <SelectData
+                                                endpoint="/api/cpus/get-cpu-id-name"
+                                                multiple={true}
+                                                placeholder="Chọn CPU"
+                                                onSelect={(value) => field.onChange(value)}
+                                                defaultValue={field.value}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={form.control}
+                                name="graphics_card_ids"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className="text-base lg:text-lg font-semibold">Card đồ họa</FormLabel>
+                                        <FormControl>
+                                            <SelectData
+                                                endpoint="/api/graphics_cards/get-graphics-card-id-name"
+                                                multiple={true}
+                                                placeholder="Chọn card đồ họa"
                                                 onSelect={(value) => field.onChange(value)}
                                                 defaultValue={field.value}
                                             />

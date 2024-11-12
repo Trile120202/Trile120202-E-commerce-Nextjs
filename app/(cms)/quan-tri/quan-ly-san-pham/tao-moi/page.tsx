@@ -362,10 +362,10 @@ const Page = () => {
                                             <FormControl>
                                                 <SelectData
                                                     endpoint="/api/ram/get-ram-date-id-name"
-                                                    multiple={true}
+                                                    multiple={false}
                                                     placeholder="Chọn RAM"
-                                                    onSelect={(value) => field.onChange(value)}
-                                                    defaultValue={field.value}
+                                                    onSelect={(value) => field.onChange([value])}
+                                                    defaultValue={field.value[0]}
                                                     className="rounded-lg"
                                                 />
                                             </FormControl>

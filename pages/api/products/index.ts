@@ -138,7 +138,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         
     } else if (req.method === 'POST') {
         try {
-
             const token = req.cookies.token;
             if (!token) {
                 return res.status(StatusCode.UNAUTHORIZED).json(transformResponse({
@@ -161,9 +160,28 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 }));
             }
 
-            const { name, price, description, specifications, stock_quantity, thumbnail_id, categories, images, ram_ids, storage_ids, tag_ids, display_ids, cpu_ids, graphics_card_ids } = req.body;
+            const { 
+                name, 
+                price, 
+                stock_quantity, 
+                description, 
+                specifications, 
+                categories,
+                ram_ids,
+                storage_ids,
+                tag_ids,
+                display_id,
+                cpu_id,
+                graphics_card_ids,
+                status,
+                thumbnail_id,
+                images
+            } = req.body;
 
-            const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+            const slug = name.toLowerCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/[^a-z0-9]+/g, '-');
 
             const trx = await db.transaction();
 
@@ -177,7 +195,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                         specifications,
                         stock_quantity,
                         thumbnail_id,
-                        status: 1
+                        status
                     })
                     .returning('*');
 
@@ -222,20 +240,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     await trx('product_tags').insert(tagRecords);
                 }
 
-                if (display_ids && display_ids.length > 0) {
-                    const displayRecords = display_ids.map((displayId: number) => ({
+                if (display_id) {
+                    await trx('product_displays').insert({
                         product_id: product.id,
-                        display_id: displayId
-                    }));
-                    await trx('product_displays').insert(displayRecords);
+                        display_id: display_id
+                    });
                 }
 
-                if (cpu_ids && cpu_ids.length > 0) {
-                    const cpuRecords = cpu_ids.map((cpuId: number) => ({
+                if (cpu_id) {
+                    await trx('product_cpus').insert({
                         product_id: product.id,
-                        cpu_id: cpuId
-                    }));
-                    await trx('product_cpus').insert(cpuRecords);
+                        cpu_id: cpu_id
+                    });
                 }
 
                 if (graphics_card_ids && graphics_card_ids.length > 0) {
