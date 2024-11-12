@@ -2,14 +2,115 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import { FaMapMarkerAlt, FaTag, FaCreditCard, FaTrash } from 'react-icons/fa';
+import { FaMapMarkerAlt, FaTag, FaCreditCard, FaTrash, FaPlus } from 'react-icons/fa';
 import { useCart } from '@/hooks/useCart';
+import useSWR from 'swr';
+
+interface Location {
+    id: number;
+    user_id: number;
+    province_code: string;
+    district_code: string;
+    ward_code: string;
+    postal_code: string;
+    phone_number: string;
+    is_default: boolean;
+    status: number;
+    created_at: string;
+    updated_at: string;
+}
+
+interface LocationResponse {
+    status: number;
+    message: string;
+    data: Location[];
+}
+
+interface Province {
+    code: string;
+    name: string;
+    id: number;
+}
+
+interface District {
+    province_code: string;
+    name: string;
+    id: number;
+}
+
+interface Ward {
+    district_code: string;
+    name: string;
+    id: number;
+}
+
+const fetcher = (url: string) => fetch(url).then(res => res.json());
 
 const Page = () => {
-    const [address, setAddress] = useState('');
+    const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
+    const [showAddForm, setShowAddForm] = useState(false);
+    const [newLocation, setNewLocation] = useState({
+        province_code: '',
+        district_code: '',
+        ward_code: '',
+        postal_code: '',
+        phone_number: '',
+        address: '',
+        is_default: false
+    });
     const [promoCode, setPromoCode] = useState('');
     const [paymentMethod, setPaymentMethod] = useState('cod');
     const { items, total, updateQuantity, removeItem } = useCart();
+    
+    const { data: locationData, error: locationError, mutate: mutateLocations } = useSWR<LocationResponse>('/api/locations', fetcher);
+    const { data: provinceData } = useSWR<{data: Province[]}>('/api/locations/p', fetcher);
+    const { data: districtData } = useSWR<{data: District[]}>(
+        newLocation.province_code ? `/api/locations/d/${newLocation.province_code}` : null,
+        fetcher
+    );
+    const { data: wardData } = useSWR<{data: Ward[]}>(
+        newLocation.district_code ? `/api/locations/w/${newLocation.district_code}` : null,
+        fetcher
+    );
+
+    const handleAddLocation = async () => {
+        try {
+            const response = await fetch('/api/locations', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(newLocation),
+            });
+
+            if (response.ok) {
+                setShowAddForm(false);
+                mutateLocations();
+            }
+        } catch (error) {
+            console.error('Error adding location:', error);
+        }
+    };
+
+    useEffect(() => {
+        if (locationData?.data?.length > 0) {
+            const defaultLocation = locationData.data.find(loc => loc.is_default);
+            setSelectedLocation(defaultLocation || locationData.data[0]);
+        }
+    }, [locationData]);
+
+    // Helper functions to get names from codes
+    const getProvinceName = (code: string) => {
+        return provinceData?.data.find(province => province.code === code)?.name || '';
+    };
+
+    const getDistrictName = (code: string) => {
+        return districtData?.data.find(district => district.province_code === code)?.name || '';
+    };
+
+    const getWardName = (code: string) => {
+        return wardData?.data.find(ward => ward.district_code === code)?.name || '';
+    };
 
     return (
         <div className="max-w-4xl mx-auto p-6">
@@ -67,17 +168,129 @@ const Page = () => {
 
             {/* Địa chỉ nhận hàng */}
             <div className="bg-white p-6 rounded-lg shadow-md mb-6">
-                <div className="flex items-center mb-4">
-                    <FaMapMarkerAlt className="text-blue-500 mr-2" />
-                    <h2 className="text-xl font-semibold">Địa chỉ nhận hàng</h2>
+                <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center">
+                        <FaMapMarkerAlt className="text-blue-500 mr-2" />
+                        <h2 className="text-xl font-semibold">Địa chỉ nhận hàng</h2>
+                    </div>
+                    {!showAddForm && (
+                        <button 
+                            onClick={() => setShowAddForm(true)}
+                            className="flex items-center text-blue-500 hover:text-blue-700"
+                        >
+                            <FaPlus className="mr-1" /> Thêm địa chỉ mới
+                        </button>
+                    )}
                 </div>
-                <textarea
-                    value={address}
-                    onChange={(e) => setAddress(e.target.value)}
-                    className="w-full p-3 border rounded-md"
-                    placeholder="Nhập địa chỉ nhận hàng..."
-                    rows={3}
-                />
+
+                {showAddForm ? (
+                    <div className="space-y-4">
+                        <select
+                            value={newLocation.province_code}
+                            onChange={(e) => {
+                                setNewLocation({
+                                    ...newLocation, 
+                                    province_code: e.target.value,
+                                    district_code: '',
+                                    ward_code: ''
+                                })
+                            }}
+                            className="w-full p-2 border rounded"
+                        >
+                            <option value="">Chọn tỉnh/thành phố</option>
+                            {provinceData?.data?.map(province => (
+                                <option key={province.id} value={province.code}>
+                                    {province.name}
+                                </option>
+                            ))}
+                        </select>
+
+                        <select
+                            value={newLocation.district_code}
+                            onChange={(e) => {
+                                setNewLocation({
+                                    ...newLocation, 
+                                    district_code: e.target.value,
+                                    ward_code: ''
+                                })
+                            }}
+                            disabled={!newLocation.province_code}
+                            className="w-full p-2 border rounded"
+                        >
+                            <option value="">Chọn quận/huyện</option>
+                            {districtData?.data?.map(district => (
+                                <option key={district.id} value={district.province_code}>
+                                    {district.name}
+                                </option>
+                            ))}
+                        </select>
+
+                        <select
+                            value={newLocation.ward_code}
+                            onChange={(e) => setNewLocation({...newLocation, ward_code: e.target.value})}
+                            disabled={!newLocation.district_code}
+                            className="w-full p-2 border rounded"
+                        >
+                            <option value="">Chọn phường/xã</option>
+                            {wardData?.data?.map(ward => (
+                                <option key={ward.id} value={ward.district_code}>
+                                    {ward.name}
+                                </option>
+                            ))}
+                        </select>
+
+                        <input
+                            type="text"
+                            placeholder="Số nhà, tên đường" 
+                            value={newLocation.address}
+                            onChange={(e) => setNewLocation({...newLocation, address: e.target.value})}
+                            className="w-full p-2 border rounded"
+                        />
+                        <input
+                            type="text"
+                            placeholder="Số điện thoại"
+                            value={newLocation.phone_number}
+                            onChange={(e) => setNewLocation({...newLocation, phone_number: e.target.value})}
+                            className="w-full p-2 border rounded"
+                        />
+                        <div className="flex items-center gap-4">
+                            <button 
+                                onClick={handleAddLocation}
+                                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                            >
+                                Lưu địa chỉ
+                            </button>
+                            <button 
+                                onClick={() => setShowAddForm(false)}
+                                className="text-gray-500 hover:text-gray-700"
+                            >
+                                Hủy
+                            </button>
+                        </div>
+                    </div>
+                ) : locationData?.data?.length ? (
+                    <div className="space-y-4">
+                        {locationData.data.map((location) => (
+                            <div 
+                                key={location.id}
+                                className={`p-4 border rounded ${selectedLocation?.id === location.id ? 'border-blue-500' : ''}`}
+                                onClick={() => setSelectedLocation(location)}
+                            >
+                                <div className="flex justify-between">
+                                    <div>
+                                        <p className="font-semibold">Số điện thoại: {location.phone_number}</p>
+                                        <p>Địa chỉ: {location.address}, {getWardName(location.ward_code)}, {getDistrictName(location.district_code)}, {getProvinceName(location.province_code)}</p>
+                                    </div>
+                                    {location.is_default && (
+                                        <span className="text-blue-500">Mặc định</span>
+                                    )}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <p className="text-gray-500">Chưa có địa chỉ nhận hàng. Vui lòng thêm địa chỉ mới.</p>
+                )}
             </div>
 
             {/* Mã giảm giá */}

@@ -76,6 +76,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 ward_code,
                 postal_code,
                 phone_number,
+                address,
                 is_default = false
             } = req.body;
 
@@ -102,6 +103,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 ward_code,
                 postal_code,
                 phone_number,
+                address,
                 status: 1,
                 created_at: db.fn.now(),
                 updated_at: db.fn.now()

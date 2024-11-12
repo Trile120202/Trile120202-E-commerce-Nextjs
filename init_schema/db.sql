@@ -38,6 +38,11 @@ DROP TABLE IF EXISTS wards CASCADE;
 DROP TABLE IF EXISTS districts CASCADE;
 DROP TABLE IF EXISTS provinces CASCADE;
 DROP TABLE IF EXISTS payment_methods CASCADE;
+DROP TABLE IF EXISTS user_delivery_addresses CASCADE;
+DROP TABLE IF EXISTS delivery_addresses CASCADE;
+
+
+
 
 
 DROP FUNCTION IF EXISTS update_modified_column() CASCADE;
@@ -732,6 +737,7 @@ CREATE TABLE delivery_addresses
     district_code    INTEGER NOT NULL,
     ward_code        INTEGER NOT NULL,
     postal_code      TEXT,
+    address TEXT,
     phone_number     TEXT,
     status INT DEFAULT 1,
     created_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
