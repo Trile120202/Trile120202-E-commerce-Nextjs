@@ -34,7 +34,7 @@ export const EditTagModal: React.FC<EditTagModalProps> = ({ tag, onUpdate, onClo
   useEffect(() => {
     setName(tag.name);
     setStatus(tag.status.toString());
-    setError(null); // Clear previous error message
+    setError(null);
   }, [tag]);
 
   useEffect(() => {

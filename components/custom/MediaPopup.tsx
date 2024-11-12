@@ -117,7 +117,6 @@ function MediaPopup({ open, onOpenChange, onSelect, multiple = false }: MediaPop
         const totalPages = data?.pagination.totalPages || 0;
         const maxVisiblePages = 3;
         
-        // Previous button
         items.push(
             <PaginationItem key="prev">
                 <PaginationPrevious 
