@@ -114,9 +114,8 @@ const Page = ({ params }: { params: { id: string } }) => {
                 }
 
                 const productData = data.data;
-                console.log("Product Data:", productData); // Log để kiểm tra dữ liệu
+                console.log("Product Data:", productData);
 
-                // Transform image data
                 const thumbnail = {
                     id: productData.thumbnail_id,
                     url: productData.thumbnail_url,
@@ -140,7 +139,6 @@ const Page = ({ params }: { params: { id: string } }) => {
                 setSelectedImages(images);
                 setDescription(productData.description);
 
-                // Helper function to handle both string and array cases
                 const parseIds = (value: string | number[] | null | undefined) => {
                     if (!value) return [];
                     if (Array.isArray(value)) return value;
@@ -150,7 +148,6 @@ const Page = ({ params }: { params: { id: string } }) => {
                     return [];
                 };
 
-                // Parse IDs using the helper function
                 const categoryIds = parseIds(productData.category_ids);
                 const ramIds = parseIds(productData.ram_ids);
                 const storageIds = parseIds(productData.storage_ids);
@@ -159,8 +156,8 @@ const Page = ({ params }: { params: { id: string } }) => {
                 const cpuIds = parseIds(productData.cpu_ids);
                 const graphicsCardIds = parseIds(productData.graphics_card_ids);
 
-                console.log("CPU IDs:", cpuIds); // Log để kiểm tra CPU IDs
-                console.log("Display IDs:", displayIds); // Log để kiểm tra Display IDs
+                console.log("CPU IDs:", cpuIds);
+                console.log("Display IDs:", displayIds);
 
                 form.reset({
                     name: productData.product_name || "",
@@ -210,7 +207,6 @@ const Page = ({ params }: { params: { id: string } }) => {
         try {
             setLoading(true);
 
-            // Validate specifications JSON if provided
             let parsedSpecifications = null;
             if (values.specifications) {
                 try {

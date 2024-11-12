@@ -79,7 +79,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 }));
             }
 
-            // Validate capacity and speed are positive integers
             if (!Number.isInteger(capacity) || capacity <= 0 || !Number.isInteger(speed) || speed <= 0) {
                 return res.status(StatusCode.BAD_REQUEST).json(transformResponse({
                     data: null,

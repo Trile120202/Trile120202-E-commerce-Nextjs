@@ -8,7 +8,6 @@ import { jwtVerify } from "jose";
 const db = knex(knexConfig);
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-    // Verify token for all requests
     const token = req.cookies.token;
     if (!token) {
         return res.status(StatusCode.UNAUTHORIZED).json(transformResponse({
@@ -27,7 +26,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const { id } = req.query;
 
         if (req.method === 'GET') {
-            // Get cart details with totals
             const cart = await db('carts as c')
                 .leftJoin('cart_items as ci', 'c.id', 'ci.cart_id')
                 .leftJoin('products as p', 'ci.product_id', 'p.id')
@@ -69,7 +67,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         } else if (req.method === 'POST') {
             const { product_id, quantity } = req.body;
 
-            // Add product to cart
             if (!product_id || !quantity) {
                 return res.status(StatusCode.BAD_REQUEST).json(transformResponse({
                     data: null,
@@ -124,7 +121,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             }));
 
         } else if (req.method === 'PUT') {
-            // Update product quantity in cart
             const { product_id, quantity } = req.body;
 
             if (!product_id || !quantity) {
@@ -135,7 +131,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 }));
             }
 
-            // Check if product exists in cart
             const cartItem = await db('cart_items')
                 .where({
                     cart_id: id,
@@ -151,7 +146,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 }));
             }
 
-            // Check product availability
             const product = await db('products')
                 .where('id', product_id)
                 .where('stock', '>=', quantity)
@@ -165,7 +159,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 }));
             }
 
-            // Update quantity
             await db('cart_items')
                 .where({
                     cart_id: id,

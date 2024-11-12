@@ -69,7 +69,7 @@ const Page = () => {
                     title: "Thành công",
                     description: "Đã hủy đơn hàng thành công",
                 });
-                mutate(); // Refresh the orders data
+                mutate();
             } else {
                 toast({
                     variant: "destructive",

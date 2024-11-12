@@ -289,7 +289,6 @@ const Page = () => {
         }
     }, [paymentMethods]);
 
-    // Helper functions to get names from codes
     const getProvinceName = (code: string) => {
         return provinceData?.data.find(province => province.code === code)?.name || '';
     };
