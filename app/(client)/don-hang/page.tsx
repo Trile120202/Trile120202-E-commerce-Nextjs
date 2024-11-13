@@ -33,6 +33,9 @@ interface Order {
     payment_method_icon: string;
     delivery_address: string;
     delivery_phone: string;
+    province_name: string;
+    district_name: string;
+    ward_name: string;
     items: OrderItem[];
 }
 
@@ -120,15 +123,20 @@ const Page = () => {
 
     const getStatusIcon = (status: number) => {
         switch(status) {
-            case 1: return <FaBox />;
-            case 2: return <FaTruck className="animate-pulse" />;
-            case 3: return <FaTruck />;
-            case 4: return <FaCheckCircle />;
-            case 5: return <FaTimesCircle />;
-            case 6: return <FaBox className="animate-pulse" />;
-            case 7: return <FaCheckCircle />;
-            case 8: return <FaTimesCircle />;
-            default: return null;
+            case 1:
+            case 2:
+                return <FaBox />;
+            case 3:
+                return <FaTruck />;
+            case 4:
+            case 7:
+                return <FaCheckCircle />;
+            case 5:
+            case 6:
+            case 8:
+                return <FaTimesCircle />;
+            default:
+                return null;
         }
     };
 
@@ -202,7 +210,9 @@ const Page = () => {
                         <div className="mt-4 pt-4 border-t">
                             <div className="flex justify-between items-center">
                                 <div>
-                                    <p className="text-sm text-gray-500">Địa chỉ: {order.delivery_address}</p>
+                                    <p className="text-sm text-gray-500">
+                                        Địa chỉ: {order.delivery_address}, {order.ward_name}, {order.district_name}, {order.province_name}
+                                    </p>
                                     <p className="text-sm text-gray-500">Số điện thoại: {order.delivery_phone}</p>
                                     <p className="text-sm text-gray-500">
                                         Phương thức thanh toán: {order.payment_method_name}
