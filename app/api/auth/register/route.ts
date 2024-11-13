@@ -7,9 +7,9 @@ const db = knex(knexConfig);
 
 export async function POST(request: Request) {
   try {
-    const { email, password, username } = await request.json();
+    const { email, password, username,full_name } = await request.json();
 
-    if (!email || !password || !username) {
+    if (!email || !password || !username || !full_name) {
       return NextResponse.json(
         { error: 'Vui lòng điền đầy đủ thông tin bắt buộc (email, mật khẩu, tên đăng nhập)' },
         { status: 400 }
@@ -64,6 +64,7 @@ export async function POST(request: Request) {
         password: hashedPassword,
         role_id: 2,
         status: 1,
+        full_name,
         created_at: db.fn.now(),
         updated_at: db.fn.now()
       })
@@ -74,6 +75,7 @@ export async function POST(request: Request) {
       user: {
         id: newUser.id,
         username: newUser.username,
+        full_name: newUser.full_name,
         email: newUser.email
       }
     }, { status: 201 });

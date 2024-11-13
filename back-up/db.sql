@@ -37,6 +37,12 @@ DROP TABLE IF EXISTS settings CASCADE;
 DROP TABLE IF EXISTS wards CASCADE;
 DROP TABLE IF EXISTS districts CASCADE;
 DROP TABLE IF EXISTS provinces CASCADE;
+DROP TABLE IF EXISTS payment_methods CASCADE;
+DROP TABLE IF EXISTS user_delivery_addresses CASCADE;
+DROP TABLE IF EXISTS delivery_addresses CASCADE;
+
+
+
 
 
 DROP FUNCTION IF EXISTS update_modified_column() CASCADE;
@@ -212,18 +218,49 @@ CREATE INDEX idx_role_permissions_created_at ON role_permissions (created_at);
 CREATE INDEX idx_role_permissions_updated_at ON role_permissions (updated_at);
 CREATE INDEX idx_role_permissions_status ON role_permissions (status);
 
+CREATE TABLE payment_methods (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    code VARCHAR(50) NOT NULL UNIQUE,
+    description TEXT,
+    is_active BOOLEAN DEFAULT true,
+    icon_url VARCHAR(255),
+    provider VARCHAR(100),
+    config JSONB,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status INT DEFAULT 1
+);
+
+INSERT INTO payment_methods (name, code, description, is_active, icon_url, provider, config) VALUES
+('Thanh toán khi nhận hàng', 'cod', 'Thanh toán tiền mặt khi nhận hàng', true, '/icons/cod.png', 'internal', '{"fee": 0}'),
+('Chuyển khoản ngân hàng', 'bank_transfer', 'Chuyển khoản qua tài khoản ngân hàng', true, '/icons/bank.png', 'internal', '{"bank_name": "Vietcombank", "account_number": "1234567890", "account_name": "CÔNG TY TNHH ABC"}'),
+('Ví điện tử MoMo', 'momo', 'Thanh toán qua ví MoMo', true, '/icons/momo.png', 'momo', '{"partner_code": "MOMO123", "access_key": "abc123"}'),
+('ZaloPay', 'zalopay', 'Thanh toán qua ZaloPay', true, '/icons/zalopay.png', 'zalopay', '{"app_id": "zalo123", "key1": "key123"}'),
+('VNPay', 'vnpay', 'Thanh toán qua cổng VNPay', true, '/icons/vnpay.png', 'vnpay', '{"terminal_id": "vnp123", "secret_key": "vnpsecret123"}');
+
+CREATE INDEX idx_payment_methods_code ON payment_methods (code);
+CREATE INDEX idx_payment_methods_is_active ON payment_methods (is_active);
+CREATE INDEX idx_payment_methods_created_at ON payment_methods (created_at);
+CREATE INDEX idx_payment_methods_updated_at ON payment_methods (updated_at);
+CREATE INDEX idx_payment_methods_status ON payment_methods (status);
+
+
 CREATE TABLE orders
 (
     id               SERIAL PRIMARY KEY,
     user_id          INT,
+    delivery_address_id INT NOT NULL,
+    note TEXT,
     order_date       TIMESTAMP                                                                                    DEFAULT CURRENT_TIMESTAMP,
-    total_amount     DECIMAL(10, 2) NOT NULL,
+    total_amount     TEXT,
     shipping_address TEXT,
-    payment_method   VARCHAR(50),
+    payment_method_id INT,
     created_at       TIMESTAMP                                                                                    DEFAULT CURRENT_TIMESTAMP,
     updated_at       TIMESTAMP                                                                                    DEFAULT CURRENT_TIMESTAMP,
     status           INT                                                                                          DEFAULT 1,
-    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE SET NULL
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE SET NULL,
+    FOREIGN KEY (payment_method_id) REFERENCES payment_methods (id) ON DELETE SET NULL
 );
 
 CREATE INDEX idx_orders_user_id ON orders (user_id);
@@ -232,6 +269,7 @@ CREATE INDEX idx_orders_total_amount ON orders (total_amount);
 CREATE INDEX idx_orders_created_at ON orders (created_at);
 CREATE INDEX idx_orders_updated_at ON orders (updated_at);
 CREATE INDEX idx_orders_status ON orders (status);
+CREATE INDEX idx_orders_payment_method ON orders (payment_method_id);
 
 CREATE TABLE order_items
 (
@@ -239,7 +277,7 @@ CREATE TABLE order_items
     order_id   INT,
     product_id INT,
     quantity   INT            NOT NULL,
-    price      DECIMAL(10, 2) NOT NULL,
+    price      TEXT NOT NULL,
     created_at TIMESTAMP      DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP      DEFAULT CURRENT_TIMESTAMP,
     status     INT            DEFAULT 1,
@@ -630,28 +668,28 @@ CREATE INDEX idx_settings_status ON settings(status);
 CREATE INDEX idx_settings_created_at ON settings(created_at);
 
 INSERT INTO settings (name, value) VALUES
-                                       ('site_name', 'Laptop Store'),
-                                       ('site_description', 'Cửa hàng laptop chính hãng'),
-                                       ('contact_email', 'contact@laptopstore.com'),
-                                       ('contact_phone', '0123456789'),
-                                       ('contact_address', 'Hà Nội, Việt Nam'),
-                                       ('social_facebook', 'https://facebook.com/laptopstore'),
-                                       ('social_instagram', 'https://instagram.com/laptopstore'),
-                                       ('social_twitter', 'https://twitter.com/laptopstore'),
-                                       ('maintenance_mode', 'false'),
-                                       ('currency', 'VND');
+('site_name', 'Laptop Store'),
+('site_description', 'Cửa hàng laptop chính hãng'),
+('contact_email', 'contact@laptopstore.com'),
+('contact_phone', '0123456789'),
+('contact_address', 'Hà Nội, Việt Nam'),
+('social_facebook', 'https://facebook.com/laptopstore'),
+('social_instagram', 'https://instagram.com/laptopstore'),
+('social_twitter', 'https://twitter.com/laptopstore'),
+('maintenance_mode', 'false'),
+('currency', 'VND');
 
 INSERT INTO settings (name, value) VALUES
-                                       ('security_login_attempts', '5'),
-                                       ('security_lockout_duration', '30'),
-                                       ('security_password_expiry', '90'),
-                                       ('security_password_length', '8'),
-                                       ('security_password_complexity', 'true'),
-                                       ('security_session_timeout', '60'),
-                                       ('security_2fa_enabled', 'false'),
-                                       ('security_ip_whitelist', ''),
-                                       ('security_ssl_required', 'true'),
-                                       ('security_jwt_expiry', '24');
+('security_login_attempts', '5'),
+('security_lockout_duration', '30'),
+('security_password_expiry', '90'),
+('security_password_length', '8'),
+('security_password_complexity', 'true'),
+('security_session_timeout', '60'),
+('security_2fa_enabled', 'false'),
+('security_ip_whitelist', ''),
+('security_ssl_required', 'true'),
+('security_jwt_expiry', '24');
 
 CREATE TABLE provinces
 (
@@ -685,13 +723,13 @@ CREATE TABLE wards
 );
 
 CREATE TABLE user_delivery_addresses (
-                                         id               SERIAL PRIMARY KEY,
-                                         user_id          INT NOT NULL,
-                                         delivery_addresses_id INTEGER NOT NULL,
-                                         is_default       BOOLEAN DEFAULT FALSE,
-                                         status           INT NOT NULL DEFAULT 1,
-                                         created_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                                         updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    id               SERIAL PRIMARY KEY,
+    user_id          INT NOT NULL,
+    delivery_addresses_id INTEGER NOT NULL,
+    is_default       BOOLEAN DEFAULT FALSE,
+    status           INT NOT NULL DEFAULT 1,
+    created_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE delivery_addresses
@@ -702,6 +740,7 @@ CREATE TABLE delivery_addresses
     district_code    INTEGER NOT NULL,
     ward_code        INTEGER NOT NULL,
     postal_code      TEXT,
+    address TEXT,
     phone_number     TEXT,
     status INT DEFAULT 1,
     created_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

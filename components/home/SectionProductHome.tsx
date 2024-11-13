@@ -152,20 +152,17 @@ const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
                     whileTap={product.stock_quantity > 0 ? { scale: 0.95 } : {}}
                 >
                     <FaShoppingCart className="sm:mr-2" />
-                    <span className="hidden sm:inline">Thêm vào giỏ</span>
+                    <span className="hidden sm:inline">Thêm SP</span>
                 </motion.button>
-                <motion.button 
-                    disabled={product.stock_quantity <= 0}
-                    className={`flex-1 flex items-center justify-center px-4 py-3 rounded-lg transition-colors duration-300 text-sm font-medium ${
-                        product.stock_quantity <= 0 
-                        ? 'bg-gray-400 cursor-not-allowed' 
-                        : 'bg-green-600 hover:bg-green-700 text-white'
-                    }`}
-                    whileTap={product.stock_quantity > 0 ? { scale: 0.95 } : {}}
-                >
-                    <FaCreditCard className="sm:mr-2" />
-                    <span className="hidden sm:inline">Mua ngay</span>
-                </motion.button>
+                <Link href={`/san-pham/${product.slug}`}>
+                    <motion.button 
+                        className="flex-1 flex items-center justify-center px-4 py-3 rounded-lg transition-colors duration-300 text-sm font-medium bg-green-600 hover:bg-green-700 text-white"
+                        whileTap={{ scale: 0.95 }}
+                    >
+                        <FaCreditCard className="sm:mr-2" />
+                        <span className="hidden sm:inline">Xem SP</span>
+                    </motion.button>
+                </Link>
             </div>
 
             <AnimatePresence>

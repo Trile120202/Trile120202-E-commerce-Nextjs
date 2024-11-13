@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Table,
     TableBody,
@@ -18,7 +18,7 @@ import {
     PaginationPrevious,
 } from "@/components/ui/pagination"
 import { Button } from "@/components/ui/button"
-import { FaEdit, FaTrash, FaPlus, FaSearch } from 'react-icons/fa'
+import { FaEdit, FaTrash, FaPlus, FaSearch, FaBox, FaTruck, FaCheckCircle, FaTimesCircle } from 'react-icons/fa'
 import { BsThreeDots } from 'react-icons/bs'
 import {
     DropdownMenu,
@@ -29,65 +29,171 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import useApi from '@/lib/useApi';
+import { useToast } from "@/hooks/use-toast";
+
+interface OrderItem {
+    id: number;
+    order_id: number;
+    product_id: number;
+    quantity: number;
+    price: number;
+    product_name: string;
+    product_image: string;
+    slug: string;
+}
+
+interface Order {
+    id: number;
+    user_id: number;
+    payment_method_id: number;
+    delivery_address_id: number;
+    status: number;
+    total_amount: number;
+    created_at: string;
+    customer_name: string;
+    full_name: string;
+    customer_email: string;
+    payment_method_name: string;
+    payment_method_icon: string;
+    address: string;
+    phone_number: string;
+    province_name: string;
+    district_name: string;
+    ward_name: string;
+    items: OrderItem[];
+}
+
+interface ApiResponse {
+    status: number;
+    message: string;
+    data: Order[];
+    pagination: {
+        currentPage: number;
+        pageSize: number;
+        totalItems: number;
+        totalPages: number;
+    };
+}
 
 const Page = () => {
-    const ordersData = [
-        { id: 1, customerName: 'Nguyễn Văn A', orderDate: '2023-06-01', totalAmount: '$150', status: 'Đã giao hàng' },
-        { id: 2, customerName: 'Trần Thị B', orderDate: '2023-06-02', totalAmount: '$200', status: 'Đang xử lý' },
-        { id: 3, customerName: 'Lê Văn C', orderDate: '2023-06-03', totalAmount: '$180', status: 'Đã hủy' },
-        { id: 4, customerName: 'Phạm Thị D', orderDate: '2023-06-04', totalAmount: '$120', status: 'Đang giao hàng' },
-        { id: 5, customerName: 'Hoàng Văn E', orderDate: '2023-06-05', totalAmount: '$250', status: 'Đã giao hàng' },
-    ];
+    const { toast } = useToast();
+    const [currentPage, setCurrentPage] = useState(1);
+    const [selectedStatus, setSelectedStatus] = useState<string>('all');
+    const [searchKeyword, setSearchKeyword] = useState<string>('');
+    const [limit] = useState<number>(10);
+
+    const { data, loading, error, fetchData } = useApi<ApiResponse>(
+        `/api/orders/get-list-order?page=${currentPage}&limit=${limit}&search=${searchKeyword}${selectedStatus !== 'all' ? `&status=${selectedStatus}` : ''}`,
+        {
+            method: 'GET'
+        }
+    );
+
+    useEffect(() => {
+        fetchData();
+    }, [currentPage, selectedStatus, searchKeyword]);
 
     const columns = [
         { accessor: 'id', label: 'ID', className: 'font-medium' },
-        { accessor: 'customerName', label: 'Tên khách hàng', className: 'font-medium' },
-        { accessor: 'orderDate', label: 'Ngày đặt hàng', className: 'text-center' },
-        { accessor: 'totalAmount', label: 'Tổng tiền', className: 'text-right' },
+        { accessor: 'full_name', label: 'Tên khách hàng', className: 'font-medium' },
+        { accessor: 'created_at', label: 'Ngày đặt hàng', className: 'text-center' },
+        { accessor: 'total_amount', label: 'Tổng tiền', className: 'text-right' },
         { accessor: 'status', label: 'Trạng thái', className: 'text-center' },
         { accessor: 'actions', label: 'Thao tác', className: 'text-right' },
     ];
 
-    const [currentPage, setCurrentPage] = useState(1);
-    const totalPages = 5;
-    const [selectedStatus, setSelectedStatus] = useState<string>('all');
-    const [searchKeyword, setSearchKeyword] = useState<string>('');
-
     const handlePageChange = (page: number) => {
-        setCurrentPage(page);
+        if (page >= 1 && page <= (data?.pagination.totalPages || 1)) {
+            setCurrentPage(page);
+        }
     };
 
     const handleEdit = (id: number) => {
         console.log(`Edit order with id: ${id}`);
     };
 
-    const handleDelete = (id: number) => {
-        console.log(`Delete order with id: ${id}`);
+    const handleDelete = async (id: number) => {
+        try {
+            const response = await fetch('/api/orders/update-status', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    id,
+                    status: 5
+                }),
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(result.message || 'Có lỗi xảy ra khi hủy đơn hàng');
+            }
+
+            toast({
+                title: "Thành công",
+                description: "Hủy đơn hàng thành công",
+            });
+
+            fetchData();
+
+        } catch (error) {
+            console.error('Error canceling order:', error);
+            toast({
+                variant: "destructive",
+                title: "Lỗi",
+                description: (error as Error).message || "Có lỗi xảy ra khi hủy đơn hàng",
+            });
+        }
     };
 
     const handleCreate = () => {
         console.log('Create new order');
     };
 
-    const getStatusColor = (status: string) => {
-        switch (status) {
-            case 'Đã giao hàng':
-                return 'bg-green-100 text-green-800';
-            case 'Đang xử lý':
-                return 'bg-yellow-100 text-yellow-800';
-            case 'Đã hủy':
-                return 'bg-red-100 text-red-800';
-            case 'Đang giao hàng':
-                return 'bg-blue-100 text-blue-800';
-            default:
-                return 'bg-gray-100 text-gray-800';
+    const getStatusText = (status: number) => {
+        switch(status) {
+            case 1: return 'Chờ xác nhận';
+            case 2: return 'Đang xử lý';
+            case 3: return 'Đang giao hàng';
+            case 4: return 'Đã giao hàng';
+            case 5: return 'Đã hủy';
+            case 6: return 'Đang hoàn trả';
+            case 7: return 'Hoàn trả thành công';
+            case 8: return 'Hoàn trả thất bại';
+            default: return 'Không xác định';
         }
     };
 
-    const filteredOrders = ordersData.filter(order => 
-        (selectedStatus === 'all' || order.status === selectedStatus) &&
-        (searchKeyword === '' || order.customerName.toLowerCase().includes(searchKeyword.toLowerCase()))
-    );
+    const getStatusColor = (status: number) => {
+        switch(status) {
+            case 1: return 'text-yellow-500 bg-yellow-100';
+            case 2: return 'text-blue-500 bg-blue-100';
+            case 3: return 'text-purple-500 bg-purple-100';
+            case 4: return 'text-green-500 bg-green-100';
+            case 5: return 'text-red-500 bg-red-100';
+            case 6: return 'text-orange-500 bg-orange-100';
+            case 7: return 'text-emerald-500 bg-emerald-100';
+            case 8: return 'text-rose-500 bg-rose-100';
+            default: return 'text-gray-500 bg-gray-100';
+        }
+    };
+
+    const getStatusIcon = (status: number) => {
+        switch(status) {
+            case 1: return <FaBox className="mr-2 h-4 w-4" />;
+            case 2: return <FaTruck className="mr-2 h-4 w-4 animate-pulse" />;
+            case 3: return <FaTruck className="mr-2 h-4 w-4" />;
+            case 4: return <FaCheckCircle className="mr-2 h-4 w-4" />;
+            case 5: return <FaTimesCircle className="mr-2 h-4 w-4" />;
+            case 6: return <FaBox className="mr-2 h-4 w-4 animate-pulse" />;
+            case 7: return <FaCheckCircle className="mr-2 h-4 w-4" />;
+            case 8: return <FaTimesCircle className="mr-2 h-4 w-4" />;
+            default: return null;
+        }
+    };
 
     return (
         <Card className="w-full shadow-lg">
@@ -109,10 +215,14 @@ const Page = () => {
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="all">Tất cả</SelectItem>
-                                <SelectItem value="Đã giao hàng">Đã giao hàng</SelectItem>
-                                <SelectItem value="Đang xử lý">Đang xử lý</SelectItem>
-                                <SelectItem value="Đã hủy">Đã hủy</SelectItem>
-                                <SelectItem value="Đang giao hàng">Đang giao hàng</SelectItem>
+                                <SelectItem value="1">Chờ xác nhận</SelectItem>
+                                <SelectItem value="2">Đang xử lý</SelectItem>
+                                <SelectItem value="3">Đang giao hàng</SelectItem>
+                                <SelectItem value="4">Đã giao hàng</SelectItem>
+                                <SelectItem value="5">Đã hủy</SelectItem>
+                                <SelectItem value="6">Đang hoàn trả</SelectItem>
+                                <SelectItem value="7">Hoàn trả thành công</SelectItem>
+                                <SelectItem value="8">Hoàn trả thất bại</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
@@ -138,7 +248,7 @@ const Page = () => {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {filteredOrders.map((row, index) => (
+                            {data?.data.map((row, index) => (
                                 <TableRow key={index} className="hover:bg-gray-50 transition duration-150">
                                     {columns.map((col, colIndex) => (
                                         <TableCell 
@@ -160,14 +270,20 @@ const Page = () => {
                                                         </DropdownMenuItem>
                                                         <DropdownMenuItem onClick={() => handleDelete(row.id)}>
                                                             <FaTrash className="mr-2 h-4 w-4" />
-                                                            <span>Xóa</span>
+                                                            <span>Hủy</span>
                                                         </DropdownMenuItem>
                                                     </DropdownMenuContent>
                                                 </DropdownMenu>
                                             ) : col.accessor === 'status' ? (
-                                                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(row.status)}`}>
-                                                    {row.status}
+                                                <span className={`px-3 py-1 rounded-full text-xs font-semibold inline-flex items-center ${getStatusColor(row.status)}`}>
+                                                    {getStatusIcon(row.status)}
+                                                    {getStatusText(row.status)}
                                                 </span>
+                                            ) : col.accessor === 'total_amount' ? (
+                                                new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' })
+                                                    .format(row.total_amount)
+                                            ) : col.accessor === 'created_at' ? (
+                                                new Date(row.created_at).toLocaleDateString('vi-VN')
                                             ) : (
                                                 row[col.accessor as keyof typeof row]
                                             )}
@@ -178,27 +294,37 @@ const Page = () => {
                         </TableBody>
                     </Table>
                 </div>
-                <Pagination className="mt-6">
-                    <PaginationContent>
-                        <PaginationItem>
-                            <PaginationPrevious href="#" onClick={() => handlePageChange(currentPage - 1)} />
-                        </PaginationItem>
-                        {[...Array(totalPages)].map((_, index) => (
-                            <PaginationItem key={index}>
-                                <PaginationLink 
-                                    href="#"
-                                    onClick={() => handlePageChange(index + 1)}
-                                    isActive={currentPage === index + 1}
-                                >
-                                    {index + 1}
-                                </PaginationLink>
+                {data?.pagination && (
+                    <Pagination className="mt-6">
+                        <PaginationContent>
+                            <PaginationItem>
+                                <PaginationPrevious 
+                                    href="#" 
+                                    onClick={() => handlePageChange(currentPage - 1)}
+                                    className={currentPage === 1 ? 'pointer-events-none opacity-50' : ''}
+                                />
                             </PaginationItem>
-                        ))}
-                        <PaginationItem>
-                            <PaginationNext href="#" onClick={() => handlePageChange(currentPage + 1)} />
-                        </PaginationItem>
-                    </PaginationContent>
-                </Pagination>
+                            {[...Array(data.pagination.totalPages)].map((_, index) => (
+                                <PaginationItem key={index}>
+                                    <PaginationLink 
+                                        href="#"
+                                        onClick={() => handlePageChange(index + 1)}
+                                        isActive={currentPage === index + 1}
+                                    >
+                                        {index + 1}
+                                    </PaginationLink>
+                                </PaginationItem>
+                            ))}
+                            <PaginationItem>
+                                <PaginationNext 
+                                    href="#" 
+                                    onClick={() => handlePageChange(currentPage + 1)}
+                                    className={currentPage === data.pagination.totalPages ? 'pointer-events-none opacity-50' : ''}
+                                />
+                            </PaginationItem>
+                        </PaginationContent>
+                    </Pagination>
+                )}
             </CardContent>
         </Card>
     );

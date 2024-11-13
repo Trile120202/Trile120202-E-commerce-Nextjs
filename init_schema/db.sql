@@ -162,6 +162,7 @@ CREATE TABLE users
     email      VARCHAR(100) NOT NULL UNIQUE,
     first_name VARCHAR(50),
     last_name  VARCHAR(50),
+    full_name TEXT,
     phone      VARCHAR(20),
     address    TEXT,
     avatar_id  INT,
