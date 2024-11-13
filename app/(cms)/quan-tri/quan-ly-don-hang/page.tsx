@@ -31,6 +31,7 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import useApi from '@/lib/useApi';
 import { useToast } from "@/hooks/use-toast";
+import { useRouter } from 'next/navigation';
 
 interface OrderItem {
     id: number;
@@ -77,6 +78,7 @@ interface ApiResponse {
 }
 
 const Page = () => {
+    const router = useRouter();
     const { toast } = useToast();
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedStatus, setSelectedStatus] = useState<string>('all');
@@ -110,7 +112,7 @@ const Page = () => {
     };
 
     const handleEdit = (id: number) => {
-        console.log(`Edit order with id: ${id}`);
+        router.push(`/quan-tri/quan-ly-don-hang/${id}`);
     };
 
     const handleDelete = async (id: number) => {
@@ -150,7 +152,7 @@ const Page = () => {
     };
 
     const handleCreate = () => {
-        console.log('Create new order');
+        router.push('/quan-tri/quan-ly-don-hang/tao-moi');
     };
 
     const getStatusText = (status: number) => {
