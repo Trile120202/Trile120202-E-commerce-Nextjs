@@ -132,6 +132,13 @@ const Page = () => {
         }
     };
 
+    const formatCurrency = (amount: number) => {
+        return new Intl.NumberFormat('vi-VN', {
+            style: 'currency',
+            currency: 'VND'
+        }).format(amount);
+    };
+
     return (
         <div className="max-w-4xl mx-auto p-6">
             <h1 className="text-3xl font-bold mb-8">Đơn hàng của tôi</h1>
@@ -185,7 +192,7 @@ const Page = () => {
                                     <div className="flex-1">
                                         <h3 className="font-semibold">{item.product_name}</h3>
                                         <p className="text-sm text-gray-500">
-                                            Số lượng: {item.quantity} x {item.price.toLocaleString('vi-VN')}₫
+                                            Số lượng: {item.quantity} x {formatCurrency(item.price)}
                                         </p>
                                     </div>
                                 </div>
@@ -204,7 +211,7 @@ const Page = () => {
                                 <div className="text-right">
                                     <p className="text-sm text-gray-500">Tổng tiền:</p>
                                     <p className="font-bold text-lg">
-                                        {order.total_amount.toLocaleString('vi-VN')}₫
+                                        {formatCurrency(order.total_amount)}
                                     </p>
                                 </div>
                             </div>
