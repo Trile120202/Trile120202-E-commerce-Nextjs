@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { FiUser, FiLock, FiMail } from 'react-icons/fi';
+import { FiUser, FiLock, FiMail, FiUserPlus } from 'react-icons/fi';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
@@ -15,7 +15,8 @@ const Page = () => {
     const [formData, setFormData] = useState({
         email: '',
         password: '',
-        username: ''
+        username: '',
+        full_name: ''
     });
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
@@ -74,6 +75,21 @@ const Page = () => {
                             </div>
                         )}
                         <form onSubmit={handleRegister} className="space-y-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="full_name" className="text-gray-700 font-medium">Họ và tên</Label>
+                                <div className="relative">
+                                    <FiUserPlus className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                                    <Input
+                                        id="full_name"
+                                        type="text"
+                                        placeholder="Nguyễn Văn A"
+                                        value={formData.full_name}
+                                        onChange={handleChange}
+                                        className="pl-10 border-2 border-gray-300 focus:border-blue-500 transition-all duration-300"
+                                        required
+                                    />
+                                </div>
+                            </div>
                             <div className="space-y-2">
                                 <Label htmlFor="username" className="text-gray-700 font-medium">Tên đăng nhập</Label>
                                 <div className="relative">
