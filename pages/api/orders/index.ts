@@ -32,12 +32,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     'payment_methods.name as payment_method_name',
                     'payment_methods.icon_url as payment_method_icon',
                     'delivery_addresses.address as delivery_address',
-                    'delivery_addresses.phone_number as delivery_phone'
+                    'delivery_addresses.phone_number as delivery_phone',
+                    'provinces.name as province_name',
+                    'districts.name as district_name',
+                    'wards.name as ward_name'
                 )
                 .from('orders')
                 .leftJoin('payment_methods', 'orders.payment_method_id', 'payment_methods.id')
                 .leftJoin('delivery_addresses', 'orders.delivery_address_id', 'delivery_addresses.id')
-                .where('orders.user_id', userId)
+                .leftJoin('provinces', 'delivery_addresses.province_code', 'provinces.code')
+                .leftJoin('districts', 'delivery_addresses.district_code', 'districts.code')
+                .leftJoin('wards', 'delivery_addresses.ward_code', 'wards.code')
+                .where('orders.user_id', userId as string)
                 .orderBy('orders.created_at', 'desc');
 
             for (let order of orders) {
@@ -47,8 +53,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                         'products.name as product_name',
                         'products.description',
                         'products.slug',
+                        'products.price',
+                        'products.specifications',
+                        'products.stock_quantity',
                         'images.url as thumbnail_url',
-                        'categories.id as category_id'
+                        'images.alt_text',
+                        'categories.id as category_id',
+                        'categories.name as category_name',
+                        'categories.slug as category_slug'
                     )
                     .from('order_items')
                     .leftJoin('products', 'order_items.product_id', 'products.id')
