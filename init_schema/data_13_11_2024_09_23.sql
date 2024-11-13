@@ -1,13 +1,10 @@
 -- Adminer 4.8.1 PostgreSQL 14.13 (Debian 14.13-1.pgdg120+1) dump
 
 DROP TABLE IF EXISTS "banner_images";
-DROP SEQUENCE IF EXISTS banner_images_id_seq;
-CREATE SEQUENCE banner_images_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
-
 CREATE TABLE "public"."banner_images" (
-    "id" integer DEFAULT nextval('banner_images_id_seq') NOT NULL,
-    "banner_id" integer NOT NULL,
-    "image_id" integer NOT NULL,
+    "id" uuid DEFAULT gen_random_uuid() NOT NULL,
+    "banner_id" uuid NOT NULL,
+    "image_id" uuid NOT NULL,
     "status" integer DEFAULT '1' NOT NULL,
     "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
     "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
@@ -25,17 +22,10 @@ CREATE INDEX "idx_banner_images_status" ON "public"."banner_images" USING btree 
 CREATE INDEX "idx_banner_images_updated_at" ON "public"."banner_images" USING btree ("updated_at");
 
 TRUNCATE "banner_images";
-INSERT INTO "banner_images" ("id", "banner_id", "image_id", "status", "created_at", "updated_at") VALUES
-(1,	1,	28,	1,	'2024-11-11 09:58:32.746489',	'2024-11-11 09:58:32.746489'),
-(2,	2,	30,	1,	'2024-11-11 09:59:04.184795',	'2024-11-11 09:59:04.184795'),
-(3,	3,	31,	1,	'2024-11-11 10:02:22.283147',	'2024-11-11 10:02:22.283147');
 
 DROP TABLE IF EXISTS "banners";
-DROP SEQUENCE IF EXISTS banners_id_seq;
-CREATE SEQUENCE banners_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
-
 CREATE TABLE "public"."banners" (
-    "id" integer DEFAULT nextval('banners_id_seq') NOT NULL,
+    "id" uuid DEFAULT gen_random_uuid() NOT NULL,
     "name" character varying(100) NOT NULL,
     "location" text NOT NULL,
     "position" text NOT NULL,
@@ -54,19 +44,12 @@ CREATE INDEX "idx_banners_status" ON "public"."banners" USING btree ("status");
 CREATE INDEX "idx_banners_updated_at" ON "public"."banners" USING btree ("updated_at");
 
 TRUNCATE "banners";
-INSERT INTO "banners" ("id", "name", "location", "position", "status", "created_at", "updated_at") VALUES
-(1,	'banner 1',	'home',	'1',	1,	'2024-11-11 09:58:32.741804',	'2024-11-11 09:58:32.741804'),
-(2,	'banner 2',	'home',	'2',	1,	'2024-11-11 09:59:04.182064',	'2024-11-11 09:59:04.182064'),
-(3,	'banner 3',	'home',	'3',	1,	'2024-11-11 10:02:22.281023',	'2024-11-11 10:02:22.281023');
 
 DROP TABLE IF EXISTS "cart_items";
-DROP SEQUENCE IF EXISTS cart_items_id_seq;
-CREATE SEQUENCE cart_items_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
-
 CREATE TABLE "public"."cart_items" (
-    "id" integer DEFAULT nextval('cart_items_id_seq') NOT NULL,
-    "cart_id" integer NOT NULL,
-    "product_id" integer NOT NULL,
+    "id" uuid DEFAULT gen_random_uuid() NOT NULL,
+    "cart_id" uuid NOT NULL,
+    "product_id" uuid NOT NULL,
     "quantity" integer DEFAULT '1' NOT NULL,
     "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
     "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
@@ -85,19 +68,11 @@ CREATE INDEX "idx_cart_items_status" ON "public"."cart_items" USING btree ("stat
 CREATE INDEX "idx_cart_items_updated_at" ON "public"."cart_items" USING btree ("updated_at");
 
 TRUNCATE "cart_items";
-INSERT INTO "cart_items" ("id", "cart_id", "product_id", "quantity", "created_at", "updated_at", "status") VALUES
-(16,	2,	6,	2,	'2024-11-12 18:31:29.708273',	'2024-11-12 18:31:44.655761',	0),
-(22,	1,	4,	1,	'2024-11-12 18:57:48.601954',	'2024-11-12 18:59:53.654016',	0),
-(20,	1,	5,	2,	'2024-11-12 18:57:40.699317',	'2024-11-12 18:59:54.305548',	0),
-(25,	1,	7,	1,	'2024-11-12 19:04:16.386348',	'2024-11-12 19:04:16.386348',	1);
 
 DROP TABLE IF EXISTS "carts";
-DROP SEQUENCE IF EXISTS carts_id_seq;
-CREATE SEQUENCE carts_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
-
 CREATE TABLE "public"."carts" (
-    "id" integer DEFAULT nextval('carts_id_seq') NOT NULL,
-    "user_id" integer NOT NULL,
+    "id" uuid DEFAULT gen_random_uuid() NOT NULL,
+    "user_id" uuid NOT NULL,
     "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
     "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
     "status" integer DEFAULT '1',
@@ -113,20 +88,14 @@ CREATE INDEX "idx_carts_updated_at" ON "public"."carts" USING btree ("updated_at
 CREATE INDEX "idx_carts_user_id" ON "public"."carts" USING btree ("user_id");
 
 TRUNCATE "carts";
-INSERT INTO "carts" ("id", "user_id", "created_at", "updated_at", "status") VALUES
-(1,	1,	'2024-11-12 08:42:18.150248',	'2024-11-12 08:42:18.150248',	1),
-(2,	2,	'2024-11-12 18:31:29.708273',	'2024-11-12 18:31:29.708273',	1);
 
 DROP TABLE IF EXISTS "categories";
-DROP SEQUENCE IF EXISTS categories_id_seq;
-CREATE SEQUENCE categories_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
-
 CREATE TABLE "public"."categories" (
-    "id" integer DEFAULT nextval('categories_id_seq') NOT NULL,
+    "id" uuid DEFAULT gen_random_uuid() NOT NULL,
     "name" character varying(100) NOT NULL,
     "slug" character varying(100) NOT NULL,
     "content" text,
-    "image_id" integer,
+    "image_id" uuid,
     "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
     "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
     "status" integer DEFAULT '1',
@@ -145,22 +114,10 @@ CREATE INDEX "idx_categories_status" ON "public"."categories" USING btree ("stat
 CREATE INDEX "idx_categories_updated_at" ON "public"."categories" USING btree ("updated_at");
 
 TRUNCATE "categories";
-INSERT INTO "categories" ("id", "name", "slug", "content", "image_id", "created_at", "updated_at", "status") VALUES
-(1,	'ASUS',	'asus',	'',	NULL,	'2024-11-11 10:04:19.66203',	'2024-11-11 10:04:19.66203',	1),
-(2,	'DELL',	'dell',	'',	NULL,	'2024-11-11 10:04:32.662004',	'2024-11-11 10:04:32.662004',	1),
-(3,	'ASUS/VIVOBOOK',	'asus-vivobook',	'',	NULL,	'2024-11-11 10:04:59.380659',	'2024-11-11 10:04:59.380659',	1),
-(4,	'HP',	'hp',	'',	NULL,	'2024-11-11 10:05:05.835693',	'2024-11-11 10:05:05.835693',	1),
-(5,	'ROG',	'rog',	'',	NULL,	'2024-11-11 10:05:11.879405',	'2024-11-11 10:05:11.879405',	1),
-(6,	'LENOVO/THING PAD',	'lenovo-thing-pad',	'',	NULL,	'2024-11-11 10:05:41.075525',	'2024-11-11 10:05:41.075525',	1),
-(7,	'MSI',	'msi',	'',	NULL,	'2024-11-11 10:05:48.532065',	'2024-11-11 10:05:48.532065',	1),
-(8,	'ACER',	'acer',	'',	NULL,	'2024-11-11 16:20:22.033743',	'2024-11-11 16:20:22.033743',	1);
 
 DROP TABLE IF EXISTS "coupons";
-DROP SEQUENCE IF EXISTS coupons_id_seq;
-CREATE SEQUENCE coupons_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
-
 CREATE TABLE "public"."coupons" (
-    "id" integer DEFAULT nextval('coupons_id_seq') NOT NULL,
+    "id" uuid DEFAULT gen_random_uuid() NOT NULL,
     "code" character varying(50) NOT NULL,
     "discount_type" character varying(20) NOT NULL,
     "discount_value" numeric(10,2) NOT NULL,
@@ -194,15 +151,10 @@ CREATE INDEX "idx_coupons_status" ON "public"."coupons" USING btree ("status");
 CREATE INDEX "idx_coupons_updated_at" ON "public"."coupons" USING btree ("updated_at");
 
 TRUNCATE "coupons";
-INSERT INTO "coupons" ("id", "code", "discount_type", "discount_value", "start_date", "end_date", "min_purchase_amount", "max_usage", "max_discount_value", "is_active", "created_at", "updated_at", "status") VALUES
-(1,	'NEWBIE',	'percentage',	20.00,	'2024-11-11',	'2024-11-20',	9990000.00,	1,	200000.00,	't',	'2024-11-11 10:03:31.24013',	'2024-11-11 10:03:31.24013',	1);
 
 DROP TABLE IF EXISTS "cpus";
-DROP SEQUENCE IF EXISTS cpus_id_seq;
-CREATE SEQUENCE cpus_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
-
 CREATE TABLE "public"."cpus" (
-    "id" integer DEFAULT nextval('cpus_id_seq') NOT NULL,
+    "id" uuid DEFAULT gen_random_uuid() NOT NULL,
     "name" character varying(100) NOT NULL,
     "brand" character varying(50),
     "model" character varying(50),
@@ -228,22 +180,11 @@ CREATE INDEX "idx_cpus_status" ON "public"."cpus" USING btree ("status");
 CREATE INDEX "idx_cpus_updated_at" ON "public"."cpus" USING btree ("updated_at");
 
 TRUNCATE "cpus";
-INSERT INTO "cpus" ("id", "name", "brand", "model", "cores", "threads", "base_clock", "boost_clock", "cache", "status", "created_at", "updated_at") VALUES
-(1,	'i7 12700K ',	'Intel',	'Core i7-12700K',	10,	12,	'3.2 GHz',	'5.0 GHz',	'30MB',	1,	'2024-11-11 09:50:32.968053',	'2024-11-11 09:50:32.968053'),
-(2,	'i5 12500H',	'Intel',	'Core i5-12600K',	8,	12,	'3.4 GHz',	'4.7 GHz',	'24MB',	1,	'2024-11-11 15:51:44.989581',	'2024-11-11 15:51:44.989581'),
-(3,	'i5 13600KF',	'Intel',	'Core i5-13600KF',	8,	14,	'3.8 GHz',	'5.2 GHz',	'16MB',	1,	'2024-11-11 15:52:56.554718',	'2024-11-11 15:52:56.554718'),
-(4,	'Ryzen 7 5800X',	'AMD',	'Ryzen 7 5800X',	8,	12,	'3.8 GHz',	'4.7 GHz',	'24MB',	1,	'2024-11-11 15:53:39.190951',	'2024-11-11 15:53:39.190951'),
-(5,	'i5 12600K',	'Intel',	'Core i5-12600K',	6,	8,	'3.2 GHz',	'4.5 GHz',	'16MB',	1,	'2024-11-11 16:00:13.895837',	'2024-11-11 16:00:13.895837'),
-(6,	'Intel® Core™ Ultra 7 155H',	'Intel',	'Core 7 Ultra 155H',	8,	16,	'3.6 GHz',	'4.9 GHz',	'24MB',	1,	'2024-11-11 16:31:15.578809',	'2024-11-11 16:31:15.578809'),
-(7,	'AMD Ryzen™ 5 7640HS',	'AMD',	'Ryzen 5 7640HS',	6,	12,	'4.5 GHz',	'5.0 GHz',	'16MB',	1,	'2024-11-11 16:44:39.890505',	'2024-11-11 16:44:39.890505');
 
 DROP TABLE IF EXISTS "delivery_addresses";
-DROP SEQUENCE IF EXISTS delivery_addresses_id_seq;
-CREATE SEQUENCE delivery_addresses_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
-
 CREATE TABLE "public"."delivery_addresses" (
-    "id" integer DEFAULT nextval('delivery_addresses_id_seq') NOT NULL,
-    "user_id" integer NOT NULL,
+    "id" uuid DEFAULT gen_random_uuid() NOT NULL,
+    "user_id" uuid NOT NULL,
     "province_code" integer NOT NULL,
     "district_code" integer NOT NULL,
     "ward_code" integer NOT NULL,
@@ -257,17 +198,10 @@ CREATE TABLE "public"."delivery_addresses" (
 ) WITH (oids = false);
 
 TRUNCATE "delivery_addresses";
-INSERT INTO "delivery_addresses" ("id", "user_id", "province_code", "district_code", "ward_code", "postal_code", "address", "phone_number", "status", "created_at", "updated_at") VALUES
-(2,	1,	31,	312,	11581,	'',	'23213213',	'1111111111',	1,	'2024-11-12 18:02:17.541001',	'2024-11-12 18:02:31.370047'),
-(1,	1,	87,	872,	30046,	'',	'3432432',	'3123213131',	1,	'2024-11-12 16:53:07.502601',	'2024-11-12 18:06:09.862242'),
-(3,	2,	79,	760,	26758,	'',	'172 Trần Hưng Đạo',	'0917739932',	1,	'2024-11-12 18:35:46.067403',	'2024-11-12 18:35:46.067403');
 
 DROP TABLE IF EXISTS "displays";
-DROP SEQUENCE IF EXISTS displays_id_seq;
-CREATE SEQUENCE displays_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
-
 CREATE TABLE "public"."displays" (
-    "id" integer DEFAULT nextval('displays_id_seq') NOT NULL,
+    "id" uuid DEFAULT gen_random_uuid() NOT NULL,
     "name" character varying(100) NOT NULL,
     "size" character varying(50),
     "resolution" character varying(50),
@@ -288,18 +222,13 @@ CREATE INDEX "idx_displays_status" ON "public"."displays" USING btree ("status")
 CREATE INDEX "idx_displays_updated_at" ON "public"."displays" USING btree ("updated_at");
 
 TRUNCATE "displays";
-INSERT INTO "displays" ("id", "name", "size", "resolution", "panel_type", "refresh_rate", "status", "created_at", "updated_at") VALUES
-(1,	'14" 3K OLED',	'14',	'2880x1800',	'OLED',	'120Hz',	1,	'2024-11-11 10:31:36.867241',	'2024-11-11 10:31:36.867241'),
-(2,	'18" 2.5K (2560 x 1600, WQXGA)',	'17.3',	'2560x1440',	'Mini LED',	'240Hz',	1,	'2024-11-11 14:22:22.215572',	'2024-11-11 14:22:22.215572'),
-(3,	'15.6" FHD (1920x1080)',	'15.6',	'1920x1080',	'OLED',	'144Hz',	1,	'2024-11-11 14:23:37.374423',	'2024-11-11 14:23:37.374423'),
-(4,	'16.1" FHD (1920 x 1080)',	'16',	'1920x1080',	'IPS',	'144Hz',	1,	'2024-11-11 16:47:18.318129',	'2024-11-11 16:47:18.318129');
 
 DROP TABLE IF EXISTS "districts";
-DROP SEQUENCE IF EXISTS districts_id_seq;
-CREATE SEQUENCE districts_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
+DROP SEQUENCE IF EXISTS districts_id_seq1;
+CREATE SEQUENCE districts_id_seq1 INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
 
 CREATE TABLE "public"."districts" (
-    "id" integer DEFAULT nextval('districts_id_seq') NOT NULL,
+    "id" integer DEFAULT nextval('districts_id_seq1') NOT NULL,
     "name" text NOT NULL,
     "code" integer NOT NULL,
     "division_type" text NOT NULL,
@@ -1018,11 +947,8 @@ INSERT INTO "districts" ("id", "name", "code", "division_type", "codename", "pro
 (705,	'Huyện Ngọc Hiển',	973,	'huyện',	'huyen_ngoc_hien',	96,	'[]');
 
 DROP TABLE IF EXISTS "graphics_cards";
-DROP SEQUENCE IF EXISTS graphics_cards_id_seq;
-CREATE SEQUENCE graphics_cards_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
-
 CREATE TABLE "public"."graphics_cards" (
-    "id" integer DEFAULT nextval('graphics_cards_id_seq') NOT NULL,
+    "id" uuid DEFAULT gen_random_uuid() NOT NULL,
     "name" character varying(100) NOT NULL,
     "brand" character varying(50),
     "memory_size" character varying(20),
@@ -1045,18 +971,10 @@ CREATE INDEX "idx_graphics_cards_status" ON "public"."graphics_cards" USING btre
 CREATE INDEX "idx_graphics_cards_updated_at" ON "public"."graphics_cards" USING btree ("updated_at");
 
 TRUNCATE "graphics_cards";
-INSERT INTO "graphics_cards" ("id", "name", "brand", "memory_size", "memory_type", "clock_speed", "status", "created_at", "updated_at") VALUES
-(1,	'RTX 2050 4GB',	'NVIDIA',	'4GB',	'GDDR5',	'2.4 GHz',	1,	'2024-11-11 09:45:00.238857',	'2024-11-11 09:45:00.238857'),
-(2,	'GeForce RTX™ 4090 GPU 16GB',	'NVIDIA',	'16GB',	'GDDR6',	'2.4 GHz',	1,	'2024-11-11 14:08:30.28733',	'2024-11-11 14:08:30.28733'),
-(3,	'GeForce RTX™ 4050 6GB',	'NVIDIA',	'6GB',	'GDDR6',	'2.2 GHz',	1,	'2024-11-11 14:24:29.749796',	'2024-11-11 14:24:29.749796'),
-(4,	'GeForce RTX™ 3050 6GB ',	'NVIDIA',	'6GB',	'GDDR6',	'2.6 GHz',	1,	'2024-11-11 16:46:31.869662',	'2024-11-11 16:46:31.869662');
 
 DROP TABLE IF EXISTS "hard_drives";
-DROP SEQUENCE IF EXISTS hard_drives_id_seq;
-CREATE SEQUENCE hard_drives_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
-
 CREATE TABLE "public"."hard_drives" (
-    "id" integer DEFAULT nextval('hard_drives_id_seq') NOT NULL,
+    "id" uuid DEFAULT gen_random_uuid() NOT NULL,
     "name" character varying(100) NOT NULL,
     "type" character varying(50) NOT NULL,
     "capacity" character varying(50) NOT NULL,
@@ -1085,18 +1003,10 @@ CREATE INDEX "idx_hard_drives_type" ON "public"."hard_drives" USING btree ("type
 CREATE INDEX "idx_hard_drives_updated_at" ON "public"."hard_drives" USING btree ("updated_at");
 
 TRUNCATE "hard_drives";
-INSERT INTO "hard_drives" ("id", "name", "type", "capacity", "interface", "brand", "created_at", "updated_at", "status") VALUES
-(1,	'SSD Western Digital Green 256GB ',	'NVMe SSD',	'256GB',	'PCIe 4.0',	'Western Digital',	'2024-11-11 09:44:09.86371',	'2024-11-11 09:44:09.86371',	1),
-(2,	'2TB (2x1TB) PCIe® 4.0 NVMe™ M.2 Performance SSD',	'NVMe SSD',	'1TB',	'PCIe 4.0',	'Western Digital',	'2024-11-11 14:06:57.146133',	'2024-11-11 14:06:57.146133',	1),
-(3,	'512GB SSD M.2 2242',	'NVMe SSD',	'512GB',	'PCIe 4.0',	'SanDisk',	'2024-11-11 14:25:25.633222',	'2024-11-11 14:25:25.633222',	1),
-(4,	'512 GB PCIe® Gen4 NVMe™ TLC M.2 SSD',	'NVMe SSD',	'512GB',	'PCIe 4.0',	'Team Group',	'2024-11-11 16:45:55.260507',	'2024-11-11 16:45:55.260507',	1);
 
 DROP TABLE IF EXISTS "images";
-DROP SEQUENCE IF EXISTS images_id_seq;
-CREATE SEQUENCE images_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
-
 CREATE TABLE "public"."images" (
-    "id" integer DEFAULT nextval('images_id_seq') NOT NULL,
+    "id" uuid DEFAULT gen_random_uuid() NOT NULL,
     "url" character varying(255) DEFAULT 'https://picsum.photos/2000/2000?random=12' NOT NULL,
     "alt_text" character varying(255),
     "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
@@ -1115,74 +1025,76 @@ CREATE INDEX "idx_images_url" ON "public"."images" USING btree ("url");
 
 TRUNCATE "images";
 INSERT INTO "images" ("id", "url", "alt_text", "created_at", "updated_at", "status") VALUES
-(1,	'https://utfs.io/f/htZOn3gdgqGNirPhXfdzKaSBlqcVv147MkQPsoA5w9tUTOed',	'asus_gaming_vivobook_k3605zf-rp634w.png',	'2024-11-11 06:00:50.650598',	'2024-11-11 06:00:50.650598',	1),
-(2,	'https://utfs.io/f/htZOn3gdgqGNUD3LF0pKcdWDQf1xV7Oa4LMbJuAgyXRqFl6p',	'asus_gaming_vivobook_k3605z_k3605v_product_photo_2k_indie_black_17__96ae44616e9348c48ebadb850ae20ee0_grande.png',	'2024-11-11 06:15:30.343924',	'2024-11-11 06:15:30.343924',	1),
-(3,	'https://utfs.io/f/htZOn3gdgqGN5doQUcA2vDWaE2qCL4kzUM9tlucsAdKbGmQF',	'asus_gaming_vivobook_k3605z_k3605v_product_photo_2k_indie_black_07__7c2414190ef24c128a392cc31d533b81_compact.png',	'2024-11-11 06:15:42.603536',	'2024-11-11 06:15:42.603536',	1),
-(4,	'https://utfs.io/f/htZOn3gdgqGNO2JIxk390DFq3lImz7XUKutLy5Z8gcnNWw4x',	'asus_gaming_vivobook_k3605z_k3605v_product_photo_2k_indie_black_09_1_4edc5c1072c94615b69c2742a7c93a35_grande.png',	'2024-11-11 06:15:50.508371',	'2024-11-11 06:15:50.508371',	1),
-(5,	'https://utfs.io/f/htZOn3gdgqGNFlOCeGNOfwWRvdVqkLXHP2eznSi6KgMZbI81',	'asus_gaming_vivobook_k3605z_k3605v_product_photo_2k__bf5a83b87cf249fd8f86309daa5b170f_grande.png',	'2024-11-11 06:15:58.741297',	'2024-11-11 06:15:58.741297',	1),
-(6,	'https://utfs.io/f/htZOn3gdgqGNtT1lSNdbEmYnR9a5XGUidor8CJIKBVWMZNbj',	'asus_gaming_vivobook_k3605zu-rp296w_new_1_49eb90c1052842bab297ef6be3054255_medium.png',	'2024-11-11 06:16:49.828379',	'2024-11-11 06:16:49.828379',	1),
-(7,	'https://utfs.io/f/htZOn3gdgqGN9hw6ONzql6CW4z2gFfP1yMc3YKXeSsVhUkTa',	'vobook_14_oled_x1405v_m1405y_cool_silver_black_keyboard_13_fingerprint_6701c548b729416d90498bdac33dec13_medium.png',	'2024-11-11 08:13:43.768909',	'2024-11-11 08:13:43.768909',	1),
-(8,	'https://utfs.io/f/htZOn3gdgqGNUjTi05pKcdWDQf1xV7Oa4LMbJuAgyXRqFl6p',	'asus_vivobook_oled15_pkw495.png',	'2024-11-11 08:13:55.318263',	'2024-11-11 08:13:55.318263',	1),
-(9,	'https://utfs.io/f/htZOn3gdgqGN6BigZPhiGmgLUXFDC6Iw9ZThno8RNHv7ka0W',	'ok-15-oled-a1505va-l1491w-i7-13700h_1_a5993d2ec835431d8042978903f03fde_b79bd77d9a664d59a97449e7a47166bc_grande.png',	'2024-11-11 08:14:07.312724',	'2024-11-11 08:14:07.312724',	1),
-(10,	'https://utfs.io/f/htZOn3gdgqGNMRAspFu1RUY9kEaniXONu8qWV5AvDMstgemG',	'sus-vivobook-15-oled-a1505va-l1491w_5_8c3803abaea44495b1f9b1461e4f8e2e_69fb8d17d8704fc4bcefed6eb145aeec_grandes.png',	'2024-11-11 08:15:20.244528',	'2024-11-11 08:15:20.244528',	1),
-(11,	'https://utfs.io/f/htZOn3gdgqGNy4h9h7kd0nUZq2JXi5L3EPY1tHD4NokGBVQ9',	'book-15-oled-a1505va-l1491w-i7-13700h_eb9734bccbea48db9450d212bc041ee6_a8c9ffd4a96c4271adc3e7b3a98506b9_grande.png',	'2024-11-11 08:15:27.185284',	'2024-11-11 08:15:27.185284',	1),
-(12,	'https://utfs.io/f/htZOn3gdgqGNnkhMwaLzqbKkiPQ6RFJZvlfsS3ydNV8Ie1UA',	'ok-15-oled-a1505va-l1491w-i7-13700h_3_e9833ccc127d48fcb15c756cf4d078ca_5bbfd41deeb04e6c90734b9cb06748ce_grande.png',	'2024-11-11 08:15:33.445201',	'2024-11-11 08:15:33.445201',	1),
-(13,	'https://utfs.io/f/htZOn3gdgqGNoXJT0XHq9XaPd67zl0WveYyiMHN2bFZQOs5E',	'msi_moder_15_F13.png',	'2024-11-11 08:17:05.804102',	'2024-11-11 08:17:05.804102',	1),
-(14,	'https://utfs.io/f/htZOn3gdgqGNihoSE3dzKaSBlqcVv147MkQPsoA5w9tUTOed',	'msi_15f13wg.png',	'2024-11-11 08:17:11.670591',	'2024-11-11 08:17:11.670591',	1),
-(15,	'https://utfs.io/f/htZOn3gdgqGN75AJCXTzxD8FrZJ4oetjfR25gUWhsXdYaCPy',	'msi_Prestige_14.png',	'2024-11-11 08:19:13.617813',	'2024-11-11 08:19:13.617813',	1),
-(16,	'https://utfs.io/f/htZOn3gdgqGNnVx9DsLzqbKkiPQ6RFJZvlfsS3ydNV8Ie1UA',	'Prestige_msi_1024__1__51da43ccf4d7474a96cac0be97ce938d_grande.png',	'2024-11-11 08:19:23.162178',	'2024-11-11 08:19:23.162178',	1),
-(18,	'https://utfs.io/f/htZOn3gdgqGNWG5nX4eN6MvKagYfHVynhUTFAR4Jxqu8XbcQ',	'msi_Prestige_grande.png',	'2024-11-11 08:19:34.932982',	'2024-11-11 08:19:34.932982',	1),
-(17,	'https://utfs.io/f/htZOn3gdgqGNDA0SVV9zbH4Xw7Ir8AyBx016sYpgVuQjTtPc',	'Prestige_msi_1024__1__51da43ccf4d7474a96cac0be97ce938d_grande.png',	'2024-11-11 08:19:28.679988',	'2024-11-11 08:19:40.57991',	-2),
-(19,	'https://utfs.io/f/htZOn3gdgqGNBPq78Erbp4rkiVDdfAO5SjKmGwgZF76JeBLX',	'_msi_Prestige1024__2__75b72195b1f64cf0b00ef5018698aa0e_grande.png',	'2024-11-11 08:19:46.350379',	'2024-11-11 08:19:46.350379',	1),
-(20,	'https://utfs.io/f/htZOn3gdgqGNkbGKtKM1yX0oVspcAMble9BhIDf76zKTjrv3',	'thinkpad_gen14_p15.png',	'2024-11-11 08:21:54.899875',	'2024-11-11 08:21:54.899875',	1),
-(21,	'https://utfs.io/f/htZOn3gdgqGNtkStFPbEmYnR9a5XGUidor8CJIKBVWMZNbj4',	'thinkpad_p14s_gen_5_intel_ct1_01_91975cbe7ce34bdb90d3cef7738e3474_compact.png',	'2024-11-11 08:22:00.145541',	'2024-11-11 08:22:00.145541',	1),
-(22,	'https://utfs.io/f/htZOn3gdgqGNqpPtmO7fpxh8bwzXd7WKQEjlMFA4YCyHZT3t',	'thinkpad_p14s_gen_5_intel_ct2_06_80e1ea85c51943a29464090a0f2e317a_grande.png',	'2024-11-11 08:22:06.297143',	'2024-11-11 08:22:06.297143',	1),
-(23,	'https://utfs.io/f/htZOn3gdgqGN47edHnc2uIlADfqWgSnQ4RLZXUMBxo9C7emv',	'thinkpad_p14s_gen_5_intel_ct2_05_52c1979d5e5547e8bc23a15a5e41332a_grande.png',	'2024-11-11 08:22:11.721509',	'2024-11-11 08:22:11.721509',	1),
-(24,	'https://utfs.io/f/htZOn3gdgqGNBAKYQPrbp4rkiVDdfAO5SjKmGwgZF76JeBLX',	'dell_g15_5525.png',	'2024-11-11 08:52:23.365714',	'2024-11-11 08:52:23.365714',	1),
-(25,	'https://utfs.io/f/htZOn3gdgqGNvFkZ1fQnEyOXcbzkQpmwxRfoY3jrSqUMFJ6a',	'ook-g-15-5525-black-coralkb-gallery-2_de3cb9d5062843eebf496b221afe3923_2a84bf93f4224ac9be61d91ae84accbe_grande.png',	'2024-11-11 08:52:42.821056',	'2024-11-11 08:52:42.821056',	1),
-(26,	'https://utfs.io/f/htZOn3gdgqGNTlVJa8vNdZun0EfI8zGqy15hbXsxmUHCDKlY',	'ook-g-15-5525-black-coralkb-gallery-3_39b65a463f8c4fa5adbe1264d024b4b4_4f4707c944334e32892a831dacec9676_grande.png',	'2024-11-11 08:52:49.385607',	'2024-11-11 08:52:49.385607',	1),
-(27,	'https://utfs.io/f/htZOn3gdgqGNjfpxkatLhkbWCSK8imxAGecHqVMF5O90f1v4',	'ook-g-15-5525-black-coralkb-gallery-6_e8a615129616430089ceed0cba8fb6d5_2e429667325249fe81801d28046fb7a1_grande.png',	'2024-11-11 08:52:54.845861',	'2024-11-11 08:52:54.845861',	1),
-(28,	'https://utfs.io/f/htZOn3gdgqGNC3DzCBEZespznAoUmqQ5d76fI0g1OyMSHtxi',	'banner_22.png',	'2024-11-11 09:53:56.876014',	'2024-11-11 09:53:56.876014',	1),
-(30,	'https://utfs.io/f/htZOn3gdgqGN20nUmwiFjTEDRXOJSndNZKkhU86iBmrgwe1x',	'banner_1_1.png',	'2024-11-11 09:58:55.156124',	'2024-11-11 09:58:55.156124',	1),
-(31,	'https://utfs.io/f/htZOn3gdgqGNbDuQ8RZ81Ozt7VTNcI0apAR2SDUxKJP4fgGE',	'banner_11.png',	'2024-11-11 10:02:14.093839',	'2024-11-11 10:02:14.093839',	1),
-(32,	'https://utfs.io/f/htZOn3gdgqGNQSckHPB8B9pbiKVANPslyfceJz3duqLm720H',	'LENOVO LOQ.png',	'2024-11-11 13:59:02.252675',	'2024-11-11 13:59:02.252675',	1),
-(29,	'https://utfs.io/f/htZOn3gdgqGNYsg2bDWMRwqCBNnrOV0v2WD3j7EHySXmh4Ku',	'banner_22.png',	'2024-11-11 09:54:05.035492',	'2024-11-11 13:59:13.446734',	-2),
-(33,	'https://utfs.io/f/htZOn3gdgqGNLq0s5k4GlhRZ3UWdgixIsGME40bD5tv7VKok',	'LENOVO LOQ (1).png',	'2024-11-11 13:59:20.818255',	'2024-11-11 13:59:20.818255',	1),
-(34,	'https://utfs.io/f/htZOn3gdgqGN9PWWZYezql6CW4z2gFfP1yMc3YKXeSsVhUkT',	'LENOVO LOQ (2).png',	'2024-11-11 13:59:27.53924',	'2024-11-11 13:59:27.53924',	1),
-(35,	'https://utfs.io/f/htZOn3gdgqGNYUGkxVWMRwqCBNnrOV0v2WD3j7EHySXmh4Ku',	'LENOVO LOQ (3).png',	'2024-11-11 13:59:32.081433',	'2024-11-11 13:59:32.081433',	1),
-(36,	'https://utfs.io/f/htZOn3gdgqGNcq4s1Xj0X9fQNCFLMTkzW416hgrbqjoGRxyl',	'LENOVO LOQ (4).png',	'2024-11-11 13:59:38.959424',	'2024-11-11 13:59:38.959424',	1),
-(37,	'https://utfs.io/f/htZOn3gdgqGNbvBLfQlZ81Ozt7VTNcI0apAR2SDUxKJP4fgG',	'LENOVO LOQ (5).png',	'2024-11-11 13:59:44.797061',	'2024-11-11 13:59:44.797061',	1),
-(38,	'https://utfs.io/f/htZOn3gdgqGN3CgyytVErzCLUyP0Nh1VRaJv4QeZFtcs7j6Y',	'LENOVO LOQ (6).png',	'2024-11-11 13:59:49.732382',	'2024-11-11 13:59:49.732382',	1),
-(39,	'https://utfs.io/f/htZOn3gdgqGNGL2zdyohXK5GQHlP69wUF1rEjZ7c0YSMdObB',	'ROG Strix SCAR 18.png',	'2024-11-11 14:00:03.143194',	'2024-11-11 14:00:03.143194',	1),
-(40,	'https://utfs.io/f/htZOn3gdgqGNiKzzcYdzKaSBlqcVv147MkQPsoA5w9tUTOed',	'ROG Strix SCAR 18 (1).png',	'2024-11-11 14:00:09.560453',	'2024-11-11 14:00:09.560453',	1),
-(41,	'https://utfs.io/f/htZOn3gdgqGNpv0elWwf4mBMCIYEJyNGo0cdaWrU82HFktVR',	'ROG Strix SCAR 18 (2).png',	'2024-11-11 14:00:15.696111',	'2024-11-11 14:00:15.696111',	1),
-(42,	'https://utfs.io/f/htZOn3gdgqGNYcuMHtWMRwqCBNnrOV0v2WD3j7EHySXmh4Ku',	'LENOVO LOQ (3).png',	'2024-11-11 14:00:21.580262',	'2024-11-11 14:00:21.580262',	1),
-(43,	'https://utfs.io/f/htZOn3gdgqGNGD7hIMohXK5GQHlP69wUF1rEjZ7c0YSMdObB',	'LENOVO LOQ (4).png',	'2024-11-11 14:00:27.739938',	'2024-11-11 14:00:27.739938',	1),
-(44,	'https://utfs.io/f/htZOn3gdgqGNDcWuyW9zbH4Xw7Ir8AyBx016sYpgVuQjTtPc',	'ROG Strix SCAR 18 (4).png',	'2024-11-11 14:00:35.678061',	'2024-11-11 14:00:35.678061',	1),
-(45,	'https://utfs.io/f/htZOn3gdgqGNdVOxA5Chq9wlWQZajS1yTxgePnfuosRmkC73',	'ROG Strix SCAR 18 (5).png',	'2024-11-11 14:00:42.899741',	'2024-11-11 14:00:42.899741',	1),
-(46,	'https://utfs.io/f/htZOn3gdgqGNhiAvY4gdgqGN3PxOzfKaSIQkmE7BXc0VrisW',	'ROG Strix SCAR 18 (6) .png',	'2024-11-11 14:00:49.12136',	'2024-11-11 14:00:49.12136',	1),
-(47,	'https://utfs.io/f/htZOn3gdgqGN0aVlEnYneMyhmc7sBzxojgZtilU2bHaJO3Td',	'banner4.png',	'2024-11-11 14:00:59.126722',	'2024-11-11 14:00:59.126722',	1),
-(48,	'https://utfs.io/f/htZOn3gdgqGNFccAtCVNOfwWRvdVqkLXHP2eznSi6KgMZbI8',	'banner2.png',	'2024-11-11 14:01:23.748914',	'2024-11-11 14:01:23.748914',	1),
-(49,	'https://utfs.io/f/htZOn3gdgqGNGNfhP9ohXK5GQHlP69wUF1rEjZ7c0YSMdObB',	'banner6.png',	'2024-11-11 14:01:36.019306',	'2024-11-11 14:01:36.019306',	1),
-(50,	'https://utfs.io/f/htZOn3gdgqGNJzUIJ1nDtgW4APFSu2r6QxOdly3bfLe5Rs9B',	'Swif Go AI 14.png',	'2024-11-11 16:36:08.341916',	'2024-11-11 16:36:08.341916',	1),
-(51,	'https://utfs.io/f/htZOn3gdgqGNnE83Y7LzqbKkiPQ6RFJZvlfsS3ydNV8Ie1UA',	'SGAI 14.png',	'2024-11-11 16:36:17.112065',	'2024-11-11 16:36:17.112065',	1),
-(52,	'https://utfs.io/f/htZOn3gdgqGNcVYVbnj0X9fQNCFLMTkzW416hgrbqjoGRxyl',	'SGAI 14(3).png',	'2024-11-11 16:37:22.932136',	'2024-11-11 16:37:22.932136',	1),
-(53,	'https://utfs.io/f/htZOn3gdgqGN4VO3DPc2uIlADfqWgSnQ4RLZXUMBxo9C7emv',	'SGAI 14(2).png',	'2024-11-11 16:37:30.067945',	'2024-11-11 16:37:30.067945',	1),
-(54,	'https://utfs.io/f/htZOn3gdgqGNNDceUU4KCmJc4rI0OSGE6HkfAB7jMoDhQVXn',	'HP VICTUS 16 .png',	'2024-11-11 16:49:01.79668',	'2024-11-11 16:49:01.79668',	1),
-(55,	'https://utfs.io/f/htZOn3gdgqGNFQpkjtNOfwWRvdVqkLXHP2eznSi6KgMZbI81',	'victus-16-s0078ax-8c5n7pa-r5-7640hs_3_d644455584c5475a81c9620497d6f452_b463a0d04e5e4ac08f20628ca476c965_grande.png',	'2024-11-11 16:49:27.53524',	'2024-11-11 16:49:27.53524',	1),
-(56,	'https://utfs.io/f/htZOn3gdgqGNnoItrD4LzqbKkiPQ6RFJZvlfsS3ydNV8Ie1U',	'_16_80w_micasilver_nt_hdcam_nonfpr_nonodd_victusamd_coreset_frontright_7411c14766fa4767935d5a3be45e21ed_grande.png',	'2024-11-11 16:49:35.827302',	'2024-11-11 16:49:35.827302',	1),
-(57,	'https://utfs.io/f/htZOn3gdgqGN6O3yYKhiGmgLUXFDC6Iw9ZThno8RNHv7ka0W',	'ictus_16_80w_micasilver_nt_hdcam_nonfpr_nonodd_victusamd_coreset_front_98a4a444dccf4c959645368c89bddf69_grande.png',	'2024-11-11 16:49:46.666686',	'2024-11-11 16:49:46.666686',	1);
+('f47ef901-01af-4ce0-a256-04d131ae2eb1',	'https://utfs.io/f/htZOn3gdgqGNirPhXfdzKaSBlqcVv147MkQPsoA5w9tUTOed',	'asus_gaming_vivobook_k3605zf-rp634w.png',	'2024-11-11 06:00:50.650598',	'2024-11-11 06:00:50.650598',	1),
+('8bf0ed30-56b9-4932-82b4-d981c5014b0d',	'https://utfs.io/f/htZOn3gdgqGNUD3LF0pKcdWDQf1xV7Oa4LMbJuAgyXRqFl6p',	'asus_gaming_vivobook_k3605z_k3605v_product_photo_2k_indie_black_17__96ae44616e9348c48ebadb850ae20ee0_grande.png',	'2024-11-11 06:15:30.343924',	'2024-11-11 06:15:30.343924',	1),
+('79068a5c-2c75-4e2c-b67a-3583607f669b',	'https://utfs.io/f/htZOn3gdgqGN5doQUcA2vDWaE2qCL4kzUM9tlucsAdKbGmQF',	'asus_gaming_vivobook_k3605z_k3605v_product_photo_2k_indie_black_07__7c2414190ef24c128a392cc31d533b81_compact.png',	'2024-11-11 06:15:42.603536',	'2024-11-11 06:15:42.603536',	1),
+('11c04438-a969-406d-994b-4548ae01e56f',	'https://utfs.io/f/htZOn3gdgqGNO2JIxk390DFq3lImz7XUKutLy5Z8gcnNWw4x',	'asus_gaming_vivobook_k3605z_k3605v_product_photo_2k_indie_black_09_1_4edc5c1072c94615b69c2742a7c93a35_grande.png',	'2024-11-11 06:15:50.508371',	'2024-11-11 06:15:50.508371',	1),
+('c0fef1c4-19cd-4967-bf81-9fd93ebc98b9',	'https://utfs.io/f/htZOn3gdgqGNFlOCeGNOfwWRvdVqkLXHP2eznSi6KgMZbI81',	'asus_gaming_vivobook_k3605z_k3605v_product_photo_2k__bf5a83b87cf249fd8f86309daa5b170f_grande.png',	'2024-11-11 06:15:58.741297',	'2024-11-11 06:15:58.741297',	1),
+('5795e2b7-0ffb-4041-a1d1-7c5f6b4cc215',	'https://utfs.io/f/htZOn3gdgqGNtT1lSNdbEmYnR9a5XGUidor8CJIKBVWMZNbj',	'asus_gaming_vivobook_k3605zu-rp296w_new_1_49eb90c1052842bab297ef6be3054255_medium.png',	'2024-11-11 06:16:49.828379',	'2024-11-11 06:16:49.828379',	1),
+('b7b9c6bd-cfde-4a07-9636-d55976cdfd6f',	'https://utfs.io/f/htZOn3gdgqGN9hw6ONzql6CW4z2gFfP1yMc3YKXeSsVhUkTa',	'vobook_14_oled_x1405v_m1405y_cool_silver_black_keyboard_13_fingerprint_6701c548b729416d90498bdac33dec13_medium.png',	'2024-11-11 08:13:43.768909',	'2024-11-11 08:13:43.768909',	1),
+('4b4760ca-4740-4d16-a08b-71b683821f9c',	'https://utfs.io/f/htZOn3gdgqGNUjTi05pKcdWDQf1xV7Oa4LMbJuAgyXRqFl6p',	'asus_vivobook_oled15_pkw495.png',	'2024-11-11 08:13:55.318263',	'2024-11-11 08:13:55.318263',	1),
+('0daa0fed-b0d3-4fb2-bf24-8968b2079db2',	'https://utfs.io/f/htZOn3gdgqGN6BigZPhiGmgLUXFDC6Iw9ZThno8RNHv7ka0W',	'ok-15-oled-a1505va-l1491w-i7-13700h_1_a5993d2ec835431d8042978903f03fde_b79bd77d9a664d59a97449e7a47166bc_grande.png',	'2024-11-11 08:14:07.312724',	'2024-11-11 08:14:07.312724',	1),
+('5770e2a4-f4d5-4df5-a698-3b7b545a1934',	'https://utfs.io/f/htZOn3gdgqGNMRAspFu1RUY9kEaniXONu8qWV5AvDMstgemG',	'sus-vivobook-15-oled-a1505va-l1491w_5_8c3803abaea44495b1f9b1461e4f8e2e_69fb8d17d8704fc4bcefed6eb145aeec_grandes.png',	'2024-11-11 08:15:20.244528',	'2024-11-11 08:15:20.244528',	1),
+('d48c78fe-cb08-442c-9a70-55a462680e98',	'https://utfs.io/f/htZOn3gdgqGNy4h9h7kd0nUZq2JXi5L3EPY1tHD4NokGBVQ9',	'book-15-oled-a1505va-l1491w-i7-13700h_eb9734bccbea48db9450d212bc041ee6_a8c9ffd4a96c4271adc3e7b3a98506b9_grande.png',	'2024-11-11 08:15:27.185284',	'2024-11-11 08:15:27.185284',	1),
+('a66631e0-9045-4e80-9bd1-7e82f16761f9',	'https://utfs.io/f/htZOn3gdgqGNnkhMwaLzqbKkiPQ6RFJZvlfsS3ydNV8Ie1UA',	'ok-15-oled-a1505va-l1491w-i7-13700h_3_e9833ccc127d48fcb15c756cf4d078ca_5bbfd41deeb04e6c90734b9cb06748ce_grande.png',	'2024-11-11 08:15:33.445201',	'2024-11-11 08:15:33.445201',	1),
+('5b536112-7c82-4b94-8070-c716ce646c40',	'https://utfs.io/f/htZOn3gdgqGNoXJT0XHq9XaPd67zl0WveYyiMHN2bFZQOs5E',	'msi_moder_15_F13.png',	'2024-11-11 08:17:05.804102',	'2024-11-11 08:17:05.804102',	1),
+('d9d7af00-2b98-4a56-b699-341efe5bffa5',	'https://utfs.io/f/htZOn3gdgqGNihoSE3dzKaSBlqcVv147MkQPsoA5w9tUTOed',	'msi_15f13wg.png',	'2024-11-11 08:17:11.670591',	'2024-11-11 08:17:11.670591',	1),
+('61c0d156-bdf7-4a48-b415-4dbd97d2d0f9',	'https://utfs.io/f/htZOn3gdgqGN75AJCXTzxD8FrZJ4oetjfR25gUWhsXdYaCPy',	'msi_Prestige_14.png',	'2024-11-11 08:19:13.617813',	'2024-11-11 08:19:13.617813',	1),
+('96348f7a-b39c-4cdd-a1ef-ccda7e2fcde0',	'https://utfs.io/f/htZOn3gdgqGNnVx9DsLzqbKkiPQ6RFJZvlfsS3ydNV8Ie1UA',	'Prestige_msi_1024__1__51da43ccf4d7474a96cac0be97ce938d_grande.png',	'2024-11-11 08:19:23.162178',	'2024-11-11 08:19:23.162178',	1),
+('9d22d2cc-05df-441c-9cd9-11bb05572f4f',	'https://utfs.io/f/htZOn3gdgqGNWG5nX4eN6MvKagYfHVynhUTFAR4Jxqu8XbcQ',	'msi_Prestige_grande.png',	'2024-11-11 08:19:34.932982',	'2024-11-11 08:19:34.932982',	1),
+('99d08066-b5dc-4d7d-a74e-05db0758e6bd',	'https://utfs.io/f/htZOn3gdgqGNDA0SVV9zbH4Xw7Ir8AyBx016sYpgVuQjTtPc',	'Prestige_msi_1024__1__51da43ccf4d7474a96cac0be97ce938d_grande.png',	'2024-11-11 08:19:28.679988',	'2024-11-11 08:19:40.57991',	-2),
+('417b2666-51d7-4ef4-b6a4-15c638a48142',	'https://utfs.io/f/htZOn3gdgqGNBPq78Erbp4rkiVDdfAO5SjKmGwgZF76JeBLX',	'_msi_Prestige1024__2__75b72195b1f64cf0b00ef5018698aa0e_grande.png',	'2024-11-11 08:19:46.350379',	'2024-11-11 08:19:46.350379',	1),
+('0eeacfab-e2b3-4aa1-a7a6-1163ef3594b8',	'https://utfs.io/f/htZOn3gdgqGNkbGKtKM1yX0oVspcAMble9BhIDf76zKTjrv3',	'thinkpad_gen14_p15.png',	'2024-11-11 08:21:54.899875',	'2024-11-11 08:21:54.899875',	1),
+('e6fdf6ac-3fce-4292-a056-29677126ac5d',	'https://utfs.io/f/htZOn3gdgqGNtkStFPbEmYnR9a5XGUidor8CJIKBVWMZNbj4',	'thinkpad_p14s_gen_5_intel_ct1_01_91975cbe7ce34bdb90d3cef7738e3474_compact.png',	'2024-11-11 08:22:00.145541',	'2024-11-11 08:22:00.145541',	1),
+('316ed3c8-ddfc-4d52-9b28-5c82b1048adc',	'https://utfs.io/f/htZOn3gdgqGNqpPtmO7fpxh8bwzXd7WKQEjlMFA4YCyHZT3t',	'thinkpad_p14s_gen_5_intel_ct2_06_80e1ea85c51943a29464090a0f2e317a_grande.png',	'2024-11-11 08:22:06.297143',	'2024-11-11 08:22:06.297143',	1),
+('bdce1f11-49e7-4ac6-9395-72e0fa90ab3a',	'https://utfs.io/f/htZOn3gdgqGN47edHnc2uIlADfqWgSnQ4RLZXUMBxo9C7emv',	'thinkpad_p14s_gen_5_intel_ct2_05_52c1979d5e5547e8bc23a15a5e41332a_grande.png',	'2024-11-11 08:22:11.721509',	'2024-11-11 08:22:11.721509',	1),
+('e5137e50-9d32-4cbd-b825-6adeea254f88',	'https://utfs.io/f/htZOn3gdgqGNBAKYQPrbp4rkiVDdfAO5SjKmGwgZF76JeBLX',	'dell_g15_5525.png',	'2024-11-11 08:52:23.365714',	'2024-11-11 08:52:23.365714',	1),
+('f16f310b-8ce7-44ce-8116-4a9482633fb4',	'https://utfs.io/f/htZOn3gdgqGNvFkZ1fQnEyOXcbzkQpmwxRfoY3jrSqUMFJ6a',	'ook-g-15-5525-black-coralkb-gallery-2_de3cb9d5062843eebf496b221afe3923_2a84bf93f4224ac9be61d91ae84accbe_grande.png',	'2024-11-11 08:52:42.821056',	'2024-11-11 08:52:42.821056',	1),
+('0ad6ec50-a443-455e-a92d-2b330ab8d535',	'https://utfs.io/f/htZOn3gdgqGNTlVJa8vNdZun0EfI8zGqy15hbXsxmUHCDKlY',	'ook-g-15-5525-black-coralkb-gallery-3_39b65a463f8c4fa5adbe1264d024b4b4_4f4707c944334e32892a831dacec9676_grande.png',	'2024-11-11 08:52:49.385607',	'2024-11-11 08:52:49.385607',	1),
+('4a99f797-5783-4988-9a74-4a4af0778a08',	'https://utfs.io/f/htZOn3gdgqGNjfpxkatLhkbWCSK8imxAGecHqVMF5O90f1v4',	'ook-g-15-5525-black-coralkb-gallery-6_e8a615129616430089ceed0cba8fb6d5_2e429667325249fe81801d28046fb7a1_grande.png',	'2024-11-11 08:52:54.845861',	'2024-11-11 08:52:54.845861',	1),
+('d85804aa-003e-4d88-939d-0cd54ffd5222',	'https://utfs.io/f/htZOn3gdgqGNC3DzCBEZespznAoUmqQ5d76fI0g1OyMSHtxi',	'banner_22.png',	'2024-11-11 09:53:56.876014',	'2024-11-11 09:53:56.876014',	1),
+('c3f59075-e3d4-4e2d-b24e-c149ae498a27',	'https://utfs.io/f/htZOn3gdgqGN20nUmwiFjTEDRXOJSndNZKkhU86iBmrgwe1x',	'banner_1_1.png',	'2024-11-11 09:58:55.156124',	'2024-11-11 09:58:55.156124',	1),
+('174622c1-c89d-428e-b0d5-e9e6bdae837d',	'https://utfs.io/f/htZOn3gdgqGNbDuQ8RZ81Ozt7VTNcI0apAR2SDUxKJP4fgGE',	'banner_11.png',	'2024-11-11 10:02:14.093839',	'2024-11-11 10:02:14.093839',	1),
+('c378842d-8028-4d0a-b041-e9df8811b3e4',	'https://utfs.io/f/htZOn3gdgqGNQSckHPB8B9pbiKVANPslyfceJz3duqLm720H',	'LENOVO LOQ.png',	'2024-11-11 13:59:02.252675',	'2024-11-11 13:59:02.252675',	1),
+('d7fe4b13-9c74-44d8-b715-a36f2c31fc4b',	'https://utfs.io/f/htZOn3gdgqGNYsg2bDWMRwqCBNnrOV0v2WD3j7EHySXmh4Ku',	'banner_22.png',	'2024-11-11 09:54:05.035492',	'2024-11-11 13:59:13.446734',	-2),
+('18045938-b864-4922-a09e-cb0a6741e4b9',	'https://utfs.io/f/htZOn3gdgqGNLq0s5k4GlhRZ3UWdgixIsGME40bD5tv7VKok',	'LENOVO LOQ (1).png',	'2024-11-11 13:59:20.818255',	'2024-11-11 13:59:20.818255',	1),
+('f3125e08-bb30-4f00-90fc-0243e7a81433',	'https://utfs.io/f/htZOn3gdgqGN9PWWZYezql6CW4z2gFfP1yMc3YKXeSsVhUkT',	'LENOVO LOQ (2).png',	'2024-11-11 13:59:27.53924',	'2024-11-11 13:59:27.53924',	1),
+('3c30bf18-94dc-4792-b35e-9d23e6d8027e',	'https://utfs.io/f/htZOn3gdgqGNYUGkxVWMRwqCBNnrOV0v2WD3j7EHySXmh4Ku',	'LENOVO LOQ (3).png',	'2024-11-11 13:59:32.081433',	'2024-11-11 13:59:32.081433',	1),
+('d0d703d7-e695-486c-8674-c50f224e5cc3',	'https://utfs.io/f/htZOn3gdgqGNcq4s1Xj0X9fQNCFLMTkzW416hgrbqjoGRxyl',	'LENOVO LOQ (4).png',	'2024-11-11 13:59:38.959424',	'2024-11-11 13:59:38.959424',	1),
+('61df47bd-c391-4aad-95cf-f67aa2417a1e',	'https://utfs.io/f/htZOn3gdgqGNbvBLfQlZ81Ozt7VTNcI0apAR2SDUxKJP4fgG',	'LENOVO LOQ (5).png',	'2024-11-11 13:59:44.797061',	'2024-11-11 13:59:44.797061',	1),
+('a332b746-045f-4a11-a97a-bbb1d612aeb1',	'https://utfs.io/f/htZOn3gdgqGN3CgyytVErzCLUyP0Nh1VRaJv4QeZFtcs7j6Y',	'LENOVO LOQ (6).png',	'2024-11-11 13:59:49.732382',	'2024-11-11 13:59:49.732382',	1),
+('0e214d53-00f0-4c31-995b-0a696ca9bda8',	'https://utfs.io/f/htZOn3gdgqGNGL2zdyohXK5GQHlP69wUF1rEjZ7c0YSMdObB',	'ROG Strix SCAR 18.png',	'2024-11-11 14:00:03.143194',	'2024-11-11 14:00:03.143194',	1),
+('0dda4a33-fed4-4b6b-b926-7e3316f89bf7',	'https://utfs.io/f/htZOn3gdgqGNiKzzcYdzKaSBlqcVv147MkQPsoA5w9tUTOed',	'ROG Strix SCAR 18 (1).png',	'2024-11-11 14:00:09.560453',	'2024-11-11 14:00:09.560453',	1),
+('0a0394f7-b581-4dc9-8178-eeb23b382f30',	'https://utfs.io/f/htZOn3gdgqGNpv0elWwf4mBMCIYEJyNGo0cdaWrU82HFktVR',	'ROG Strix SCAR 18 (2).png',	'2024-11-11 14:00:15.696111',	'2024-11-11 14:00:15.696111',	1),
+('e88a67c2-f653-437d-81fa-5ee2212fad85',	'https://utfs.io/f/htZOn3gdgqGNYcuMHtWMRwqCBNnrOV0v2WD3j7EHySXmh4Ku',	'LENOVO LOQ (3).png',	'2024-11-11 14:00:21.580262',	'2024-11-11 14:00:21.580262',	1),
+('1a0dee11-9497-408d-b698-1fd2b71ee341',	'https://utfs.io/f/htZOn3gdgqGNGD7hIMohXK5GQHlP69wUF1rEjZ7c0YSMdObB',	'LENOVO LOQ (4).png',	'2024-11-11 14:00:27.739938',	'2024-11-11 14:00:27.739938',	1),
+('d8dcbc5c-0254-4727-87fd-ba9c20ae0085',	'https://utfs.io/f/htZOn3gdgqGNDcWuyW9zbH4Xw7Ir8AyBx016sYpgVuQjTtPc',	'ROG Strix SCAR 18 (4).png',	'2024-11-11 14:00:35.678061',	'2024-11-11 14:00:35.678061',	1),
+('3e466929-6cd5-45eb-9316-2cc58f3f53e1',	'https://utfs.io/f/htZOn3gdgqGNdVOxA5Chq9wlWQZajS1yTxgePnfuosRmkC73',	'ROG Strix SCAR 18 (5).png',	'2024-11-11 14:00:42.899741',	'2024-11-11 14:00:42.899741',	1),
+('dde95dd9-6545-4450-82a0-09f3b70649ae',	'https://utfs.io/f/htZOn3gdgqGNhiAvY4gdgqGN3PxOzfKaSIQkmE7BXc0VrisW',	'ROG Strix SCAR 18 (6) .png',	'2024-11-11 14:00:49.12136',	'2024-11-11 14:00:49.12136',	1),
+('304c3205-f75c-4a1e-8aba-7206e07a4536',	'https://utfs.io/f/htZOn3gdgqGN0aVlEnYneMyhmc7sBzxojgZtilU2bHaJO3Td',	'banner4.png',	'2024-11-11 14:00:59.126722',	'2024-11-11 14:00:59.126722',	1),
+('62c4a6a7-35c7-4dae-94b8-f16bba02b465',	'https://utfs.io/f/htZOn3gdgqGNFccAtCVNOfwWRvdVqkLXHP2eznSi6KgMZbI8',	'banner2.png',	'2024-11-11 14:01:23.748914',	'2024-11-11 14:01:23.748914',	1),
+('c22dbe7e-fdd2-4780-ab2a-22dd2d5bac3d',	'https://utfs.io/f/htZOn3gdgqGNGNfhP9ohXK5GQHlP69wUF1rEjZ7c0YSMdObB',	'banner6.png',	'2024-11-11 14:01:36.019306',	'2024-11-11 14:01:36.019306',	1),
+('a6707f3e-51a3-4f93-a60d-a37ad53d0896',	'https://utfs.io/f/htZOn3gdgqGNJzUIJ1nDtgW4APFSu2r6QxOdly3bfLe5Rs9B',	'Swif Go AI 14.png',	'2024-11-11 16:36:08.341916',	'2024-11-11 16:36:08.341916',	1),
+('75128129-3036-40c5-b3bd-f544f35c4313',	'https://utfs.io/f/htZOn3gdgqGNnE83Y7LzqbKkiPQ6RFJZvlfsS3ydNV8Ie1UA',	'SGAI 14.png',	'2024-11-11 16:36:17.112065',	'2024-11-11 16:36:17.112065',	1),
+('3ddefbaa-286d-4b75-a4ba-bfa6d1789919',	'https://utfs.io/f/htZOn3gdgqGNcVYVbnj0X9fQNCFLMTkzW416hgrbqjoGRxyl',	'SGAI 14(3).png',	'2024-11-11 16:37:22.932136',	'2024-11-11 16:37:22.932136',	1),
+('d0a8d695-9e8a-43fd-a78f-98bdf28828b3',	'https://utfs.io/f/htZOn3gdgqGN4VO3DPc2uIlADfqWgSnQ4RLZXUMBxo9C7emv',	'SGAI 14(2).png',	'2024-11-11 16:37:30.067945',	'2024-11-11 16:37:30.067945',	1),
+('7adede1b-ba6b-4097-ba35-0e6edca6122b',	'https://utfs.io/f/htZOn3gdgqGNNDceUU4KCmJc4rI0OSGE6HkfAB7jMoDhQVXn',	'HP VICTUS 16 .png',	'2024-11-11 16:49:01.79668',	'2024-11-11 16:49:01.79668',	1),
+('c8c192cb-6cbb-44fd-97ae-f06afc939abd',	'https://utfs.io/f/htZOn3gdgqGNFQpkjtNOfwWRvdVqkLXHP2eznSi6KgMZbI81',	'victus-16-s0078ax-8c5n7pa-r5-7640hs_3_d644455584c5475a81c9620497d6f452_b463a0d04e5e4ac08f20628ca476c965_grande.png',	'2024-11-11 16:49:27.53524',	'2024-11-11 16:49:27.53524',	1),
+('c5cbc2dd-7c46-4818-9e3c-03eca9d31ffe',	'https://utfs.io/f/htZOn3gdgqGNnoItrD4LzqbKkiPQ6RFJZvlfsS3ydNV8Ie1U',	'_16_80w_micasilver_nt_hdcam_nonfpr_nonodd_victusamd_coreset_frontright_7411c14766fa4767935d5a3be45e21ed_grande.png',	'2024-11-11 16:49:35.827302',	'2024-11-11 16:49:35.827302',	1),
+('a59bf196-f665-496b-a67d-c74c50dd63e5',	'https://utfs.io/f/htZOn3gdgqGN6O3yYKhiGmgLUXFDC6Iw9ZThno8RNHv7ka0W',	'ictus_16_80w_micasilver_nt_hdcam_nonfpr_nonodd_victusamd_coreset_front_98a4a444dccf4c959645368c89bddf69_grande.png',	'2024-11-11 16:49:46.666686',	'2024-11-11 16:49:46.666686',	1),
+('e0fe2019-c705-4970-a9e1-7ea5806d3d55',	'https://utfs.io/f/htZOn3gdgqGNFVslBwNOfwWRvdVqkLXHP2eznSi6KgMZbI81',	'4.png',	'2024-11-13 08:24:17.665924',	'2024-11-13 08:24:47.071612',	-2);
 
+DELIMITER ;;
 
+CREATE TRIGGER "update_images_modtime" BEFORE UPDATE ON "public"."images" FOR EACH ROW EXECUTE FUNCTION update_modified_column();;
+
+DELIMITER ;
 
 DROP TABLE IF EXISTS "order_items";
-DROP SEQUENCE IF EXISTS order_items_id_seq1;
-CREATE SEQUENCE order_items_id_seq1 INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
-
 CREATE TABLE "public"."order_items" (
-    "id" integer DEFAULT nextval('order_items_id_seq1') NOT NULL,
-    "order_id" integer,
-    "product_id" integer,
+    "id" uuid DEFAULT gen_random_uuid() NOT NULL,
+    "order_id" uuid,
+    "product_id" uuid,
     "quantity" integer NOT NULL,
     "price" text NOT NULL,
     "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
@@ -1202,29 +1114,17 @@ CREATE INDEX "idx_order_items_status" ON "public"."order_items" USING btree ("st
 CREATE INDEX "idx_order_items_updated_at" ON "public"."order_items" USING btree ("updated_at");
 
 TRUNCATE "order_items";
-INSERT INTO "order_items" ("id", "order_id", "product_id", "quantity", "price", "created_at", "updated_at", "status") VALUES
-(1,	1,	2,	3,	'17890000',	'2024-11-12 18:19:41.130452',	'2024-11-12 18:19:41.130452',	1),
-(2,	1,	3,	1,	'109990000',	'2024-11-12 18:19:41.130452',	'2024-11-12 18:19:41.130452',	1),
-(3,	1,	3,	1,	'109990000',	'2024-11-12 18:19:41.130452',	'2024-11-12 18:19:41.130452',	1),
-(4,	2,	7,	1,	'22990000',	'2024-11-12 18:23:19.403473',	'2024-11-12 18:23:19.403473',	1),
-(5,	2,	7,	2,	'22990000',	'2024-11-12 18:23:19.403473',	'2024-11-12 18:23:19.403473',	1),
-(6,	3,	5,	1,	'34650000',	'2024-11-12 18:35:53.520346',	'2024-11-12 18:35:53.520346',	1),
-(7,	4,	6,	1,	'26490000',	'2024-11-12 19:01:03.383122',	'2024-11-12 19:01:03.383122',	1),
-(8,	4,	7,	1,	'22990000',	'2024-11-12 19:01:03.383122',	'2024-11-12 19:01:03.383122',	1);
 
 DROP TABLE IF EXISTS "orders";
-DROP SEQUENCE IF EXISTS orders_id_seq1;
-CREATE SEQUENCE orders_id_seq1 INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
-
 CREATE TABLE "public"."orders" (
-    "id" integer DEFAULT nextval('orders_id_seq1') NOT NULL,
-    "user_id" integer,
-    "delivery_address_id" integer NOT NULL,
+    "id" uuid DEFAULT gen_random_uuid() NOT NULL,
+    "user_id" uuid,
+    "delivery_address_id" uuid NOT NULL,
     "note" text,
     "order_date" timestamp DEFAULT CURRENT_TIMESTAMP,
     "total_amount" text,
     "shipping_address" text,
-    "payment_method_id" integer,
+    "payment_method_id" uuid,
     "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
     "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
     "status" integer DEFAULT '1',
@@ -1246,18 +1146,10 @@ CREATE INDEX "idx_orders_updated_at" ON "public"."orders" USING btree ("updated_
 CREATE INDEX "idx_orders_user_id" ON "public"."orders" USING btree ("user_id");
 
 TRUNCATE "orders";
-INSERT INTO "orders" ("id", "user_id", "delivery_address_id", "note", "order_date", "total_amount", "shipping_address", "payment_method_id", "created_at", "updated_at", "status") VALUES
-(2,	1,	2,	'',	'2024-11-12 18:23:19.403473',	'69000000',	'23213213, , , Thành phố Hải Phòng',	1,	'2024-11-12 18:23:19.403473',	'2024-11-12 18:23:19.403473',	1),
-(3,	2,	3,	'',	'2024-11-12 18:35:53.520346',	'34680000',	'172 Trần Hưng Đạo, , , Thành phố Hồ Chí Minh',	1,	'2024-11-12 18:35:53.520346',	'2024-11-12 18:35:53.520346',	1),
-(4,	1,	2,	'',	'2024-11-12 19:01:03.383122',	'49510000',	'23213213, , , Thành phố Hải Phòng',	1,	'2024-11-12 19:01:03.383122',	'2024-11-12 19:01:03.383122',	1),
-(1,	1,	2,	'',	'2024-11-12 18:19:41.130452',	'273680000',	'23213213, , , Thành phố Hải Phòng',	1,	'2024-11-12 18:19:41.130452',	'2024-11-13 02:02:57.544683',	5);
 
 DROP TABLE IF EXISTS "payment_methods";
-DROP SEQUENCE IF EXISTS payment_methods_id_seq;
-CREATE SEQUENCE payment_methods_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
-
 CREATE TABLE "public"."payment_methods" (
-    "id" integer DEFAULT nextval('payment_methods_id_seq') NOT NULL,
+    "id" uuid DEFAULT gen_random_uuid() NOT NULL,
     "name" character varying(100) NOT NULL,
     "code" character varying(50) NOT NULL,
     "description" text,
@@ -1284,18 +1176,15 @@ CREATE INDEX "idx_payment_methods_updated_at" ON "public"."payment_methods" USIN
 
 TRUNCATE "payment_methods";
 INSERT INTO "payment_methods" ("id", "name", "code", "description", "is_active", "icon_url", "provider", "config", "created_at", "updated_at", "status") VALUES
-(3,	'Ví điện tử MoMo',	'momo',	'Thanh toán qua ví MoMo',	't',	'/icons/momo.png',	'momo',	'{"access_key": "abc123", "partner_code": "MOMO123"}',	'2024-11-12 17:00:02.242814',	'2024-11-12 17:01:02.242',	1),
-(4,	'ZaloPay',	'zalopay',	'Thanh toán qua ZaloPay',	't',	'/icons/zalopay.png',	'zalopay',	'{"key1": "key123", "app_id": "zalo123"}',	'2024-11-12 17:00:02.242814',	'2024-11-12 17:01:02.242',	1),
-(2,	'Chuyển khoản ngân hàng',	'bank_transfer',	'Chuyển khoản qua tài khoản ngân hàng',	't',	'/icons/bank.png',	'internal',	'{"bank_name": "Vietcombank", "account_name": "CÔNG TY TNHH ABC", "account_number": "1234567890"}',	'2024-11-12 17:00:02.242814',	'2024-11-12 17:01:02.242',	1),
-(5,	'VNPay',	'vnpay',	'Thanh toán qua cổng VNPay',	't',	'/icons/vnpay.png',	'vnpay',	'{"secret_key": "vnpsecret123", "terminal_id": "vnp123"}',	'2024-11-12 17:02:02.242',	'2024-11-12 17:02:02.242',	1),
-(1,	'Thanh toán khi nhận hàng',	'cod',	'Thanh toán tiền mặt khi nhận hàng',	't',	'/icons/cod.png',	'internal',	'{"fee": 0}',	'2024-11-12 19:04:02.242',	'2024-11-12 17:00:02.242814',	1);
+('f5aeca2b-a32d-4f2a-9dc6-91d6c6ec92db',	'Thanh toán khi nhận hàng',	'cod',	'Thanh toán tiền mặt khi nhận hàng',	't',	'/icons/cod.png',	'internal',	'{"fee": 0}',	'2024-11-13 07:57:58.003236',	'2024-11-13 07:57:58.003236',	1),
+('3cac6396-1387-44f6-a37c-d8f6106d9eb7',	'Chuyển khoản ngân hàng',	'bank_transfer',	'Chuyển khoản qua tài khoản ngân hàng',	't',	'/icons/bank.png',	'internal',	'{"bank_name": "Vietcombank", "account_name": "CÔNG TY TNHH ABC", "account_number": "1234567890"}',	'2024-11-13 07:57:58.003236',	'2024-11-13 07:57:58.003236',	1),
+('b857fabd-f8e6-4685-b1eb-679181545552',	'Ví điện tử MoMo',	'momo',	'Thanh toán qua ví MoMo',	't',	'/icons/momo.png',	'momo',	'{"access_key": "abc123", "partner_code": "MOMO123"}',	'2024-11-13 07:57:58.003236',	'2024-11-13 07:57:58.003236',	1),
+('5f4a4bec-d8eb-4736-b3a8-3bbd67ff86ec',	'ZaloPay',	'zalopay',	'Thanh toán qua ZaloPay',	't',	'/icons/zalopay.png',	'zalopay',	'{"key1": "key123", "app_id": "zalo123"}',	'2024-11-13 07:57:58.003236',	'2024-11-13 07:57:58.003236',	1),
+('482c2ea1-d418-4926-b26a-0506ae193c55',	'VNPay',	'vnpay',	'Thanh toán qua cổng VNPay',	't',	'/icons/vnpay.png',	'vnpay',	'{"secret_key": "vnpsecret123", "terminal_id": "vnp123"}',	'2024-11-13 07:57:58.003236',	'2024-11-13 07:57:58.003236',	1);
 
 DROP TABLE IF EXISTS "permissions";
-DROP SEQUENCE IF EXISTS permissions_id_seq;
-CREATE SEQUENCE permissions_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
-
 CREATE TABLE "public"."permissions" (
-    "id" integer DEFAULT nextval('permissions_id_seq') NOT NULL,
+    "id" uuid DEFAULT gen_random_uuid() NOT NULL,
     "name" character varying(50) NOT NULL,
     "description" text,
     "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
@@ -1317,8 +1206,8 @@ TRUNCATE "permissions";
 
 DROP TABLE IF EXISTS "product_categories";
 CREATE TABLE "public"."product_categories" (
-    "product_id" integer NOT NULL,
-    "category_id" integer NOT NULL,
+    "product_id" uuid NOT NULL,
+    "category_id" uuid NOT NULL,
     "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
     "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
     "status" integer DEFAULT '1',
@@ -1336,23 +1225,12 @@ CREATE INDEX "idx_product_categories_status" ON "public"."product_categories" US
 CREATE INDEX "idx_product_categories_updated_at" ON "public"."product_categories" USING btree ("updated_at");
 
 TRUNCATE "product_categories";
-INSERT INTO "product_categories" ("product_id", "category_id", "created_at", "updated_at", "status") VALUES
-(1,	3,	'2024-11-11 12:14:07.481021',	'2024-11-11 12:14:07.481021',	1),
-(3,	5,	'2024-11-11 15:48:18.83658',	'2024-11-11 15:48:18.83658',	1),
-(2,	3,	'2024-11-11 15:57:06.733043',	'2024-11-11 15:57:06.733043',	1),
-(4,	6,	'2024-11-11 16:04:05.989523',	'2024-11-11 16:04:05.989523',	1),
-(5,	7,	'2024-11-11 16:07:48.335194',	'2024-11-11 16:07:48.335194',	1),
-(6,	8,	'2024-11-11 16:40:29.723896',	'2024-11-11 16:40:29.723896',	1),
-(7,	4,	'2024-11-11 16:51:10.241755',	'2024-11-11 16:51:10.241755',	1);
 
 DROP TABLE IF EXISTS "product_cpus";
-DROP SEQUENCE IF EXISTS product_cpus_id_seq;
-CREATE SEQUENCE product_cpus_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
-
 CREATE TABLE "public"."product_cpus" (
-    "id" integer DEFAULT nextval('product_cpus_id_seq') NOT NULL,
-    "product_id" integer NOT NULL,
-    "cpu_id" integer NOT NULL,
+    "id" uuid DEFAULT gen_random_uuid() NOT NULL,
+    "product_id" uuid NOT NULL,
+    "cpu_id" uuid NOT NULL,
     "status" integer DEFAULT '1' NOT NULL,
     "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
     "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
@@ -1360,19 +1238,12 @@ CREATE TABLE "public"."product_cpus" (
 ) WITH (oids = false);
 
 TRUNCATE "product_cpus";
-INSERT INTO "product_cpus" ("id", "product_id", "cpu_id", "status", "created_at", "updated_at") VALUES
-(1,	1,	1,	1,	'2024-11-11 12:14:07.481021',	'2024-11-11 12:14:07.481021'),
-(3,	3,	1,	1,	'2024-11-11 15:48:18.83658',	'2024-11-11 15:48:18.83658'),
-(4,	2,	3,	1,	'2024-11-11 15:57:06.733043',	'2024-11-11 15:57:06.733043');
 
 DROP TABLE IF EXISTS "product_displays";
-DROP SEQUENCE IF EXISTS product_displays_id_seq;
-CREATE SEQUENCE product_displays_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
-
 CREATE TABLE "public"."product_displays" (
-    "id" integer DEFAULT nextval('product_displays_id_seq') NOT NULL,
-    "product_id" integer NOT NULL,
-    "display_id" integer NOT NULL,
+    "id" uuid DEFAULT gen_random_uuid() NOT NULL,
+    "product_id" uuid NOT NULL,
+    "display_id" uuid NOT NULL,
     "status" integer DEFAULT '1' NOT NULL,
     "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
     "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
@@ -1380,19 +1251,12 @@ CREATE TABLE "public"."product_displays" (
 ) WITH (oids = false);
 
 TRUNCATE "product_displays";
-INSERT INTO "product_displays" ("id", "product_id", "display_id", "status", "created_at", "updated_at") VALUES
-(1,	1,	1,	1,	'2024-11-11 12:14:07.481021',	'2024-11-11 12:14:07.481021'),
-(3,	3,	2,	1,	'2024-11-11 15:48:18.83658',	'2024-11-11 15:48:18.83658'),
-(4,	2,	3,	1,	'2024-11-11 15:57:06.733043',	'2024-11-11 15:57:06.733043');
 
 DROP TABLE IF EXISTS "product_graphics_cards";
-DROP SEQUENCE IF EXISTS product_graphics_cards_id_seq;
-CREATE SEQUENCE product_graphics_cards_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
-
 CREATE TABLE "public"."product_graphics_cards" (
-    "id" integer DEFAULT nextval('product_graphics_cards_id_seq') NOT NULL,
-    "product_id" integer NOT NULL,
-    "graphics_card_id" integer NOT NULL,
+    "id" uuid DEFAULT gen_random_uuid() NOT NULL,
+    "product_id" uuid NOT NULL,
+    "graphics_card_id" uuid NOT NULL,
     "status" integer DEFAULT '1' NOT NULL,
     "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
     "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
@@ -1400,19 +1264,11 @@ CREATE TABLE "public"."product_graphics_cards" (
 ) WITH (oids = false);
 
 TRUNCATE "product_graphics_cards";
-INSERT INTO "product_graphics_cards" ("id", "product_id", "graphics_card_id", "status", "created_at", "updated_at") VALUES
-(2,	1,	1,	1,	'2024-11-11 12:14:07.481021',	'2024-11-11 12:14:07.481021'),
-(6,	3,	2,	1,	'2024-11-11 15:48:18.83658',	'2024-11-11 15:48:18.83658'),
-(7,	2,	3,	1,	'2024-11-11 15:57:06.733043',	'2024-11-11 15:57:06.733043'),
-(8,	4,	1,	1,	'2024-11-11 16:04:05.989523',	'2024-11-11 16:04:05.989523'),
-(9,	5,	3,	1,	'2024-11-11 16:07:48.335194',	'2024-11-11 16:07:48.335194'),
-(10,	6,	3,	1,	'2024-11-11 16:40:29.723896',	'2024-11-11 16:40:29.723896'),
-(11,	7,	4,	1,	'2024-11-11 16:51:10.241755',	'2024-11-11 16:51:10.241755');
 
 DROP TABLE IF EXISTS "product_hard_drives";
 CREATE TABLE "public"."product_hard_drives" (
-    "product_id" integer NOT NULL,
-    "hard_id" integer NOT NULL,
+    "product_id" uuid NOT NULL,
+    "hard_id" uuid NOT NULL,
     "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
     "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
     "status" integer DEFAULT '1',
@@ -1430,23 +1286,12 @@ CREATE INDEX "idx_product_hard_status" ON "public"."product_hard_drives" USING b
 CREATE INDEX "idx_product_hard_updated_at" ON "public"."product_hard_drives" USING btree ("updated_at");
 
 TRUNCATE "product_hard_drives";
-INSERT INTO "product_hard_drives" ("product_id", "hard_id", "created_at", "updated_at", "status") VALUES
-(1,	1,	'2024-11-11 12:14:07.481021',	'2024-11-11 12:14:07.481021',	1),
-(3,	2,	'2024-11-11 15:48:18.83658',	'2024-11-11 15:48:18.83658',	1),
-(2,	3,	'2024-11-11 15:57:06.733043',	'2024-11-11 15:57:06.733043',	1),
-(4,	3,	'2024-11-11 16:04:05.989523',	'2024-11-11 16:04:05.989523',	1),
-(5,	1,	'2024-11-11 16:07:48.335194',	'2024-11-11 16:07:48.335194',	1),
-(6,	3,	'2024-11-11 16:40:29.723896',	'2024-11-11 16:40:29.723896',	1),
-(7,	4,	'2024-11-11 16:51:10.241755',	'2024-11-11 16:51:10.241755',	1);
 
 DROP TABLE IF EXISTS "product_images";
-DROP SEQUENCE IF EXISTS product_images_id_seq;
-CREATE SEQUENCE product_images_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
-
 CREATE TABLE "public"."product_images" (
-    "id" integer DEFAULT nextval('product_images_id_seq') NOT NULL,
-    "product_id" integer,
-    "image_id" integer,
+    "id" uuid DEFAULT gen_random_uuid() NOT NULL,
+    "product_id" uuid,
+    "image_id" uuid,
     "display_order" integer,
     "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
     "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
@@ -1467,42 +1312,11 @@ CREATE INDEX "idx_product_images_status" ON "public"."product_images" USING btre
 CREATE INDEX "idx_product_images_updated_at" ON "public"."product_images" USING btree ("updated_at");
 
 TRUNCATE "product_images";
-INSERT INTO "product_images" ("id", "product_id", "image_id", "display_order", "created_at", "updated_at", "status") VALUES
-(6,	1,	8,	1,	'2024-11-11 12:14:07.481021',	'2024-11-11 12:14:07.481021',	1),
-(7,	1,	9,	2,	'2024-11-11 12:14:07.481021',	'2024-11-11 12:14:07.481021',	1),
-(8,	1,	10,	3,	'2024-11-11 12:14:07.481021',	'2024-11-11 12:14:07.481021',	1),
-(9,	1,	11,	4,	'2024-11-11 12:14:07.481021',	'2024-11-11 12:14:07.481021',	1),
-(10,	1,	12,	5,	'2024-11-11 12:14:07.481021',	'2024-11-11 12:14:07.481021',	1),
-(18,	3,	40,	1,	'2024-11-11 15:48:18.83658',	'2024-11-11 15:48:18.83658',	1),
-(19,	3,	41,	2,	'2024-11-11 15:48:18.83658',	'2024-11-11 15:48:18.83658',	1),
-(20,	3,	44,	3,	'2024-11-11 15:48:18.83658',	'2024-11-11 15:48:18.83658',	1),
-(21,	3,	45,	4,	'2024-11-11 15:48:18.83658',	'2024-11-11 15:48:18.83658',	1),
-(22,	3,	46,	5,	'2024-11-11 15:48:18.83658',	'2024-11-11 15:48:18.83658',	1),
-(23,	2,	10,	1,	'2024-11-11 15:57:06.733043',	'2024-11-11 15:57:06.733043',	1),
-(24,	2,	3,	2,	'2024-11-11 15:57:06.733043',	'2024-11-11 15:57:06.733043',	1),
-(25,	2,	2,	3,	'2024-11-11 15:57:06.733043',	'2024-11-11 15:57:06.733043',	1),
-(26,	2,	5,	4,	'2024-11-11 15:57:06.733043',	'2024-11-11 15:57:06.733043',	1),
-(27,	4,	33,	1,	'2024-11-11 16:04:05.989523',	'2024-11-11 16:04:05.989523',	1),
-(28,	4,	34,	2,	'2024-11-11 16:04:05.989523',	'2024-11-11 16:04:05.989523',	1),
-(29,	4,	35,	3,	'2024-11-11 16:04:05.989523',	'2024-11-11 16:04:05.989523',	1),
-(30,	4,	36,	4,	'2024-11-11 16:04:05.989523',	'2024-11-11 16:04:05.989523',	1),
-(31,	4,	37,	5,	'2024-11-11 16:04:05.989523',	'2024-11-11 16:04:05.989523',	1),
-(32,	4,	38,	6,	'2024-11-11 16:04:05.989523',	'2024-11-11 16:04:05.989523',	1),
-(33,	5,	18,	1,	'2024-11-11 16:07:48.335194',	'2024-11-11 16:07:48.335194',	1),
-(34,	5,	19,	2,	'2024-11-11 16:07:48.335194',	'2024-11-11 16:07:48.335194',	1),
-(35,	5,	15,	3,	'2024-11-11 16:07:48.335194',	'2024-11-11 16:07:48.335194',	1),
-(36,	6,	51,	1,	'2024-11-11 16:40:29.723896',	'2024-11-11 16:40:29.723896',	1),
-(37,	6,	52,	2,	'2024-11-11 16:40:29.723896',	'2024-11-11 16:40:29.723896',	1),
-(38,	6,	53,	3,	'2024-11-11 16:40:29.723896',	'2024-11-11 16:40:29.723896',	1),
-(39,	7,	10,	1,	'2024-11-11 16:51:10.241755',	'2024-11-11 16:51:10.241755',	1),
-(40,	7,	55,	2,	'2024-11-11 16:51:10.241755',	'2024-11-11 16:51:10.241755',	1),
-(41,	7,	57,	3,	'2024-11-11 16:51:10.241755',	'2024-11-11 16:51:10.241755',	1),
-(42,	7,	56,	4,	'2024-11-11 16:51:10.241755',	'2024-11-11 16:51:10.241755',	1);
 
 DROP TABLE IF EXISTS "product_ram";
 CREATE TABLE "public"."product_ram" (
-    "product_id" integer NOT NULL,
-    "ram_id" integer NOT NULL,
+    "product_id" uuid NOT NULL,
+    "ram_id" uuid NOT NULL,
     "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
     "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
     "status" integer DEFAULT '1',
@@ -1520,22 +1334,11 @@ CREATE INDEX "idx_product_ram_status" ON "public"."product_ram" USING btree ("st
 CREATE INDEX "idx_product_ram_updated_at" ON "public"."product_ram" USING btree ("updated_at");
 
 TRUNCATE "product_ram";
-INSERT INTO "product_ram" ("product_id", "ram_id", "created_at", "updated_at", "status") VALUES
-(1,	2,	'2024-11-11 12:14:07.481021',	'2024-11-11 12:14:07.481021',	1),
-(3,	4,	'2024-11-11 15:48:18.83658',	'2024-11-11 15:48:18.83658',	1),
-(2,	1,	'2024-11-11 15:57:06.733043',	'2024-11-11 15:57:06.733043',	1),
-(4,	5,	'2024-11-11 16:04:05.989523',	'2024-11-11 16:04:05.989523',	1),
-(5,	2,	'2024-11-11 16:07:48.335194',	'2024-11-11 16:07:48.335194',	1),
-(6,	6,	'2024-11-11 16:40:29.723896',	'2024-11-11 16:40:29.723896',	1),
-(7,	7,	'2024-11-11 16:51:10.241755',	'2024-11-11 16:51:10.241755',	1);
 
 DROP TABLE IF EXISTS "product_specifications";
-DROP SEQUENCE IF EXISTS product_specifications_id_seq;
-CREATE SEQUENCE product_specifications_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
-
 CREATE TABLE "public"."product_specifications" (
-    "id" integer DEFAULT nextval('product_specifications_id_seq') NOT NULL,
-    "product_id" integer NOT NULL,
+    "id" uuid DEFAULT gen_random_uuid() NOT NULL,
+    "product_id" uuid NOT NULL,
     "spec_name" character varying(100) NOT NULL,
     "spec_value" text NOT NULL,
     "unit" character varying(50),
@@ -1560,8 +1363,8 @@ TRUNCATE "product_specifications";
 
 DROP TABLE IF EXISTS "product_tags";
 CREATE TABLE "public"."product_tags" (
-    "product_id" integer NOT NULL,
-    "tag_id" integer NOT NULL,
+    "product_id" uuid NOT NULL,
+    "tag_id" uuid NOT NULL,
     "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
     "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
     "status" integer DEFAULT '1',
@@ -1579,36 +1382,17 @@ CREATE INDEX "idx_product_tags_tag_id" ON "public"."product_tags" USING btree ("
 CREATE INDEX "idx_product_tags_updated_at" ON "public"."product_tags" USING btree ("updated_at");
 
 TRUNCATE "product_tags";
-INSERT INTO "product_tags" ("product_id", "tag_id", "created_at", "updated_at", "status") VALUES
-(1,	2,	'2024-11-11 12:14:07.481021',	'2024-11-11 12:14:07.481021',	1),
-(1,	4,	'2024-11-11 12:14:07.481021',	'2024-11-11 12:14:07.481021',	1),
-(1,	5,	'2024-11-11 12:14:07.481021',	'2024-11-11 12:14:07.481021',	1),
-(3,	4,	'2024-11-11 15:48:18.83658',	'2024-11-11 15:48:18.83658',	1),
-(3,	1,	'2024-11-11 15:48:18.83658',	'2024-11-11 15:48:18.83658',	1),
-(2,	4,	'2024-11-11 15:57:06.733043',	'2024-11-11 15:57:06.733043',	1),
-(2,	5,	'2024-11-11 15:57:06.733043',	'2024-11-11 15:57:06.733043',	1),
-(4,	5,	'2024-11-11 16:04:05.989523',	'2024-11-11 16:04:05.989523',	1),
-(4,	4,	'2024-11-11 16:04:05.989523',	'2024-11-11 16:04:05.989523',	1),
-(4,	2,	'2024-11-11 16:04:05.989523',	'2024-11-11 16:04:05.989523',	1),
-(4,	1,	'2024-11-11 16:04:05.989523',	'2024-11-11 16:04:05.989523',	1),
-(5,	5,	'2024-11-11 16:07:48.335194',	'2024-11-11 16:07:48.335194',	1),
-(5,	4,	'2024-11-11 16:07:48.335194',	'2024-11-11 16:07:48.335194',	1),
-(6,	4,	'2024-11-11 16:40:29.723896',	'2024-11-11 16:40:29.723896',	1),
-(7,	5,	'2024-11-11 16:51:10.241755',	'2024-11-11 16:51:10.241755',	1);
 
 DROP TABLE IF EXISTS "products";
-DROP SEQUENCE IF EXISTS products_id_seq;
-CREATE SEQUENCE products_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
-
 CREATE TABLE "public"."products" (
-    "id" integer DEFAULT nextval('products_id_seq') NOT NULL,
+    "id" uuid DEFAULT gen_random_uuid() NOT NULL,
     "name" character varying(255) NOT NULL,
     "slug" character varying(255) NOT NULL,
-    "price" text NOT NULL,
+    "price" numeric(10,2) NOT NULL,
     "description" text,
     "specifications" jsonb,
     "stock_quantity" integer DEFAULT '0' NOT NULL,
-    "thumbnail_id" integer,
+    "thumbnail_id" uuid,
     "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
     "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
     "status" integer DEFAULT '1',
@@ -1633,22 +1417,19 @@ CREATE INDEX "idx_products_status" ON "public"."products" USING btree ("status")
 CREATE INDEX "idx_products_status_thumb" ON "public"."products" USING btree ("status", "thumbnail_id");
 
 TRUNCATE "products";
-INSERT INTO "products" ("id", "name", "slug", "price", "description", "specifications", "stock_quantity", "thumbnail_id", "created_at", "updated_at", "status") VALUES
-(4,	'Lenovo LOQ 15IAX9 83GS001RVN',	'lenovo-loq-15iax9-83gs001rvn',	'21290000',	'<h2><strong>Thông số kỹ thuật:</strong></h2><p><a href="https://gearvn.com/collections/cpu-bo-vi-xu-ly" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);"><strong>CPU</strong></a>Intel® Core™ i5-12450HX, 8C (4P + 4E) / 12T, P-core up to 4.4GHz, E-core up to 3.1GHz, 12MB<a href="https://gearvn.com/collections/ram-pc" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);"><strong>RAM</strong></a>12GB (1 x 12GB) DDR5-4800 SO-DIMM (2x SO-DIMM socket, up to 32GB SDRAM)<strong>Ổ cứng</strong>512GB&nbsp;<a href="https://gearvn.com/collections/ssd-o-cung-the-ran" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">SSD</a>&nbsp;M.2 2242 PCIe 4.0x4 NVMe (2 Slots: M.2 2242/M.2 2280 PCIe 4.0 x4)<strong>Card đồ họa</strong>NVIDIA® GeForce RTX™ 3050 6GB GDDR6, Boost Clock 1732MHz, TGP 95W<a href="https://gearvn.com/pages/man-hinh" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);"><strong>Màn hình</strong></a>15.6" FHD (1920x1080) IPS 300nits Anti-glare,&nbsp;<strong>100% sRGB</strong>, 144Hz, G-SYNC®<strong>Cổng kết nối</strong>3x USB-A (USB 5Gbps / USB 3.2 Gen 1)</p><p>1x USB-C® (USB 10Gbps / USB 3.2 Gen 2), with PD 140W and DisplayPort™ 1.4</p><p>1x HDMI® 2.1, up to 8K/60Hz</p><p>1x Headphone / microphone combo jack (3.5mm)</p><p>1x Ethernet (RJ-45)</p><p>1x Power connector<a href="https://gearvn.com/collections/ban-phim-may-tinh" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);"><strong>Bàn phím</strong></a>White Backlit, English<strong>Audio</strong>Stereo speakers, 2W x2, optimized with Nahimic Audio<strong>Chuẩn Lan</strong>100/1000M<strong>Wifi + Bluetooth</strong>Wi-Fi® 6, 11ax 2x2 + BT5.2<a href="https://gearvn.com/collections/webcam" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);"><strong>Webcam</strong></a>FHD 1080p with E-shutter<strong>Hệ điều hành&nbsp;&nbsp;&nbsp;</strong>Windows® 11 Home Single Language, English<strong>Pin</strong>Integrated 60Wh (3 Cell)<strong>Trọng lượng</strong>2.38 kg<strong>Màu sắc</strong>Luna Grey<strong>Chất liệu</strong>PC-ABS (Top), PC-ABS (Bottom)<strong>Kích thước&nbsp;&nbsp;&nbsp;</strong>359.86 x 258.7 x 21.9-23.9 mm (14.17 x 10.19 x 0.86-0.94 inches)</p><h2 class="ql-align-justify"><strong>Đánh giá chi tiết laptop gaming Lenovo LOQ 15IAX9 83GS001RVN</strong></h2><p><a href="https://gearvn.com/pages/laptop-gaming" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">Laptop gaming</a>&nbsp;đang trở thành một thiết bị vô cùng phổ biến trong công việc, học tập và giải trí. Ở những chiếc laptop gaming, chúng ta đều nhận thấy được sức mạnh xử lý tuyệt vời và thiết kế bắt mắt và đó cũng chính là lý do bạn nên sở hữu ngay một em laptop gaming&nbsp;<strong>Lenovo LOQ 15IAX9 83GS001RVN</strong>, nó sẽ giúp ích rất nhiều cho bạn. Cùng&nbsp;<a href="https://gearvn.com/" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">GEARVN</a>&nbsp;tìm hiểu về chiếc máy này&nbsp;ngay sau đây nhé!</p><p class="ql-align-center"><img src="https://product.hstatic.net/200000722513/product/loq_15irx9_ct2_04_4a4f0aff35514332b8d2b8e4f4805910_grande.png"></p><h2><strong>Thiết kế thanh lịch và đầy sự sang trọng</strong></h2><p>Ngoại hình bên ngoài của&nbsp;Lenovo LOQ 15IAX9 83GS001RVN được&nbsp;bao trọn với&nbsp;lớp màu&nbsp;<strong>Luna Grey</strong>&nbsp;cực kỳ bắt mắt và sang trọng, tạo nên cảm giác sử dụng với những chiếc laptop văn phòng hay&nbsp;<a href="https://gearvn.com/collections/laptop" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">laptop</a>&nbsp;doanh nhân hơn là&nbsp;một chiếc laptop&nbsp;gaming. Với đó là những bề mặt được làm phẳng và đơn giản bao gồm mặt A được tô điểm thêm phần logo của series LOQ, tạo nên nét chấm phá dành cho&nbsp;<a href="https://gearvn.com/collections/laptop-gaming-lenovo-loq" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">Lenovo LOQ</a>&nbsp;15IAX9 83GS001RVN.</p><p class="ql-align-center"><img src="https://file.hstatic.net/200000722513/file/gearvn-laptop-gaming-lenovo-loq-15iax9-83gs001rvn-6_4fdd9083aeb2403fb024a652469b4906_grande.jpg"></p><h3><strong>Sức mạnh lý tưởng cho mọi cuộc chơi</strong></h3><p>Nằm trong mức giá khoảng 20 triệu, LOQ 15IAX9 83GS001RVN làm chủ mọi trận chiến và cân tốt mọi tác vụ với sức mạnh đến từ “bộ não”&nbsp;<strong>i5-12450HX</strong>. Mang trong mình tiền tố HX mạnh mẽ, điều này như khẳng định tốc độ xử lý mạnh mẽ được hòa quyện với khả tiết kiệm năng lượng tối đa dành cho chiếc&nbsp;<a href="https://gearvn.com/collections/laptop-gaming-lenovo" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">laptop gaming Lenovo</a>. Ngoài ra,&nbsp;không thể thiếu chiếc&nbsp;<a href="https://gearvn.com/collections/vga-card-man-hinh" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">card đồ họa</a>&nbsp;hỗ trợ cho khả năng xử lý đồ họa mà mọi chiếc laptop chơi game đều cần, đó sẽ là trọng trách được giao cho&nbsp;<strong>RTX 3050&nbsp;6GB GDDR6</strong>. Sức mạnh từ RTX 3000 series đảm bảo hiệu năng đầy đủ cho những tựa game online cùng những tựa game offline hot hiện nay cho bạn thoải mái giải trí cùng chiếc laptop.</p><p class="ql-align-center"><img src="https://file.hstatic.net/200000722513/file/gearvn-laptop-gaming-lenovo-loq-15iax9-83gs001rvn-3_8759f0be326f48cfa4ac7a75ea69f88c_grande.jpg"></p><p>Đi kèm trên LOQ 15IAX9 83GS001RVN là bộ nhớ lưu trữ khổng lồ bao gồm&nbsp;<strong>12GB</strong>&nbsp;<a href="https://gearvn.com/collections/ram-laptop" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">RAM</a>&nbsp;DDR5 và&nbsp;<strong>512GB</strong>&nbsp;<a href="https://gearvn.com/collections/ssd-laptop" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">SSD</a>. Dung lượng RAM lớn cùng với thế hệ RAM DDR5 tân tiến giúp cho những thao tác đa tác vụ được xử lý mượt mà và mọi dữ liệu sẽ được lưu trữ vào chiếc SSD M.2 tốc độ cao.</p><h3><strong>Những khung hình chất lượng trên màn hình 15.6 inch</strong></h3><p>Mọi khung hình và chi tiết sẽ được LOQ 15IAX9 83GS001RVN trình chiếu trên chiếc&nbsp;<a href="https://gearvn.com/pages/man-hinh" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">màn hình</a>&nbsp;<strong>15.6 inch</strong>. Được tạo nên từ tấm nền IPS với độ phân giải&nbsp;<a href="https://gearvn.com/collections/do-phan-giai-full-hd-1080p" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">Full HD</a>, màn hình cho góc nhìn rộng và chi tiết hình ảnh được hiển thị sắc nét. Với những tiêu chuẩn hiển thị đỉnh cao, LOQ 15IAX9 83GS001RVN mang đến trải nghiệm thị giác đỉnh cao thông qua những thước phim, hình ảnh và video. Sinh ra dành cho game thủ, chiếc màn hình còn sở hữu tần số quét lên đến&nbsp;<a href="https://gearvn.com/collections/man-hinh-144hz" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">144Hz</a>&nbsp;giúp mang tới sự mượt mà nhất định trong từng pha hành động ở những trận chiến căng thẳng và giảm thiểu tình trạng xé màn hình.</p><p class="ql-align-center"><img src="https://file.hstatic.net/200000722513/file/gearvn-laptop-gaming-lenovo-loq-15iax9-83gs001rvn-4_51a57d1e0232455880ea425e1cebcd96_grande.jpg"></p><h3><strong>Đảm bảo mọi kết nối hữu dụng</strong></h3><p>Lenovo LOQ 15IAX9 83GS001RVN mang tới cho chúng ta mọi kết nối cần thiết cho công việc, học tập và giải trí bao gồm USB Type-A / Type-C, cổng HDMI 2.1, combo jack audio và cổng LAN RJ-45. Bạn có thể thoải mái kết nối cùng những thiết bị ngoại vi như&nbsp;<a href="https://gearvn.com/collections/chuot-may-tinh" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">chuột máy tính</a>,&nbsp;<a href="https://gearvn.com/collections/ban-phim-may-tinh" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">bàn phím</a>,&nbsp;<a href="https://gearvn.com/collections/tai-nghe-may-tinh" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">tai nghe</a>,... hay phục vụ cho công việc trình chiếu của làm việc và học tập.</p><p class="ql-align-center"><img src="https://file.hstatic.net/200000722513/file/gearvn-laptop-gaming-lenovo-loq-15iax9-83gs001rvn-9_edc62192bc4e43ce8cf678c6eb7fbcf8_grande.jpg"></p><p class="ql-align-center"><img src="https://file.hstatic.net/200000722513/file/gearvn-laptop-gaming-lenovo-loq-15iax9-83gs001rvn-10_c21dc4bdeb264f9f8d116caa14f3b0b9_grande.jpg"></p><p>Bài viết trên đây đã điểm qua một số thông số đáng chú ý của chiếc laptop gaming Lenovo LOQ 15IAX9 83GS001RVN, bạn có thể để lại bình luận bên dưới nếu có bất kỳ thắc mắc nào về sản phẩm hoặc liên hệ trực tiếp qua số hotline của chúng tôi để được tư vấn và giải đáp ngay nhé!</p>',	NULL,	15000,	32,	'2024-11-11 16:04:05.989523',	'2024-11-11 16:04:05.989523',	1),
-(1,	'ASUS Vivobook S 14 OLED S5406MA',	'asus-vivobook-s-14-oled-s5406ma',	'16990000.00',	'<h2 class="ql-align-justify"><strong>Đánh giá chi tiết&nbsp;Laptop ASUS Vivobook S 14 OLED S5406MA PP046WS</strong></h2><p class="ql-align-justify">ASUS Vivobook S 14 OLED S5406MA PP046WS là một trong những chiếc laptop đáng chú ý trên thị trường hiện nay, đặc biệt dành cho những người dùng yêu thích thiết kế đẹp mắt và trải nghiệm hình ảnh sắc nét. Với trọng lượng chỉ 1,3kg, card đồ họa mạnh mẽ được hãng chuẩn bị sẵn 16GB RAM và thời lượng pin khổng lồ&nbsp;đã giúp cho chiếc laptop này nổi bật trong phân khúc đồng giá.</p><h3 class="ql-align-justify"><strong>Thiết kế thanh lịch, mỏng nhẹ với màn hình 14 inch sắc nét</strong></h3><p class="ql-align-justify">Laptop&nbsp;ASUS Vivobook S 14 OLED có trọng lượng nhẹ chỉ khoảng 1,3 kg dễ dàng di chuyển đi học, đi làm hay đi công tác&nbsp;mà không cần lo máy nặng và cồng kềnh.&nbsp;Bàn phím RGB với phím tắt Copilot thông minh cùng thiết kế mỏng nhẹ, góc cạnh mềm mại, biến ASUS Vivobook S 14 OLED S5406MA-PP046WS thành người bạn đồng hành hoàn hảo cho mọi tác vụ, đáp ứng các nhu cầu của bạn từ làm việc đến giải trí.</p><p class="ql-align-justify">Điểm thu hút nhất của chiếc laptop này chính là màn hình OLED 3K. Với độ phân giải cao, màu sắc được tái tạo chân thực, độ tương phản tuyệt vời, mọi hình ảnh hiển thị trên màn hình đều trở nên sống động và cuốn hút hơn bao giờ hết. Đặc biệt, công nghệ OLED còn mang đến góc nhìn rộng, màu đen sâu và khả năng hiển thị chi tiết tốt hơn so với các loại màn hình thông thường.</p><p class="ql-align-center"><img src="https://product.hstatic.net/200000722513/product/s-vivobook-s-14-oled-s5406ma-pp136w_7_d82e796b77ff48e790c85f02a2a20679_7a533cb3d3334d2f8c18a255eede5caa_1024x1024.png"></p><h3 class="ql-align-justify"><strong>Trang bị RAM 16GB và ổ cứng SSD</strong></h3><p class="ql-align-justify">Bên cạnh màn hình đẹp mắt, ASUS Vivobook S 14 OLED S5406MA PP046WS còn được trang bị cấu hình mạnh mẽ với vi xử lý Intel Core U5-125H, RAM 16GB mang chức năng tối ưu hiệu suất cho các tác vụ đa nhiệm&nbsp;và ổ cứng SSD 512GB PCIe có khả năng đọc dữ liệu mượt mà, để máy không bị giật lag khi làm việc.&nbsp;Cấu hình này hoàn toàn đủ sức để bạn thực hiện mọi tác vụ hàng ngày một cách mượt mà, từ làm việc văn phòng, lướt web, xem phim cho đến chơi game nhẹ nhàng.</p><p class="ql-align-center"><img src="https://product.hstatic.net/200000722513/product/s-vivobook-s-14-oled-s5406ma-pp136w_1_55b68fc6b842472db8d4db1923037c83_0909d2c22d2645e5a0db5f4c5e776c75_1024x1024.png"></p><p>&nbsp;</p><h3 class="ql-align-justify"><strong>Card đồ họa&nbsp;Intel® Arc™ Graphics và CPU mạnh mẽ</strong></h3><p class="ql-align-justify">Intel® Core™ Ultra 5 Processor 125H là một con chip xử lý cao cấp của Intel, được thiết kế để cung cấp hiệu suất mạnh mẽ cho các tác vụ đòi hỏi nhiều tài nguyên. Với 14 nhân và 18 luồng xử lý, bộ vi xử lý này có khả năng xử lý đa nhiệm một cách hiệu quả. Tốc độ xung nhịp cơ bản là 1.2 GHz, nhưng có thể tăng lên đến 4.5 GHz khi cần thiết, giúp tăng tốc độ xử lý các tác vụ nặng.</p><p class="ql-align-center"><img src="https://product.hstatic.net/200000722513/product/s-vivobook-s-14-oled-s5406ma-pp136w_5_0fd3ef4e78534e399c066ca7abe4bd56_46bbf5f5383f44e5828ec544819d1fa0_1024x1024.png"></p><h3><strong>Thời lượng pin khổng lồ</strong></h3><p class="ql-align-justify">Khi sử dụng&nbsp;Laptop&nbsp;ASUS Vivobook S 14 OLED bạn sẽ không lo lắng về vấn đề sạc liên tục để làm việc hay giải trí bởi máy đã được trang bị viên pin 4-cell Li-ion có dung lượng 75WHrs để laptop có thể hoạt động cả ngày dài mà không quá lo về vấn để sạc pin. Bên cạnh đó,&nbsp;ASUS Vivobook S 14 OLED cũng được trang bị Bluetooth 5.3 đảm bảo cho tốc độ truyền ổn định và&nbsp;đầy đủ các cổng giao tiếp để bạn dễ dàng kết nối với các thiết bị ngoại vi.</p><p class="ql-align-center"><img src="https://product.hstatic.net/200000722513/product/sus-vivobook-s-14-oled-s5406ma-pp136w_f797ef36a74641089313832483d62357_9f7e431993f5488f83e5ed424faa900d_1024x1024.png"></p><p class="ql-align-justify">ASUS Vivobook S 14 OLED S5406MA PP046WS là một chiếc laptop đáng để bạn cân nhắc nếu đang tìm kiếm một sản phẩm có màn hình đẹp, hiệu năng mạnh mẽ và thiết kế thời trang. Với những ưu điểm vượt trội, chiếc laptop này chắc chắn sẽ mang đến cho bạn những trải nghiệm tuyệt vời. Hãy đến ngay với GEARVN để được tư vấn chi tiết về sản phẩm và những chương trình khuyễn mãi hấp dẫn.</p>',	NULL,	100,	7,	'2024-11-11 10:33:36.177643',	'2024-11-12 18:08:06.413754',	1),
-(5,	'MSI Prestige 14 AI Studio C1VEG 056VN',	'msi-prestige-14-ai-studio-c1veg-056vn',	'34650000',	'<h2 class="ql-align-justify"><strong>Đánh giá laptop MSI Prestige 14 AI Studio C1VEG 056VN</strong></h2><p class="ql-align-justify">Bạn là một người sáng tạo, luôn tìm kiếm công cụ phù hợp để biến ý tưởng thành hiện thực? Bạn muốn một chiếc laptop vừa mạnh mẽ, vừa gọn nhẹ, để đồng hành cùng bạn trong mọi dự án? Laptop MSI Prestige 14 AI Studio C1VEG 056VN chính là lời giải đáp cho bạn. Chiếc laptop này không chỉ sở hữu thiết kế sang trọng, tinh tế mà còn được trang bị cấu hình mạnh mẽ, đáp ứng mọi nhu cầu sáng tạo, cho phép bạn thực hiện các tác vụ phức tạp một cách mượt mà và hiệu quả. Cùng&nbsp;<a href="https://gearvn.com/" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">GEARVN</a>&nbsp;khám phá sản phẩm thông qua nội dung dưới đây nhé!</p><p class="ql-align-center"><img src="https://product.hstatic.net/200000722513/product/ava_e10fafc0165e4a2cb5380668574e512d_1024x1024.png"></p><h3 class="ql-align-justify"><strong>Thiết kế sang trọng, hiệu năng đột phá</strong></h3><p class="ql-align-justify">MSI Prestige 14 AI Studio C1VEG 056VN sở hữu vẻ ngoài thanh lịch, tinh tế với thiết kế mỏng nhẹ, trọng lượng chỉ 1.7 kg. Chất liệu vỏ nhựa kết hợp nắp lưng bằng kim loại mang đến sự chắc chắn và sang trọng cho chiếc laptop. Với kích thước 313.4 mm x 246.5 mm x 18.95 mm, bạn có thể dễ dàng mang theo laptop mọi lúc mọi nơi.</p><p class="ql-align-center"><img src="https://product.hstatic.net/200000722513/product/1024__3__7ec191a6f2cb43abbe95997fca237fd1_1024x1024.png"></p><p class="ql-align-justify">Bên trong, chiếc&nbsp;<a href="https://gearvn.com/collections/laptop" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">laptop</a>&nbsp;này được trang bị con chip Intel Core Ultra 7 Meteor Lake - 155H mạnh mẽ, với 16 nhân, 22 luồng, tốc độ&nbsp;<a href="https://gearvn.com/collections/cpu-bo-vi-xu-ly" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">CPU</a>&nbsp;3.8GHz và Turbo Boost lên đến 4.8 GHz. Kết hợp với&nbsp;<a href="http://ram/" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">RAM</a>&nbsp;32GB DDR5 tốc độ 5600 MHz và SSD 1TB NVMe PCIe Gen 4 x 4, MSI Prestige 14 AI Studio C1VEG 056VN mang đến hiệu suất ấn tượng, xử lý đa nhiệm mượt mà, cho phép bạn thực hiện các tác vụ nặng như chỉnh sửa video, render hình ảnh hay chơi game một cách mượt mà.</p><h3 class="ql-align-justify"><strong>Trải nghiệm hình ảnh sống động với màn hình 2,8K 144Hz</strong></h3><p class="ql-align-justify"><a href="https://gearvn.com/pages/man-hinh" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">Màn hình</a>&nbsp;14 inch 2.8K (2880 x 1800) của MSI Prestige 14 AI Studio C1VEG 056VN sở hữu tần số quét 144Hz, mang đến trải nghiệm hình ảnh mượt mà, sắc nét. Công nghệ tấm nền IPS giúp cho màu sắc hiển thị chính xác, không bị biến dạng khi nhìn từ các góc nghiêng khác nhau. Độ phủ màu 100% DCI-P3 cho phép bạn tái tạo màu sắc chân thực, đảm bảo chất lượng hình ảnh tuyệt vời cho công việc chỉnh sửa ảnh, video. Độ sáng màn hình 400 nits cho phép bạn sử dụng thoải mái trong nhiều điều kiện ánh sáng khác nhau.</p><p class="ql-align-center"><img src="https://product.hstatic.net/200000722513/product/1024__2__75b72195b1f64cf0b00ef5018698aa0e_1024x1024.png"></p><p class="ql-align-justify">MSI Prestige 14 AI Studio C1VEG 056VN được trang bị&nbsp;<a href="https://gearvn.com/collections/vga-card-man-hinh" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">card đồ họa</a>&nbsp;rời NVIDIA GeForce RTX 4050, 6 GB. Card đồ họa này mang đến hiệu suất đồ họa mạnh mẽ, hỗ trợ bạn xử lý các tác vụ đồ họa chuyên nghiệp, chỉnh sửa video, render hình ảnh, chơi game một cách mượt mà, mang đến trải nghiệm giải trí tuyệt vời.</p><h3 class="ql-align-justify"><strong>Tiện ích đa dạng, kết nối hoàn hảo</strong></h3><p class="ql-align-justify">MSI Prestige 14 AI Studio C1VEG 056VN được trang bị đầy đủ các cổng kết nối cần thiết, bao gồm: LAN (RJ45), 1x Headphone-out, 1 x USB 3.2, HDMI, 1 x USB Type-C (hỗ trợ USB, Power Delivery 3.1 và DisplayPort), cho phép bạn dễ dàng kết nối với nhiều thiết bị ngoại vi khác nhau. Laptop còn được trang bị Wi-Fi 7 (802.11be) và Bluetooth 5.4 để kết nối không dây nhanh chóng, ổn định.</p><p class="ql-align-justify">Ngoài ra, MSI Prestige 14 AI Studio C1VEG 056VN còn sở hữu nhiều tính năng tiện lợi: Full HD&nbsp;<a href="https://gearvn.com/collections/webcam" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">Webcam</a>, Camera IR, bảo mật vân tay, công tắc khóa camera, mở khóa khuôn mặt, đèn bàn phím đơn sắc - màu trắng.</p><p><br></p>',	NULL,	199,	16,	'2024-11-11 16:07:48.335194',	'2024-11-12 18:35:53.520346',	1),
-(6,	'Acer Swift Go 14 SFG14 73 75YM',	'acer-swift-go-14-sfg14-73-75ym',	'26490000',	'<h2 class="ql-align-justify"><strong>Đánh giá chi tiết Laptop Acer Swift Go 14 SFG14 73 75YM</strong></h2><p class="ql-align-justify">Với màn hình OLED 2.8K sống động, màu sắc chân thực và độ sáng cao, Acer Swift Go 14 là người bạn đồng hành hoàn hảo cho những tác vụ đồ họa, thiết kế và chỉnh sửa video. Cấu hình mạnh mẽ với chip&nbsp;<a href="https://gearvn.com/collections/cpu-bo-vi-xu-ly" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">Intel Core</a>&nbsp;thế hệ mới và đồ họa rời cho phép bạn xử lý đa nhiệm mượt mà, tăng năng suất làm việc. Thiết kế mỏng nhẹ, sang trọng và thời lượng pin ấn tượng, chiếc<a href="https://gearvn.com/collections/laptop-ai" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">&nbsp;laptop AI&nbsp;</a>này&nbsp;giúp bạn làm việc hiệu quả mọi lúc mọi nơi.&nbsp;Cùng GEARVN tìm hiểu chi tiết về Acer Swift Go 14 SFG14 73 75YM trong bài viết sau!</p><p class="ql-align-center"><img src="https://product.hstatic.net/200000722513/product/wift-go-ai-2024-gen-2-sfg14-73-71zx_1_ccc2cc55cf11451086e09eac92cae064_cebd993058e6471d8b7b7d2dccb51ca3_1024x1024.png"></p><h3 class="ql-align-justify"><strong>Trải nghiệm đỉnh cao với màn hình OLED 14 inch siêu sắc nét</strong></h3><h3>&nbsp;</h3><p class="ql-align-justify">Được trang bị màn hình OLED 14 inch độ phân giải 2.8K (2880 x 1800), Acer Swift Go AI OLED SFG14-73-75YM mang đến chất lượng hình ảnh vượt trội. Tấm nền OLED không chỉ cung cấp màu đen sâu thẳm, tỷ lệ tương phản vô cực mà còn tiết kiệm năng lượng hiệu quả.</p><p class="ql-align-center"><img src="https://file.hstatic.net/200000722513/file/acer-swift-go-14-ai-gen-2-sfg14-73-ksp-12_1024x1024.jpg"></p><p class="ql-align-justify">Với độ sáng 400 nits, góc nhìn rộng 170 độ và công nghệ chống lóa, màn hình chiếc laptop&nbsp;<a href="https://gearvn.com/collections/acer-swift-series" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">Acer Swift</a>&nbsp;này đảm bảo trải nghiệm hình ảnh sống động, rõ nét trong mọi điều kiện ánh sáng. Độ phủ màu 100% Adobe RGB và 100% DCI-P3 cùng công nghệ HDR 500 giúp tái tạo màu sắc chuẩn xác, đáp ứng nhu cầu của các nhà sáng tạo nội dung chuyên nghiệp.</p><h3><strong>Trải nghiệm làm việc mượt mà với CPU Intel Core Ultra 7 thế hệ 14</strong></h3><p class="ql-align-justify">Laptop Acer Swift Go AI OLED SFG14-73-75YM được trang bị vi xử lý&nbsp;<a href="https://gearvn.com/collections/cpu-intel-core-i7" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">Intel Core Ultra 7</a>&nbsp;thế hệ 14 mạnh mẽ, mang đến hiệu suất vượt trội và khả năng xử lý đa nhiệm ấn tượng. Với 16 nhân và 22 luồng, CPU này dễ dàng xử lý mọi tác vụ, từ làm việc với các ứng dụng văn phòng, chỉnh sửa ảnh/video đến chơi game, một cách mượt mà và nhanh chóng.</p><p class="ql-align-center"><img src="https://file.hstatic.net/200000722513/file/acer-swift-go-14-ai-gen-2-sfg14-73-ksp-3_1024x1024.jpg"></p><p class="ql-align-justify">Tốc độ xung nhịp cao cùng công nghệ AI tiên tiến giúp tối ưu hóa hiệu suất, tiết kiệm năng lượng và mang đến trải nghiệm người dùng thông minh hơn. Bạn có thể thoải mái làm việc với nhiều ứng dụng cùng lúc, mở các tệp tin lớn mà không lo giật lag, giúp tăng năng suất làm việc đáng kể.</p><h3><strong>Đồ họa tích hợp mạnh mẽ cho Acer Swift Go AI OLED</strong></h3><p class="ql-align-justify">Laptop Acer Swift Go AI OLED SFG14-73-75YM được trang bị đồ họa Intel Arc Graphics với 8GB GDDR6 VRAM, mang đến hiệu suất đồ họa ấn tượng. Card đồ họa này hỗ trợ các tính năng hiện đại như ray tracing và AI-enhanced graphics, giúp nâng cao chất lượng hình ảnh và hiệu suất tổng thể.</p><p class="ql-align-center"><img src="https://file.hstatic.net/200000722513/file/laptop_acer_swift_go_14_sfg14_73_57fz-q_1024x1024.jpg"></p><p class="ql-align-justify">Với Intel Arc Graphics, bạn có thể thoải mái chỉnh sửa video 4K, thiết kế đồ họa 3D và chơi game ở mức cài đặt trung bình mà không gặp phải hiện tượng giật lag.</p><h3 class="ql-align-justify"><strong>Cổng kết nối đa dạng đáp ứng mọi nhu cầu kết nối</strong></h3><p class="ql-align-justify">Acer Swift Go AI OLED SFG14-73-75YM được trang bị đầy đủ các cổng kết nối hiện đại, bao gồm 4 cổng USB (2 x USB 3.2 Gen 1, 2 x USB 3.2 Type-C), 1 cổng&nbsp;<a href="https://gearvn.com/collections/day-cap-hdmi" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">HDMI</a>&nbsp;2.1 và 1 cổng DisplayPort.</p><p class="ql-align-center"><img src="https://product.hstatic.net/200000722513/product/wift-go-ai-2024-gen-2-sfg14-73-71zx_7_f10270b3e17b408bbab551fa6f56a508_f45b781f5db04086be91311f023f2d72_1024x1024.png"></p><p class="ql-align-justify">Với hệ thống cổng kết nối đa dạng này, bạn có thể dễ dàng kết nối với nhiều thiết bị ngoại vi khác nhau, từ chuột, bàn phím, ổ cứng ngoài đến màn hình độ phân giải cao, máy chiếu. Điều này giúp bạn mở rộng không gian làm việc và nâng cao hiệu suất làm việc.</p><h3 class="ql-align-justify"><strong>Làm việc đa nhiệm mượt mà với RAM 16GB và SSD 512GB</strong></h3><h3 class="ql-align-justify">&nbsp;</h3><p class="ql-align-justify">Laptop Acer Swift Go AI OLED SFG14-73-75YM được trang bị bộ nhớ RAM 16GB LPDDR5X siêu nhanh và ổ cứng SSD PCIe NVMe 512GB, mang đến trải nghiệm làm việc đa nhiệm mượt mà và hiệu quả. Bạn có thể thoải mái mở nhiều ứng dụng cùng lúc, chuyển đổi giữa các tab một cách nhanh chóng mà không lo giật lag.</p><p class="ql-align-center"><img src="https://product.hstatic.net/200000722513/product/wift-go-ai-2024-gen-2-sfg14-73-71zx_3_b95fb967509d4f8f98f03fcae16e41cc_a346efc3b9564db4882c1c601ce4d254_1024x1024.png"></p><p class="ql-align-justify">Ổ cứng&nbsp;<a href="https://gearvn.com/collections/ssd-laptop" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">SSD</a>&nbsp;không chỉ cung cấp tốc độ đọc ghi dữ liệu siêu tốc mà còn giúp máy khởi động và mở ứng dụng nhanh hơn đáng kể. Với dung lượng lưu trữ lên đến 512GB, bạn có thể lưu trữ mọi thứ mình cần, từ tài liệu làm việc, hình ảnh, video đến các trò chơi yêu thích.</p><p class="ql-align-justify"><br></p><p><br></p>',	NULL,	19,	50,	'2024-11-11 16:40:29.723896',	'2024-11-12 19:01:03.383122',	1),
-(7,	'HP VICTUS 16-s0078AX 8C5N7PA',	'hp-victus-16-s0078ax-8c5n7pa',	'22990000',	'<h2><strong>Thông số kĩ thuật:</strong></h2><p><a href="https://gearvn.com/collections/cpu-bo-vi-xu-ly" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);"><strong>CPU</strong></a><span style="color: rgb(0, 0, 0);">AMD Ryzen™ 5 7640HS (up to 5.0 GHz max boost clock, 16 MB L3 cache, 6 cores, 12 threads)</span><a href="https://gearvn.com/collections/ram-laptop" rel="noopener noreferrer" target="_blank" style="color: rgb(66, 139, 202); background-color: transparent;"><strong>RAM</strong></a><span style="color: rgb(0, 0, 0);">16GB (2x8GB) DDR5 5600MHz (2x SO-DIMM socket, up to 32GB SDRAM)</span><a href="https://gearvn.com/collections/hdd-o-cung-pc" rel="noopener noreferrer" target="_blank" style="color: rgb(66, 139, 202); background-color: transparent;"><strong>Ổ cứng</strong></a><span style="color: rgb(0, 0, 0);">512 GB PCIe® Gen4 NVMe™ TLC M.2 SSD (1 slot)</span><a href="https://gearvn.com/collections/vga-card-man-hinh" rel="noopener noreferrer" target="_blank" style="color: rgb(66, 139, 202); background-color: transparent;"><strong>VGA</strong></a><span style="color: rgb(0, 0, 0);">NVIDIA® GeForce RTX™ 3050 6GB GDDR6</span><a href="https://gearvn.com/pages/man-hinh" rel="noopener noreferrer" target="_blank" style="color: rgb(66, 139, 202); background-color: transparent;"><strong>Màn hình</strong></a><span style="color: rgb(0, 0, 0);">16.1" FHD (1920 x 1080), 144 Hz, IPS, micro-edge, anti-glare, 250 nits, 45% NTSC</span></p><p><strong style="color: rgb(0, 0, 0);">Cổng giao tiếp</strong>1x USB Type-C® 5Gbps signaling rate (USB Power Delivery, DisplayPort™ 1.4a, HP Sleep and Charge)</p><p>1x USB Type-A 5Gbps signaling rate (HP Sleep and Charge)</p><p>2x USB Type-A 5Gbps signaling rate</p><p>1x HDMI 2.1</p><p>1x RJ-45</p><p>1x AC smart pin</p><p>1x headphone/microphone combo<a href="https://gearvn.com/collections/ban-phim-may-tinh" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);"><strong>Bàn phím</strong></a><span style="color: rgb(0, 0, 0);">Full-size, 1-zone RGB backlit, moonstone grey keyboard with numeric keypad</span><strong style="color: rgb(0, 0, 0);">Audio</strong>Audio by B&amp;O; Dual speakers; HP Audio Boost<strong style="color: rgb(0, 0, 0);">Chuẩn LAN</strong><span style="color: rgb(0, 0, 0);">10/100/1000 GbE LAN</span><strong style="color: rgb(0, 0, 0);">Chuẩn WIFI</strong><span style="color: rgb(0, 0, 0);">MediaTek Wi-Fi 6E MT7922 (2x2)</span><strong style="color: rgb(0, 0, 0);">Bluetooth</strong><span style="color: rgb(0, 0, 0);">v5.3</span><a href="https://gearvn.com/collections/webcam" rel="noopener noreferrer" target="_blank" style="color: rgb(66, 139, 202); background-color: transparent;"><strong>Webcam</strong></a><span style="color: rgb(0, 0, 0);">HP True Vision 1080p FHD camera with temporal noise reduction and integrated dual array digital microphones</span><strong style="color: rgb(0, 0, 0);">Hệ điều hành</strong><span style="color: rgb(0, 0, 0);">Windows 11 Home</span><strong style="color: rgb(0, 0, 0);">Pin</strong><span style="color: rgb(0, 0, 0);">4 Cell 70WHr</span><strong style="color: rgb(0, 0, 0);">Trọng lượng</strong><span style="color: rgb(0, 0, 0);">2.31 kg</span><strong style="color: rgb(0, 0, 0);">Màu sắc</strong><span style="color: rgb(0, 0, 0);">Mica silver, dark chrome logo</span><strong style="color: rgb(0, 0, 0);">Kích thước</strong><span style="color: rgb(0, 0, 0);">36.9 x 25.94 x 2.29~2.39 cm</span></p><h2 class="ql-align-justify"><strong>Đánh giá chi tiết laptop gaming&nbsp;HP VICTUS 16-s0078AX 8C5N7PA</strong></h2><p><strong>Laptop gaming HP VICTUS 16-s0078AX 8C5N7PA</strong>&nbsp;là một sự lựa chọn tốt cho những game thủ đang tìm kiếm một chiếc&nbsp;<a href="https://gearvn.com/collections/laptop" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">laptop</a>&nbsp;xách tay mạnh mẽ với hiệu suất ổn định và giá cả hợp lý và&nbsp;ưu điểm về màn hình lớn 16 inch.&nbsp;Dưới đây&nbsp;<a href="https://gearvn.com/" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">GEARVN</a>&nbsp;giới thiệu đến bạn&nbsp;một số thông tin chi tiết về sản phẩm này.</p><p class="ql-align-center"><img src="https://product.hstatic.net/200000722513/product/khung-laptop-23_9dc8867468e64beaa9df5edebe4c94bc_grande.png"></p><h2><strong>Thiết kế sang trọng, tinh tế</strong></h2><p>Laptop gaming HP VICTUS 16-s0078AX 8C5N7PA&nbsp;là 1 chiếc&nbsp;<a href="https://gearvn.com/pages/laptop-gaming" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">laptop gaming</a>&nbsp;được thiết kế với trọng lượng vô cùng lý tưởng&nbsp;<strong>2.3kg</strong>&nbsp;và độ dày chỉ có&nbsp;<strong>23.9mm</strong>, chiếc laptop này thực sự là một người bạn đồng hành lý tưởng cho những ai thích di dộng. Với trọng lượng vừa phải, tạo nên cảm giác thoải mái cho người dùng khi mang theo, tạo điều kiện linh hoạt cho người sử dụng ở nhiều địa điểm khác nhau.</p><p class="ql-align-center"><img src="https://product.hstatic.net/200000722513/product/victus-16-s0078ax-8c5n7pa-r5-7640hs_3_d644455584c5475a81c9620497d6f452_b463a0d04e5e4ac08f20628ca476c965_grande.png"></p><h2><strong>Hiệu năng mạnh mẽ từ chip AMD</strong></h2><p>HP VICTUS 16-s0078AX 8C5N7PA&nbsp;được trang bị&nbsp;<a href="https://gearvn.com/collections/cpu-bo-vi-xu-ly?hang=amd" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">CPU&nbsp;AMD</a>&nbsp;<strong>Ryzen™ 5 7640HS (6C/12T)</strong>,&nbsp;hỗ trợ tốc độ cao tối đa lên đến&nbsp;<strong>5.0GHz</strong>,&nbsp;<a href="https://gearvn.com/collections/vga-card-man-hinh" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">card đồ họa</a>&nbsp;<strong>NVIDIA® GeForce RTX™ 3050 6GB GDDR6</strong>&nbsp;kết hợp&nbsp;<strong>16GB</strong>&nbsp;<a href="https://gearvn.com/collections/ram-laptop" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">RAM</a>&nbsp;có thể đáp ứng chơi mượt các tựa game esport và AAA nặng ở mức cài đặt khá, không quá cao. Ổ cứng&nbsp;<a href="https://gearvn.com/collections/ssd-laptop" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">SSD</a>&nbsp;<strong>512GB NVMe PCIe</strong>&nbsp;tốc độ cao giúp khởi động máy, load game và ứng dụng nhanh chóng.</p><p class="ql-align-center"><img src="https://product.hstatic.net/200000722513/product/victus-16-s0078ax-8c5n7pa-r5-7640hs_1_bbf8ff87056f48bf9310a4a2609e1ffe_d722587d6fbd4dc3811cdd02712ce9f8_grande.png"></p><h2><strong>Màn hình kích thước lớn</strong></h2><p>Laptop gaming HP VICTUS 16-s0078AX 8C5N7PA&nbsp;được trang bị&nbsp;<a href="https://gearvn.com/pages/man-hinh" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">màn hình</a>&nbsp;<strong>16 inch</strong>&nbsp;<a href="https://gearvn.com/collections/do-phan-giai-full-hd-1080p" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">Full HD</a>&nbsp;<strong>(1920 x 1080) IPS</strong>&nbsp;cung cấp không gian lớn cho trải nghiệm game sắc nét, chân thực. Công nghệ chống&nbsp;chói kết hợp tần số quét&nbsp;<a href="https://gearvn.com/collections/man-hinh-144hz" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">144Hz</a>&nbsp;cho ra độ phân giải cao và khả năng tái tạo màu sắc tuyệt vời. Độ sáng&nbsp;<strong>250 nits</strong>&nbsp;giúp bạn dễ dàng sử dụng máy ở nhiều điều kiện môi trường ánh sáng khác nhau.</p><p class="ql-align-center"><img src="https://product.hstatic.net/200000722513/product/p-victus-16-s0078ax-8c5n7pa-r5-7640hs_d999a4b4a2904fb9bcb8aa1a016f6170_9c2d9253bd004feeb25be7acacf34831_grande.png"></p><h2><strong>Bàn phím và&nbsp;cổng kết nối</strong></h2><p><a href="https://gearvn.com/collections/ban-phim-may-tinh" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">Bàn phím</a>&nbsp;<strong>RGB&nbsp;backlit</strong>&nbsp;full size với hành trình phím hợp lý giúp bạn dễ dàng thao tác trong môi trường thiếu sáng.&nbsp;HP VICTUS 16-s0078AX 8C5N7PA được trang bị đầy đủ các cổng kết nối:&nbsp;1x USB Type-C®, 3x USB Type-A,&nbsp;1x&nbsp;<a href="https://gearvn.com/collections/day-cap-hdmi" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">HDMI</a>&nbsp;2.1,&nbsp;1x RJ-45, 1x giắc cắm&nbsp;<a href="https://gearvn.com/collections/tai-nghe-may-tinh" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">tai nghe</a></p><p class="ql-align-center"><img src="https://product.hstatic.net/200000722513/product/victus-16-s0078ax-8c5n7pa-r5-7640hs_2_a2117f21f3124c3297286e75f974eb4e_4b3d0d2691694a509dc202819ea004b6_grande.png"></p><p>Trên đây là đánh giá thông số của chiếc laptop&nbsp;gaming HP VICTUS 16-s0078AX 8C5N7PA, bạn có thể để lại bình luận bên dưới nếu có bất kì thắc mắc nào về sản phẩm hoặc liên hệ trực tiếp cho chúng tôi qua số hotline&nbsp;<strong>19005301&nbsp;</strong>để được giải đáp ngay nhé!</p><p><br></p>',	NULL,	11,	54,	'2024-11-11 16:51:10.241755',	'2024-11-12 19:01:03.383122',	1),
-(2,	'ASUS Gaming Vivobook K360ZF',	'asus-gaming-vivobook-k360zf',	'17890000',	'<h2><strong>Thông số kỹ thuật:</strong></h2><p><a href="https://gearvn.com/collections/cpu-bo-vi-xu-ly" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);"><strong>CPU</strong></a>Intel® Core™ i5-12500H Processor 2.5 GHz (18M Cache, up to 4.5 GHz, 4P+8E cores)<a href="https://gearvn.com/collections/ram-laptop" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);"><strong>RAM</strong></a>16GB (8GB Onboard + 8GB Sodimm) DDR4 3200MHz<a href="https://gearvn.com/collections/ssd-laptop" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);"><strong>Ổ cứng</strong></a>512GB M.2 NVMe™ PCIe® 4.0 SSD<a href="https://gearvn.com/collections/vga-card-man-hinh" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);"><strong>VGA</strong></a>NVIDIA® GeForce® RTX™ 2050&nbsp;4GB GDDR6&nbsp;<a href="https://gearvn.com/pages/man-hinh" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);"><strong>Màn hình</strong></a>16.0-inch&nbsp;WUXGA (1920 x 1200) 16:10, IPS-level Panel, 144Hz,&nbsp;300nits,&nbsp;45% NTSC color gamut,&nbsp;Anti-glare display,&nbsp;TÜV Rheinland-certified<strong>Cổng giao tiếp</strong>1x USB 3.2 Gen 1 Type-C support power delivery</p><p>2x USB 3.2 Gen 1 Type-A</p><p>1x HDMI 2.1 TMDS</p><p>1x 3.5mm Combo Audio Jack</p><p>1x DC-in</p><p>SD 4.0 card reader<a href="https://gearvn.com/collections/ban-phim-may-tinh" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);"><strong>Bàn phím</strong></a>Backlit Chiclet Keyboard with Num-key<a href="https://gearvn.com/collections/thiet-bi-tai-nghe-loa-audio-chuyen-nghiep" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);"><strong>Audio</strong></a>SonicMaster</p><p>Built-in speaker</p><p>Built-in array microphone<strong>Đọc thẻ nhớ</strong>None<strong>Chuẩn LAN</strong>None<strong>Chuẩn WIFI</strong>Wi-Fi 6E(802.11ax) (Dual band) 2*2<strong>Bluetooth</strong>Bluetooth® 5.3 Wireless Card<a href="https://gearvn.com/collections/webcam" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);"><strong>Webcam</strong></a>720p HD camera ; With privacy shutter<strong>Hệ điều hành</strong>Windows 11 Home<strong>Pin</strong>50WHrs, 3S1P, 3-cell Li-ion<strong>Trọng lượng</strong>a</p><p>1.80 kg (3.97 lbs)<strong>Màu sắc</strong>Indie Black<strong>Chất liệu</strong>LCD cover (Aluminum),&nbsp;Top case (Plastic)<strong>Kích thước</strong></p><p>35.86 x 24.91 x 1.89 ~ 1.89 cm</p><h2 class="ql-align-justify">Đ<strong>ánh giá chi tiết Laptop gaming ASUS Vivobook 16X K3605ZF RP634W</strong></h2><h2 class="ql-align-justify"><br></h2><p class="ql-align-justify">Nếu bạn đang mong muốn tìm một chiếc laptop mỏng nhẹ, hiệu năng mạnh đáp ứng được các nhu cầu từ giải trí đến công việc thì bạn có thể tham khảo ngay chiếc&nbsp;Laptop gaming ASUS Vivobook 16X K3605ZF RP634W. Với màn hình WUXGA 16inch, ổ cứng 512GB SSD cùng 16GB RAM cho khả năng đa nhiệm mượt mà chắc chắn sẽ làm hài lòng những người dùng khó tính nhất. Cùng tham khảo những chi tiết dưới đây để biết thêm về chiếc máy siêu phẩm này.</p><h3 class="ql-align-justify"><strong>Lớp vỏ chắn chắn, thân máy mỏng nhẹ</strong></h3><p class="ql-align-justify">Với thiết kế mỏng nhẹ và tinh tế, ASUS Vivobook 16X K3605ZF-RP634W không chỉ là một công cụ làm việc hiệu quả mà còn là một phụ kiện thời trang. Vỏ máy được làm từ chất liệu cao cấp, tạo cảm giác chắc chắn và sang trọng. các cạnh máy được thiết kế bo tròn thanh lịch giúp máy trông có phần thanh thoát, nhẹ nhàng hơn.&nbsp;Với độ mỏng đáng kinh ngạc&nbsp;đã làm tăng tính di động của máy khi bạn có thể đem đi khắp nơi từ công ty cho đến những quán cà phê.</p><p class="ql-align-center"><img src="https://file.hstatic.net/200000722513/file/4_2048x2048.jpg"></p><p class="ql-align-justify">&nbsp;</p><h3 class="ql-align-justify"><strong>Màn hình WUXGA chi tiết, rõ ràng</strong></h3><p class="ql-align-justify">ASUS Vivobook 16X K3605ZF-RP634W được trang bị màn hình 16 inch WUXGA với tấm nền IPS-level, mang đến góc nhìn rộng, độ sáng cao và khả năng chống chói tốt. Tần số quét cao 144Hz giúp hình ảnh chuyển động mượt mà, giảm thiểu hiện tượng nhòe và xé hình. Với màn hình này, bạn có thể tận hưởng những thước phim, hình ảnh và trò chơi với chất lượng hình ảnh tốt nhất.</p><p class="ql-align-center"><img src="https://file.hstatic.net/200000722513/file/3_2048x2048.jpg"></p><p class="ql-align-justify">&nbsp;</p><h3 class="ql-align-justify"><strong>Cấu hình khỏe đáp ứng mọi tác vụ</strong></h3><p class="ql-align-justify">So với các đối thủ cùng phân khúc, ASUS Vivobook 16X K3605ZF-RP634W nổi bật với hiệu năng vượt trội và thiết kế hiện đại. Bộ vi xử lý Intel Core i5-12500H mạnh mẽ hơn đáng kể so với các dòng chip cùng cấp, giúp máy xử lý mọi tác vụ một cách nhanh chóng và hiệu quả.&nbsp;</p><p class="ql-align-justify">Card đồ họa NVIDIA GeForce RTX 2050 cũng mang đến khả năng xử lý đồ họa ấn tượng, đáp ứng tốt nhu cầu của cả người dùng phổ thông và người dùng chuyên nghiệp.Máy còn sở hữu không gian lưu trữ to lớn với 512GB SSD cũng như khả năng ghi đọc dữ liệu nhanh, để giúp người dùng mở máy hoặc khởi động các ứng dụng trong nháy mắt.</p><p class="ql-align-center"><img src="https://file.hstatic.net/200000722513/file/2_2048x2048.jpg"></p><p class="ql-align-center"><img src="https://file.hstatic.net/200000722513/file/2_2048x2048.jpg"></p><p>&nbsp;</p><h3 class="ql-align-justify"><strong>Bàn phím gõ êm tay</strong></h3><p class="ql-align-justify">ASUS Vivobook 16X&nbsp;được hãng trang bị cho màn phím&nbsp;Backlit Chiclet với Num-key có đèn&nbsp;giúp người dùng có thể làm việc trong cả môi trường thiếu ánh sáng, nhất là những khi bạn cần làm việc vào ban đêm, đèn bàn phím sẽ giúp bạn nhìn rõ phím hơn. Các khoảng cách phím cũng được thiết kế hợp lý, độ nảy ổn định, hành trình phím sâu cho bạn cảm giác vô cùng êm tay khi gõ văn bản.</p><p class="ql-align-justify">Không chỉ hỗ trợ cho gõ văn bản, bàn phím của ASUS Vivobook 16X còn hỗ trợ bạn tính toán với bàn phím số Num-key vô cùng tiện lợi. Bàn phím còn tối ưu các phím chức năng giúp bạn truy cập nhanh chóng các ứng dụng chỉ với các thao tác phím tắt đơn giản.&nbsp;</p><p class="ql-align-justify">Công nghệ kháng vi khuẩn ASUS Antimicrobial được chứng minh là có khả năng ức chế 99% sự phát triển của vi khuẩn15 với hiệu quả bảo vệ tối thiểu ba năm.</p><p class="ql-align-center"><img src="https://file.hstatic.net/200000722513/file/11_2048x2048.jpg"></p><h3 class="ql-align-justify"><strong>Cổng kết nối đa dạng</strong></h3><p class="ql-align-justify">Dù nhỏ gọn nhưng ASUS Vivobook 16X vẫn được hãng trang bị chỉn chu các cổng kết nối hiện đại như USB Type-C, USB Type-A, HDMI, jack âm thanh 3.5mm, DC-in và đầu đọc thẻ SD 4.0. Máy cũng có thể kết nối Wifi 6E để kết nối mạng ổn định hay Bluetooth 5.3 để kết nối những thiết bị ngoại vi không dây nhanh chóng.</p><p class="ql-align-center"><img src="https://file.hstatic.net/200000722513/file/6_2048x2048.jpg"></p><p class="ql-align-center">&nbsp;</p><p class="ql-align-justify"><strong>Tản nhiệt:</strong></p><p class="ql-align-justify">Để duy trì nhiệt độ của máy tính xách tay mát mẻ trong mọi tình huống, công nghệ tản nhiệt ASUS IceCool trên Vivobook 16X OLED sử dụng các ống dẫn nhiệt nâng cấp 8 mm, 6 mm và 4 mm*, và một quạt IceBlade giúp tăng khả năng dẫn nhiệt một cách hiệu quả. Quạt 87 cánh và bộ cánh quạt được làm từ polymer tinh thể lỏng, tức là chúng nhẹ và mỏng hơn so với quạt thông thường. Kết quả cuối cùng chính là CPU Intel Core và GPU NVIDIA có thể chạy thoải mái lên tới TDP kết hợp 70 W nhanh chóng4 ở chế độ Hiệu năng — mà không gây nghẽn cổ chai!</p><p><br></p>',	NULL,	1000,	1,	'2024-11-11 15:38:13.708086',	'2024-11-13 02:02:57.544683',	1),
-(3,	'Laptop gaming ASUS ROG Strix SCAR 18 G834JYR R6199',	'laptop-gaming-asus-rog-strix-scar-18-g834jyr-r6199',	'109990000',	'<h2><strong>Thông số kỹ thuật:&nbsp;</strong></h2><p><strong>CPU</strong>Intel® Core™ i9-14900HX 2.2 GHz (36MB Cache, up to 5.8 GHz, 24 cores, 32 Threads)<strong>RAM</strong>64GB (2x32GB) DDR5 5600MHz (2x SO-DIMM socket, up to 64GB SDRAM)<strong>Ổ Cứng</strong>2TB (2x1TB)&nbsp;PCIe® 4.0 NVMe™ M.2 Performance SSD (RAID 0) (2x slot SSD, nâng cấp tối đa 2TB/1 slot)<strong>Card đồ họa</strong>NVIDIA® GeForce RTX™ 4090 Laptop GPU&nbsp;16GB GDDR6 (686 AI TOPs)</p><p>ROG Boost: 2090MHz* at 175W (2040MHz Boost Clock+50MHz OC, 150W+25W Dynamic Boost)<strong>Màn hình</strong>18" 2.5K (2560 x 1600, WQXGA) 16:10,&nbsp;240Hz 3ms,&nbsp;Mini LED,&nbsp;1100nits,&nbsp;Anti-glare display,&nbsp;G-Sync,&nbsp;Pantone Validated,&nbsp;ROG Nebula HDR Display<strong>Cổng kết nối</strong>1x 3.5mm Combo Audio Jack</p><p>1x HDMI 2.1 FRL</p><p>2x USB 3.2 Gen 2 Type-A</p><p>1x USB 3.2 Gen 2 Type-C support DisplayPort™ / power delivery / G-SYNC</p><p>1x 2.5G LAN port</p><p>1x Thunderbolt™ 4 support DisplayPort™ / G-SYNC<strong>Bàn phím</strong>Backlit Chiclet Keyboard Per-Key RGB<strong style="color: rgb(0, 0, 0);">Audio</strong>Dolby&nbsp;Atmos, Hi-Res&nbsp;certification, Smart&nbsp;Amp&nbsp;Technology,&nbsp;AI noise-canceling technology<strong>Lan</strong>10/100/1000/2500 Mbps<strong>Wifi + Bluetooth</strong>Wi-Fi 6E(802.11ax) (Triple band) 2*2 + Bluetooth® 5.3 Wireless Card<strong>Webcam</strong>720P HD camera<strong style="color: rgb(0, 0, 0);">Hệ điều hành</strong><strong>No preinstalled OS</strong><strong style="color: rgb(0, 0, 0);">Pin</strong>90WHrs, 4S1P, 4-cell Li-ion<strong style="color: rgb(0, 0, 0);">Trọng lượngád</strong>3.10 Kg (6.83 lbs)<strong>Màu sắc</strong>Off Black<strong>Kích thước</strong></p><p><br></p><p><br></p><p>39.9 x 29.4 x 2.31 ~ 3.08 cm (15.71" x 11.57" x 0.91" ~ 1.21")</p><p><br></p><p><br></p><h2 class="ql-align-justify">Đ<strong>ánh giá chi tiết laptop gaming ASUS ROG Strix SCAR 18 G834JY R6011W</strong></h2><h2 class="ql-align-justify"><br></h2><p class="ql-align-justify"><a href="https://gearvn.com/collections/laptop-gaming-asus" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);"><strong>Laptop gaming ASUS</strong></a>&nbsp;<strong>ROG Strix SCAR 18 G834JY R6011W&nbsp;</strong>là một trong những chiến thần&nbsp;mới nhất của nhà Asus. Thuộc phân khúc&nbsp;<a href="https://gearvn.com/pages/laptop-gaming" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">laptop gaming</a>&nbsp;cao cấp, bất ngờ khi ASUS ROG Strix SCAR 18 lại mang đến vẻ ngoài vô cùng ấn tượng với sự thu hút ngay từ cái nhìn đầu tiên.&nbsp;Từng đường nét trên laptop được chau chuốt tỉ mỉ giúp mang lại cho SCAR 18 một vẻ ngoài đậm chất gaming ngoài sự mong đợi. Kết hợp với hiệu năng chơi game siêu khủng, đây hứa hẹn sẽ là một item siêu hot&nbsp;trong thời gian tới.</p><p class="ql-align-center"><img src="https://file.hstatic.net/1000026716/file/gearvn-laptop-gaming-asus-rog-strix-scar-18-g834jy-n6039w-1_03cf50507f70423c84a5e6f3b25eb44e_1024x1024.jpg"></p><h3 class="ql-align-justify"><strong>Màn hình chơi game tuyệt&nbsp;đỉnh</strong></h3><p class="ql-align-justify"><a href="https://gearvn.com/collections/laptop-asus-rog-series" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">ASUS ROG</a>&nbsp;Strix SCAR 18 G834JY R6011W hứa hẹn mang đến trải nghiệm chơi game tuyệt đỉnh nhờ vào chiếc&nbsp;màn hình&nbsp;<strong>18&nbsp;inch (16:10)</strong>&nbsp;được&nbsp;hỗ trợ&nbsp;tốc độ khung hình nhanh nhất trên Thế giới giúp bạn có thể chơi game với&nbsp;tốc độ cao như tuyển thủ&nbsp;chuyên nghiệp. Nó có thể cân mọi tác vụ game FPS ở cài đặt đồ họa cao nhất.</p><p class="ql-align-center"><img src="https://file.hstatic.net/1000026716/file/gearvn-laptop-gaming-asus-rog-strix-scar-18-g834jy-n6039w-2_0e72e29a6caf4b7693e6aba126831148_1024x1024.jpg"></p><blockquote class="ql-align-center"><strong><em>&gt;&gt;Xem thêm:&nbsp;</em></strong><a href="https://gearvn.com/blogs/thu-thuat-giai-dap/nhung-tinh-nang-vuot-troi-tren-laptop-gaming" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: -webkit-link;"><strong><em>Những tính năng vượt trội chỉ có trên laptop gaming</em></strong></a><strong><em>.</em></strong></blockquote><p class="ql-align-justify">Hơn nữa, màn hình còn sở hữu tần số quét&nbsp;<a href="https://gearvn.com/collections/man-hinh-240hz" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">240Hz</a>&nbsp;cực nhanh giúp hình ảnh chuyển động nhanh mượt mà và rõ nét hơn bao giờ hết. Bên cạnh đó, thời gian phản hồi&nbsp;<strong>3ms</strong>&nbsp;giúp giảm thiểu độ mờ hình ảnh để theo dõi mục tiêu chính xác. Mặc khác, chiếc laptop này còn được tích hợp nhiều công nghệ hiện đại, giúp cho quá trình chơi game, làm việc&nbsp;của bạn được thoải mái và chân thật nhất: 100% DCI-P3, độ sáng 1100nits,&nbsp;NanoEdge,...</p><h3 class="ql-align-justify"><strong>Hiệu năng ASUS ROG Strix SCAR 18 siêu khủng</strong></h3><p class="ql-align-justify">ASUS ROG Strix SCAR 18 sở hữu&nbsp;<a href="https://gearvn.com/collections/cpu-bo-vi-xu-ly?hang=intel" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">CPU Intel</a>&nbsp;Core&nbsp;<strong>i9 14900HX (24C/32T)</strong>&nbsp;thế hệ 13 mới nhất giúp tăng tốc các tác vụ và trò chơi hàng ngày. ROG Boost đẩy GPU NVIDIA GeForce&nbsp;<a href="https://gearvn.com/collections/vga-rtx-4090" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">RTX 4090</a>&nbsp;sang chế độ Turbo để có trải nghiệm chơi game mượt mà và nhanh chóng.</p><p class="ql-align-center"><img src="https://file.hstatic.net/1000026716/file/gearvn-laptop-gaming-asus-rog-strix-scar-18-g834jy-n6039w-3_04cf6fe09e0b4e6b916f98067786898d_1024x1024.jpg"></p><p class="ql-align-justify">Sự kết hợp giữa con chip hiệu năng cao với&nbsp;<a href="https://gearvn.com/collections/ram-laptop" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">RAM</a>&nbsp;<strong>64GB&nbsp;DDR5&nbsp;5600MHz</strong>&nbsp;(2 khe trống&nbsp;nâng cấp tối đa lên đến 64GB)&nbsp;cho phép bạn chạy tất cả các trò chơi và các tác vụ tiêu thụ điện năng cao&nbsp;một cách dễ dàng. Ổ lưu trữ&nbsp;<strong>2TB</strong>&nbsp;<a href="https://gearvn.com/collections/ssd-pcie-4-0" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">M.2 NVMe PCIe 4.0 SSD</a>&nbsp;sẽ tiết kiệm thời gian hơn để tải tất cả các ứng dụng và trò chơi của bạn.</p><h3 class="ql-align-justify"><strong>Hệ thống tản nhiệt mát mẻ</strong></h3><p class="ql-align-justify">Vì là một laptop gaming nên thiết kế hệ thống tản nhiệt thông minh của ASUS ROG Strix SCAR 18 cũng được kết hợp các tính năng phù hợp với thiết lập hệ thống để đảm bảo trải nghiệm mát mẻ&nbsp;tốt nhất có thể trong mọi tình huống. Những cải tiến mới như&nbsp;<a href="https://gearvn.com/collections/phu-kien-may-tinh?loaisanpham=keotannhiet" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">keo tản nhiệt</a>&nbsp;kim loại lỏng trên CPU và bề ngoài có lỗ thông hơi giúp giảm tiếng ồn&nbsp;và&nbsp;cải thiện hiệu suất rõ rệt so với thế hệ trước.</p><p class="ql-align-center"><img src="https://file.hstatic.net/1000026716/file/gearvn-laptop-gaming-asus-rog-strix-scar-18-g834jy-n6039w-4_c8813c3796e44b69b8d16c5ad5e6ff20_1024x1024.jpg"></p><blockquote class="ql-align-center"><strong><em>&gt;&gt;Xem thêm:&nbsp;</em></strong><a href="https://gearvn.com/blogs/thu-thuat-giai-dap/huong-dan-chon-de-tan-nhiet-cho-laptop" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: -webkit-link;"><strong><em>Hướng dẫn mua đế tản nhiệt cho laptop</em></strong></a><strong><em>.</em></strong></blockquote><h3 class="ql-align-justify"><strong>Nâng cao khả năng kết nối</strong></h3><p class="ql-align-justify">ASUS ROG Strix SCAR 18 được trang bị&nbsp;<strong>Intel Wi-Fi 6E</strong>&nbsp;cực nhanh với&nbsp;<strong>Gig + (802.11ax)</strong>&nbsp;cho phép bạn chơi game với tốc độ mạng LAN ở bất kỳ đâu bạn có kết nối tương thích. Wi-Fi 6E (Gig +) vận hành với tốc độ băng thông cao hỗ trợ&nbsp;cho quá trình sử dụng&nbsp;mạng hiệu quả và độ tin cậy cao hơn ở những nơi đông người. Công nghệ này cũng làm giảm độ trễ, giảm thiểu tình trạng giật lag trong các hoạt động sử dụng nhiều mạng như các cuộc đua nhanh khi đang di chuyển.</p><p class="ql-align-center"><img src="https://product.hstatic.net/200000722513/product/06_scar_18_l_55aac4f9282d47daaf8694f04026b538_grande.png"></p><p class="ql-align-center"><img src="https://product.hstatic.net/200000722513/product/07_scar_18_l_8d426881c70647c694d018701086b066_grande.png"></p><p class="ql-align-justify">Ngoài ra,&nbsp;<a href="https://gearvn.com/collections/laptop" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">laptop</a>&nbsp;ASUS ROG Strix SCAR 18 G834JYR R6011W còn được trang bị các cổng kết nối phổ biến, cho bạn dễ dàng kết nối với các thiết bị ngoại vi khác (<a href="https://gearvn.com/collections/loa" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">loa</a>,&nbsp;<a href="https://gearvn.com/collections/chuot-may-tinh" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">chuột</a>,...):&nbsp;2x USB 3.2 Gen 2 Type-A,&nbsp;1x USB 3.2 Gen 2 Type-C (hỗ trợ&nbsp;DisplayPort),&nbsp;1x 2.5G LAN, 1x Thunderbolt™ 4,&nbsp;1x giắc cắm&nbsp;<a href="https://gearvn.com/collections/tai-nghe-may-tinh" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">tai nghe</a>&nbsp;3.5mm, 1x&nbsp;<a href="https://gearvn.com/collections/day-cap-hdmi" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">HDMI</a>&nbsp;2.1.</p><h3 class="ql-align-justify"><strong>Thiết kế bàn phím tiện lợi</strong></h3><p class="ql-align-justify">Đạt được lợi thế cạnh tranh trong các cuộc thi esport với&nbsp;<a href="https://gearvn.com/collections/ban-phim-may-tinh" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">bàn phím</a>&nbsp;bền bỉ&nbsp;được thiết kế để chơi game&nbsp;một cách&nbsp;chính xác. ASUS ROG Strix SCAR 18 sử dụng các phím chức năng cách đều nhau để dễ dàng xác định và sử dụng&nbsp;để truy cập nhanh các lệnh quan trọng để bạn có thể tập trung vào trò chơi của mình.&nbsp;</p><p class="ql-align-center"><img src="https://file.hstatic.net/1000026716/file/gearvn-laptop-gaming-asus-rog-strix-scar-18-g834jy-n6039w-7_03d97a58289d41569ef4ba1f489a7606_1024x1024.jpg"></p><p class="ql-align-justify">Ngoài ra,&nbsp;bàn phím còn có thể chịu được hơn 20 triệu lần nhấn phím trong thời gian dài chơi game nặng. Tỏa sáng cùng hệ thống đèn LED RGB rực rỡ cho không gian thêm rực rỡ cùng&nbsp;<a href="https://gearvn.com/collections/laptop-asus" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">laptop Asus</a>&nbsp;ROG Strix SCAR 18.</p><p class="ql-align-center"><img src="https://product.hstatic.net/200000722513/product/01_scar_18_l_65a3d95536234e4f93ecaab42582f603_grande.png"></p><p class="ql-align-justify">Trên đây&nbsp;<a href="https://gearvn.com/" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">GEARVN</a>&nbsp;đã&nbsp;điểm qua một vài&nbsp;thông số&nbsp;đáng chú ý&nbsp;của chiếc laptop gaming ASUS ROG Strix SCAR 18 G834JYR R6011W, bạn có thể để lại bình luận bên dưới nếu có bất kì thắc mắc nào về sản phẩm hoặc liên hệ trực tiếp cho chúng tôi qua số hotline&nbsp;<strong>19005301</strong>&nbsp;để được tư vấn và&nbsp;giải đáp ngay nhé!</p>',	NULL,	10,	39,	'2024-11-11 15:43:23.110504',	'2024-11-13 02:02:57.544683',	1);
 
+DELIMITER ;;
+
+CREATE TRIGGER "update_product_modtime" BEFORE UPDATE ON "public"."products" FOR EACH ROW EXECUTE FUNCTION update_modified_column();;
+
+DELIMITER ;
 
 DROP TABLE IF EXISTS "provinces";
-DROP SEQUENCE IF EXISTS provinces_id_seq;
-CREATE SEQUENCE provinces_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
+DROP SEQUENCE IF EXISTS provinces_id_seq1;
+CREATE SEQUENCE provinces_id_seq1 INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
 
 CREATE TABLE "public"."provinces" (
-    "id" integer DEFAULT nextval('provinces_id_seq') NOT NULL,
+    "id" integer DEFAULT nextval('provinces_id_seq1') NOT NULL,
     "name" text NOT NULL,
     "code" integer NOT NULL,
     "division_type" text NOT NULL,
@@ -1725,11 +1506,8 @@ INSERT INTO "provinces" ("id", "name", "code", "division_type", "codename", "pho
 (63,	'Tỉnh Cà Mau',	96,	'tỉnh',	'tinh_ca_mau',	290,	'[]');
 
 DROP TABLE IF EXISTS "ram";
-DROP SEQUENCE IF EXISTS ram_id_seq;
-CREATE SEQUENCE ram_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
-
 CREATE TABLE "public"."ram" (
-    "id" integer DEFAULT nextval('ram_id_seq') NOT NULL,
+    "id" uuid DEFAULT gen_random_uuid() NOT NULL,
     "name" character varying(100) NOT NULL,
     "type" character varying(50) NOT NULL,
     "capacity" integer NOT NULL,
@@ -1758,23 +1536,12 @@ CREATE INDEX "idx_ram_type" ON "public"."ram" USING btree ("type");
 CREATE INDEX "idx_ram_updated_at" ON "public"."ram" USING btree ("updated_at");
 
 TRUNCATE "ram";
-INSERT INTO "ram" ("id", "name", "type", "capacity", "speed", "brand", "created_at", "updated_at", "status") VALUES
-(1,	'KingTon 16GB DDR4 3200MHz',	'DDR4',	16,	3200,	'Kingston',	'2024-11-11 09:19:29.406442',	'2024-11-11 09:19:29.406442',	1),
-(2,	'G.Skill Ripjaws DDR4 16GB 3200MHz',	'DDR4',	16,	3200,	'G.Skill',	'2024-11-11 09:38:21.421101',	'2024-11-11 09:38:21.421101',	1),
-(3,	'Crucial DDR5 8GB ',	'DDR5',	8,	4800,	'Crucial',	'2024-11-11 09:39:08.733282',	'2024-11-11 09:39:08.733282',	1),
-(4,	'64GB (2x32GB) DDR5 5600MHz',	'DDR5',	32,	5600,	'Crucial',	'2024-11-11 14:05:12.009969',	'2024-11-11 14:05:12.009969',	1),
-(5,	'16GB (1 x 16GB) DDR5-4800',	'DDR5',	16,	4800,	'Corsair',	'2024-11-11 16:01:45.438338',	'2024-11-11 16:01:45.438338',	1),
-(6,	'16GB (1x16GB) LPDDR5 5600MHz Onboard ',	'DDR5',	16,	5600,	'Corsair',	'2024-11-11 16:32:31.084232',	'2024-11-11 16:32:31.084232',	1),
-(7,	'16GB (2x8GB) DDR5 5600MHz',	'DDR5',	8,	5600,	'Apacer',	'2024-11-11 16:45:15.814489',	'2024-11-11 16:45:15.814489',	1);
 
 DROP TABLE IF EXISTS "reviews";
-DROP SEQUENCE IF EXISTS reviews_id_seq;
-CREATE SEQUENCE reviews_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
-
 CREATE TABLE "public"."reviews" (
-    "id" integer DEFAULT nextval('reviews_id_seq') NOT NULL,
-    "product_id" integer,
-    "user_id" integer,
+    "id" uuid DEFAULT gen_random_uuid() NOT NULL,
+    "product_id" uuid,
+    "user_id" uuid,
     "rating" integer NOT NULL,
     "comment" text,
     "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
@@ -1799,8 +1566,8 @@ TRUNCATE "reviews";
 
 DROP TABLE IF EXISTS "role_permissions";
 CREATE TABLE "public"."role_permissions" (
-    "role_id" integer NOT NULL,
-    "permission_id" integer NOT NULL,
+    "role_id" uuid NOT NULL,
+    "permission_id" uuid NOT NULL,
     "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
     "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
     "status" integer DEFAULT '1',
@@ -1820,11 +1587,8 @@ CREATE INDEX "idx_role_permissions_updated_at" ON "public"."role_permissions" US
 TRUNCATE "role_permissions";
 
 DROP TABLE IF EXISTS "roles";
-DROP SEQUENCE IF EXISTS roles_id_seq;
-CREATE SEQUENCE roles_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
-
 CREATE TABLE "public"."roles" (
-    "id" integer DEFAULT nextval('roles_id_seq') NOT NULL,
+    "id" uuid DEFAULT gen_random_uuid() NOT NULL,
     "name" character varying(50) NOT NULL,
     "description" text,
     "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
@@ -1844,15 +1608,12 @@ CREATE INDEX "idx_roles_updated_at" ON "public"."roles" USING btree ("updated_at
 
 TRUNCATE "roles";
 INSERT INTO "roles" ("id", "name", "description", "created_at", "updated_at", "status") VALUES
-(1,	'admin',	'Administrator role',	'2024-11-11 05:49:08.748584',	'2024-11-11 05:49:08.748584',	1),
-(2,	'user',	'User role',	'2024-11-11 05:49:08.762844',	'2024-11-11 05:49:08.762844',	1);
+('550e8400-e29b-41d4-a716-446655440000',	'admin',	'Administrator role',	'2024-11-13 08:33:51.517618',	'2024-11-13 08:33:51.517618',	1),
+('550e8400-e29b-41d4-a716-446655440001',	'user',	'User role',	'2024-11-13 08:33:51.530166',	'2024-11-13 08:33:51.530166',	1);
 
 DROP TABLE IF EXISTS "settings";
-DROP SEQUENCE IF EXISTS settings_id_seq;
-CREATE SEQUENCE settings_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
-
 CREATE TABLE "public"."settings" (
-    "id" integer DEFAULT nextval('settings_id_seq') NOT NULL,
+    "id" uuid DEFAULT gen_random_uuid() NOT NULL,
     "name" character varying(100) NOT NULL,
     "value" text,
     "status" integer DEFAULT '1' NOT NULL,
@@ -1869,33 +1630,30 @@ CREATE INDEX "idx_settings_status" ON "public"."settings" USING btree ("status")
 
 TRUNCATE "settings";
 INSERT INTO "settings" ("id", "name", "value", "status", "created_at", "updated_at") VALUES
-(1,	'site_name',	'Laptop Store',	1,	'2024-11-11 07:49:41.777231',	'2024-11-11 07:49:41.777231'),
-(2,	'site_description',	'Cửa hàng laptop chính hãng',	1,	'2024-11-11 07:49:41.777231',	'2024-11-11 07:49:41.777231'),
-(3,	'contact_email',	'contact@laptopstore.com',	1,	'2024-11-11 07:49:41.777231',	'2024-11-11 07:49:41.777231'),
-(4,	'contact_phone',	'0123456789',	1,	'2024-11-11 07:49:41.777231',	'2024-11-11 07:49:41.777231'),
-(5,	'contact_address',	'Hà Nội, Việt Nam',	1,	'2024-11-11 07:49:41.777231',	'2024-11-11 07:49:41.777231'),
-(6,	'social_facebook',	'https://facebook.com/laptopstore',	1,	'2024-11-11 07:49:41.777231',	'2024-11-11 07:49:41.777231'),
-(7,	'social_instagram',	'https://instagram.com/laptopstore',	1,	'2024-11-11 07:49:41.777231',	'2024-11-11 07:49:41.777231'),
-(8,	'social_twitter',	'https://twitter.com/laptopstore',	1,	'2024-11-11 07:49:41.777231',	'2024-11-11 07:49:41.777231'),
-(9,	'maintenance_mode',	'false',	1,	'2024-11-11 07:49:41.777231',	'2024-11-11 07:49:41.777231'),
-(10,	'currency',	'VND',	1,	'2024-11-11 07:49:41.777231',	'2024-11-11 07:49:41.777231'),
-(11,	'security_login_attempts',	'5',	1,	'2024-11-11 07:59:08.357137',	'2024-11-11 07:59:08.357137'),
-(12,	'security_lockout_duration',	'30',	1,	'2024-11-11 07:59:08.357137',	'2024-11-11 07:59:08.357137'),
-(13,	'security_password_expiry',	'90',	1,	'2024-11-11 07:59:08.357137',	'2024-11-11 07:59:08.357137'),
-(14,	'security_password_length',	'8',	1,	'2024-11-11 07:59:08.357137',	'2024-11-11 07:59:08.357137'),
-(15,	'security_password_complexity',	'true',	1,	'2024-11-11 07:59:08.357137',	'2024-11-11 07:59:08.357137'),
-(16,	'security_session_timeout',	'60',	1,	'2024-11-11 07:59:08.357137',	'2024-11-11 07:59:08.357137'),
-(17,	'security_2fa_enabled',	'false',	1,	'2024-11-11 07:59:08.357137',	'2024-11-11 07:59:08.357137'),
-(18,	'security_ip_whitelist',	'',	1,	'2024-11-11 07:59:08.357137',	'2024-11-11 07:59:08.357137'),
-(19,	'security_ssl_required',	'true',	1,	'2024-11-11 07:59:08.357137',	'2024-11-11 07:59:08.357137'),
-(20,	'security_jwt_expiry',	'24',	1,	'2024-11-11 07:59:08.357137',	'2024-11-11 07:59:08.357137');
+('bf00f01c-45a1-4f1a-ad89-a7def2ee62a5',	'site_name',	'Laptop Store',	1,	'2024-11-13 07:57:59.793165',	'2024-11-13 07:57:59.793165'),
+('aa1353a9-0972-4cfb-b51f-28522a9d4193',	'site_description',	'Cửa hàng laptop chính hãng',	1,	'2024-11-13 07:57:59.793165',	'2024-11-13 07:57:59.793165'),
+('8a64ada0-bb1a-4c96-a5b3-5e94e72693ea',	'contact_email',	'contact@laptopstore.com',	1,	'2024-11-13 07:57:59.793165',	'2024-11-13 07:57:59.793165'),
+('cad2ee46-134c-40c8-8b9b-7d3a90fb265e',	'contact_phone',	'0123456789',	1,	'2024-11-13 07:57:59.793165',	'2024-11-13 07:57:59.793165'),
+('0180ae34-1132-48ee-8df3-3f54b5a3ab35',	'contact_address',	'Hà Nội, Việt Nam',	1,	'2024-11-13 07:57:59.793165',	'2024-11-13 07:57:59.793165'),
+('d7daeb48-45c0-4096-9c90-4f98f0f6339f',	'social_facebook',	'https://facebook.com/laptopstore',	1,	'2024-11-13 07:57:59.793165',	'2024-11-13 07:57:59.793165'),
+('14c12cbb-44c0-41ad-8ef2-73dc381ec58b',	'social_instagram',	'https://instagram.com/laptopstore',	1,	'2024-11-13 07:57:59.793165',	'2024-11-13 07:57:59.793165'),
+('b520962a-7b05-492c-84a7-470834ac63a8',	'social_twitter',	'https://twitter.com/laptopstore',	1,	'2024-11-13 07:57:59.793165',	'2024-11-13 07:57:59.793165'),
+('4e8055fa-85f7-474e-8688-82952ea3b717',	'maintenance_mode',	'false',	1,	'2024-11-13 07:57:59.793165',	'2024-11-13 07:57:59.793165'),
+('b385ab64-2671-4bfd-adef-49fd6bf749e1',	'currency',	'VND',	1,	'2024-11-13 07:57:59.793165',	'2024-11-13 07:57:59.793165'),
+('9fc96872-f1d7-4db8-8ebb-133108519334',	'security_login_attempts',	'5',	1,	'2024-11-13 07:57:59.806087',	'2024-11-13 07:57:59.806087'),
+('b6b2c6f5-f9e8-4583-814b-07fbfc09b4de',	'security_lockout_duration',	'30',	1,	'2024-11-13 07:57:59.806087',	'2024-11-13 07:57:59.806087'),
+('e84762fc-c7b8-4038-9abe-74a7f0b1cef5',	'security_password_expiry',	'90',	1,	'2024-11-13 07:57:59.806087',	'2024-11-13 07:57:59.806087'),
+('ebae4299-1486-4881-8db8-48e4e01c3edb',	'security_password_length',	'8',	1,	'2024-11-13 07:57:59.806087',	'2024-11-13 07:57:59.806087'),
+('528162ee-fc86-46fc-a680-db9ec552cf7e',	'security_password_complexity',	'true',	1,	'2024-11-13 07:57:59.806087',	'2024-11-13 07:57:59.806087'),
+('d45d9a91-e483-48d1-8870-c8b389d882e8',	'security_session_timeout',	'60',	1,	'2024-11-13 07:57:59.806087',	'2024-11-13 07:57:59.806087'),
+('9567ca4d-058e-472d-a3df-648a967b1850',	'security_2fa_enabled',	'false',	1,	'2024-11-13 07:57:59.806087',	'2024-11-13 07:57:59.806087'),
+('18ade65d-d04c-4481-8f09-ebb6d3044210',	'security_ip_whitelist',	'',	1,	'2024-11-13 07:57:59.806087',	'2024-11-13 07:57:59.806087'),
+('f00ad54f-9fa5-42f9-825b-cebed4d222be',	'security_ssl_required',	'true',	1,	'2024-11-13 07:57:59.806087',	'2024-11-13 07:57:59.806087'),
+('9bb6f738-c68f-4fc2-b506-555856c4fbb1',	'security_jwt_expiry',	'24',	1,	'2024-11-13 07:57:59.806087',	'2024-11-13 07:57:59.806087');
 
 DROP TABLE IF EXISTS "tags";
-DROP SEQUENCE IF EXISTS tags_id_seq;
-CREATE SEQUENCE tags_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
-
 CREATE TABLE "public"."tags" (
-    "id" integer DEFAULT nextval('tags_id_seq') NOT NULL,
+    "id" uuid DEFAULT gen_random_uuid() NOT NULL,
     "name" character varying(50) NOT NULL,
     "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
     "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
@@ -1913,21 +1671,12 @@ CREATE INDEX "idx_tags_status" ON "public"."tags" USING btree ("status");
 CREATE INDEX "idx_tags_updated_at" ON "public"."tags" USING btree ("updated_at");
 
 TRUNCATE "tags";
-INSERT INTO "tags" ("id", "name", "created_at", "updated_at", "status") VALUES
-(1,	'gaming',	'2024-11-11 06:38:36.493111',	'2024-11-11 06:38:36.493111',	1),
-(2,	'văn phòng',	'2024-11-11 06:39:22.76508',	'2024-11-11 06:39:22.76508',	1),
-(3,	'đồ họa',	'2024-11-11 06:41:03.416613',	'2024-11-11 06:41:03.416613',	1),
-(4,	'mỏng nhẹ',	'2024-11-11 06:43:50.459935',	'2024-11-11 07:32:41.931413',	1),
-(5,	'sinh viên',	'2024-11-11 09:18:04.269347',	'2024-11-11 09:18:04.269347',	1);
 
 DROP TABLE IF EXISTS "user_delivery_addresses";
-DROP SEQUENCE IF EXISTS user_delivery_addresses_id_seq;
-CREATE SEQUENCE user_delivery_addresses_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
-
 CREATE TABLE "public"."user_delivery_addresses" (
-    "id" integer DEFAULT nextval('user_delivery_addresses_id_seq') NOT NULL,
-    "user_id" integer NOT NULL,
-    "delivery_addresses_id" integer NOT NULL,
+    "id" uuid DEFAULT gen_random_uuid() NOT NULL,
+    "user_id" uuid NOT NULL,
+    "delivery_addresses_id" uuid NOT NULL,
     "is_default" boolean DEFAULT false,
     "status" integer DEFAULT '1' NOT NULL,
     "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
@@ -1936,30 +1685,23 @@ CREATE TABLE "public"."user_delivery_addresses" (
 ) WITH (oids = false);
 
 TRUNCATE "user_delivery_addresses";
-INSERT INTO "user_delivery_addresses" ("id", "user_id", "delivery_addresses_id", "is_default", "status", "created_at", "updated_at") VALUES
-(2,	1,	2,	'f',	1,	'2024-11-12 18:02:17.584951',	'2024-11-12 18:02:31.371742'),
-(1,	1,	1,	'f',	1,	'2024-11-12 16:53:07.506408',	'2024-11-12 18:06:09.863953'),
-(3,	2,	3,	'f',	1,	'2024-11-12 18:35:46.069998',	'2024-11-12 18:35:46.069998');
 
 DROP TABLE IF EXISTS "users";
-DROP SEQUENCE IF EXISTS users_id_seq;
-CREATE SEQUENCE users_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
-
 CREATE TABLE "public"."users" (
-    "id" integer DEFAULT nextval('users_id_seq') NOT NULL,
+    "id" uuid DEFAULT gen_random_uuid() NOT NULL,
     "username" character varying(50) NOT NULL,
     "password" character varying(255) NOT NULL,
     "email" character varying(100) NOT NULL,
     "first_name" character varying(50),
     "last_name" character varying(50),
+    "full_name" text,
     "phone" character varying(20),
     "address" text,
-    "avatar_id" integer,
-    "role_id" integer DEFAULT '2',
+    "avatar_id" uuid,
+    "role_id" uuid DEFAULT '550e8400-e29b-41d4-a716-446655440001',
     "status" integer DEFAULT '1',
     "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
     "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
-    "full_name" text,
     CONSTRAINT "users_email_key" UNIQUE ("email"),
     CONSTRAINT "users_pkey" PRIMARY KEY ("id"),
     CONSTRAINT "users_username_key" UNIQUE ("username")
@@ -1978,16 +1720,15 @@ CREATE INDEX "idx_users_updated_at" ON "public"."users" USING btree ("updated_at
 CREATE INDEX "idx_users_username" ON "public"."users" USING btree ("username");
 
 TRUNCATE "users";
-INSERT INTO "users" ("id", "username", "password", "email", "first_name", "last_name", "phone", "address", "avatar_id", "role_id", "status", "created_at", "updated_at", "full_name") VALUES
-(2,	'admin',	'$2b$10$0gU3PZxpc3NSA7Y8oE83BuKxt7hQ.nz7WHokvYpYKKnT.mWZDmE1u',	'admin@gmail.com',	NULL,	NULL,	NULL,	NULL,	NULL,	1,	1,	'2024-11-11 05:53:27.36959',	'2024-11-11 05:53:27.36959',	'admin'),
-(1,	'tranthoilong',	'$2b$10$anslrfThTH5zPIVH5nnrSu/HKoB96SxpehHjt9pmTTLlVULA8VFoW',	'tranthoilong@gmail.com',	NULL,	NULL,	NULL,	NULL,	NULL,	1,	1,	'2024-11-11 05:49:19.274446',	'2024-11-11 05:49:19.274446',	'Trần Thới Long');
+INSERT INTO "users" ("id", "username", "password", "email", "first_name", "last_name", "full_name", "phone", "address", "avatar_id", "role_id", "status", "created_at", "updated_at") VALUES
+('bfece6d4-82d8-46b9-8326-c36b4bbc813d',	'admin',	'$2b$10$e.1iu46rLRcRjj1xAmkjOeevQH69VnBUdeFJsx1UghNgHupjoDy16',	'admin@gmail.com',	NULL,	NULL,	'Admin',	NULL,	NULL,	NULL,	'550e8400-e29b-41d4-a716-446655440000',	1,	'2024-11-13 08:37:47.806602',	'2024-11-13 08:37:47.806602');
 
 DROP TABLE IF EXISTS "wards";
-DROP SEQUENCE IF EXISTS wards_id_seq;
-CREATE SEQUENCE wards_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
+DROP SEQUENCE IF EXISTS wards_id_seq1;
+CREATE SEQUENCE wards_id_seq1 INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
 
 CREATE TABLE "public"."wards" (
-    "id" integer DEFAULT nextval('wards_id_seq') NOT NULL,
+    "id" integer DEFAULT nextval('wards_id_seq1') NOT NULL,
     "name" text NOT NULL,
     "code" integer NOT NULL,
     "division_type" text NOT NULL,
@@ -12598,13 +12339,10 @@ INSERT INTO "wards" ("id", "name", "code", "division_type", "codename", "distric
 (10598,	'Xã Đất Mũi',	32248,	'xã',	'xa_dat_mui',	973);
 
 DROP TABLE IF EXISTS "wishlist";
-DROP SEQUENCE IF EXISTS wishlist_id_seq;
-CREATE SEQUENCE wishlist_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
-
 CREATE TABLE "public"."wishlist" (
-    "id" integer DEFAULT nextval('wishlist_id_seq') NOT NULL,
-    "user_id" integer,
-    "product_id" integer,
+    "id" uuid DEFAULT gen_random_uuid() NOT NULL,
+    "user_id" uuid,
+    "product_id" uuid,
     "added_at" timestamp DEFAULT CURRENT_TIMESTAMP,
     "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
     "status" integer DEFAULT '1',
@@ -12630,15 +12368,12 @@ ALTER TABLE ONLY "public"."banner_images" ADD CONSTRAINT "banner_images_image_id
 ALTER TABLE ONLY "public"."cart_items" ADD CONSTRAINT "cart_items_cart_id_fkey" FOREIGN KEY (cart_id) REFERENCES carts(id) ON DELETE CASCADE NOT DEFERRABLE;
 ALTER TABLE ONLY "public"."cart_items" ADD CONSTRAINT "cart_items_product_id_fkey" FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE NOT DEFERRABLE;
 
-ALTER TABLE ONLY "public"."carts" ADD CONSTRAINT "carts_user_id_fkey" FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE NOT DEFERRABLE;
-
 ALTER TABLE ONLY "public"."categories" ADD CONSTRAINT "categories_image_id_fkey" FOREIGN KEY (image_id) REFERENCES images(id) ON DELETE SET NULL NOT DEFERRABLE;
 
 ALTER TABLE ONLY "public"."order_items" ADD CONSTRAINT "order_items_order_id_fkey" FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE NOT DEFERRABLE;
 ALTER TABLE ONLY "public"."order_items" ADD CONSTRAINT "order_items_product_id_fkey" FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE SET NULL NOT DEFERRABLE;
 
 ALTER TABLE ONLY "public"."orders" ADD CONSTRAINT "orders_payment_method_id_fkey" FOREIGN KEY (payment_method_id) REFERENCES payment_methods(id) ON DELETE SET NULL NOT DEFERRABLE;
-ALTER TABLE ONLY "public"."orders" ADD CONSTRAINT "orders_user_id_fkey" FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL NOT DEFERRABLE;
 
 ALTER TABLE ONLY "public"."product_categories" ADD CONSTRAINT "product_categories_category_id_fkey" FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE NOT DEFERRABLE;
 ALTER TABLE ONLY "public"."product_categories" ADD CONSTRAINT "product_categories_product_id_fkey" FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE NOT DEFERRABLE;
@@ -12669,15 +12404,12 @@ ALTER TABLE ONLY "public"."product_tags" ADD CONSTRAINT "product_tags_tag_id_fke
 ALTER TABLE ONLY "public"."products" ADD CONSTRAINT "products_thumbnail_id_fkey" FOREIGN KEY (thumbnail_id) REFERENCES images(id) ON DELETE SET NULL NOT DEFERRABLE;
 
 ALTER TABLE ONLY "public"."reviews" ADD CONSTRAINT "reviews_product_id_fkey" FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE NOT DEFERRABLE;
-ALTER TABLE ONLY "public"."reviews" ADD CONSTRAINT "reviews_user_id_fkey" FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL NOT DEFERRABLE;
 
 ALTER TABLE ONLY "public"."role_permissions" ADD CONSTRAINT "role_permissions_permission_id_fkey" FOREIGN KEY (permission_id) REFERENCES permissions(id) ON DELETE CASCADE NOT DEFERRABLE;
-ALTER TABLE ONLY "public"."role_permissions" ADD CONSTRAINT "role_permissions_role_id_fkey" FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE NOT DEFERRABLE;
 
 ALTER TABLE ONLY "public"."users" ADD CONSTRAINT "users_avatar_id_fkey" FOREIGN KEY (avatar_id) REFERENCES images(id) ON DELETE SET NULL NOT DEFERRABLE;
 ALTER TABLE ONLY "public"."users" ADD CONSTRAINT "users_role_id_fkey" FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE SET NULL NOT DEFERRABLE;
 
 ALTER TABLE ONLY "public"."wishlist" ADD CONSTRAINT "wishlist_product_id_fkey" FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE NOT DEFERRABLE;
-ALTER TABLE ONLY "public"."wishlist" ADD CONSTRAINT "wishlist_user_id_fkey" FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE NOT DEFERRABLE;
 
--- 2024-11-13 02:27:26.87918+00
+-- 2024-11-13 08:52:54.69698+00
