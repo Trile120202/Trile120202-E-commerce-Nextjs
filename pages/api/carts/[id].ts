@@ -75,7 +75,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 }));
             }
 
-            // Check product availability
             const product = await db('products')
                 .where('id', product_id)
                 .where('stock', '>=', quantity)

@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { FiUser, FiLock, FiMail, FiUserPlus } from 'react-icons/fi';
+import { FiUser, FiLock, FiMail, FiUserPlus, FiEye, FiEyeOff } from 'react-icons/fi';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
@@ -20,6 +20,7 @@ const Page = () => {
     });
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { id, value } = e.target;
@@ -126,13 +127,20 @@ const Page = () => {
                                     <FiLock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                                     <Input
                                         id="password"
-                                        type="password"
+                                        type={showPassword ? "text" : "password"}
                                         placeholder="••••••••"
                                         value={formData.password}
                                         onChange={handleChange}
-                                        className="pl-10 border-2 border-gray-300 focus:border-blue-500 transition-all duration-300"
+                                        className="pl-10 pr-10 border-2 border-gray-300 focus:border-blue-500 transition-all duration-300"
                                         required
                                     />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                    >
+                                        {showPassword ? <FiEyeOff /> : <FiEye />}
+                                    </button>
                                 </div>
                             </div>
                             <Button 
