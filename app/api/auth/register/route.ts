@@ -47,13 +47,13 @@ export async function POST(request: Request) {
       );
     }
 
-    const role = await db('roles').where({ id: 2 }).first();
-    if (!role) {
-      return NextResponse.json(
-        { error: 'Vai trò người dùng không tồn tại' },
-        { status: 500 }
-      );
-    }
+    // const role = await db('roles').where({ id: 2 }).first();
+    // if (!role) {
+    //   return NextResponse.json(
+    //     { error: 'Vai trò người dùng không tồn tại' },
+    //     { status: 500 }
+    //   );
+    // }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -62,7 +62,6 @@ export async function POST(request: Request) {
         username,
         email,
         password: hashedPassword,
-        role_id: 2,
         status: 1,
         full_name,
         created_at: db.fn.now(),

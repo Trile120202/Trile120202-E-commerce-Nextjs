@@ -18,7 +18,12 @@ export async function POST(request: Request) {
       );
     }
 
-    const user = await db('users').where({ username }).first();
+    const user = await db('users')
+      .select('users.*', 'roles.name as role_name')
+      .leftJoin('roles', 'users.role_id', 'roles.id')
+      .where('users.username', username)
+      .first();
+
     if (!user) {
       return NextResponse.json(
         { error: 'Tên đăng nhập hoặc mật khẩu không đúng' },
@@ -42,7 +47,8 @@ export async function POST(request: Request) {
         email: user.email,
         firstName: user.first_name,
         lastName: user.last_name,
-        roleId: user.role_id
+        roleId: user.role_id,
+        roleName: user.role_name
       },
       process.env.JWT_SECRET || 'your-secret-key',
       { expiresIn: '1d' }
@@ -55,7 +61,8 @@ export async function POST(request: Request) {
       email: user.email,
       firstName: user.first_name,
       lastName: user.last_name,
-      roleId: user.role_id
+      roleId: user.role_id,
+      roleName: user.role_name
     });
 
     const response = NextResponse.json({
@@ -70,6 +77,7 @@ export async function POST(request: Request) {
         address: user.address,
         avatarId: user.avatar_id,
         roleId: user.role_id,
+        roleName: user.role_name,
         status: user.status
       }
     });

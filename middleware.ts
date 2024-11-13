@@ -27,7 +27,7 @@ export async function middleware(request: NextRequest) {
       );
 
       const payload = verified.payload as any;
-      if (!payload.roleId || payload.roleId !== 1) {
+      if (!payload.roleId || payload.roleName !== 'admin') {
         return NextResponse.redirect(new URL('/', request.url));
       }
 

@@ -53,7 +53,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 new TextEncoder().encode(process.env.JWT_SECRET || 'your-secret-key')
             );
 
-            if (!verified.payload.roleId || verified.payload.roleId !== 1) {
+            if (!verified.payload.roleId || verified.payload.roleName !== "admin") {
                 return res.status(StatusCode.UNAUTHORIZED).json(transformResponse({
                     data: null,
                     message: 'Unauthorized - Invalid role',

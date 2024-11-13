@@ -24,7 +24,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 new TextEncoder().encode(process.env.JWT_SECRET || 'your-secret-key')
             );
 
-            if (!token && verified.payload.roleId !== 1) {
+            if (!token && verified.payload.roleName !== "admin") {
                 return res.status(StatusCode.UNAUTHORIZED).json(transformResponse({
                     data: null,
                     message: 'Unauthorized - Invalid permissions',

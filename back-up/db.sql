@@ -49,7 +49,7 @@ DROP FUNCTION IF EXISTS update_modified_column() CASCADE;
 
 CREATE TABLE images
 (
-    id         SERIAL PRIMARY KEY,
+    id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     url        VARCHAR(255) NOT NULL DEFAULT 'https://picsum.photos/2000/2000?random=12',
     alt_text   VARCHAR(255),
     created_at TIMESTAMP             DEFAULT CURRENT_TIMESTAMP,
@@ -64,14 +64,14 @@ CREATE INDEX idx_images_status ON images (status);
 
 CREATE TABLE products
 (
-    id             SERIAL PRIMARY KEY,
+    id             UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name           VARCHAR(255)   NOT NULL,
     slug           VARCHAR(255)   NOT NULL UNIQUE,
     price          DECIMAL(10, 2) NOT NULL,
     description    TEXT,
     specifications JSONB,
     stock_quantity INT            NOT NULL DEFAULT 0,
-    thumbnail_id   INT,
+    thumbnail_id   UUID,
     created_at     TIMESTAMP               DEFAULT CURRENT_TIMESTAMP,
     updated_at     TIMESTAMP               DEFAULT CURRENT_TIMESTAMP,
     status         INT                     DEFAULT 1,
@@ -86,9 +86,9 @@ CREATE INDEX idx_products_specs ON products USING GIN (specifications);
 
 CREATE TABLE product_images
 (
-    id            SERIAL PRIMARY KEY,
-    product_id    INT,
-    image_id      INT,
+    id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    product_id    UUID,
+    image_id      UUID,
     display_order INT,
     created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -106,11 +106,11 @@ CREATE INDEX idx_product_images_status ON product_images (status);
 
 CREATE TABLE categories
 (
-    id         SERIAL PRIMARY KEY,
+    id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name       VARCHAR(100) NOT NULL,
     slug       VARCHAR(100) NOT NULL UNIQUE,
     content    TEXT,
-    image_id   INT null,
+    image_id   UUID null,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     status     INT       DEFAULT 1,
@@ -125,8 +125,8 @@ CREATE INDEX idx_categories_status ON categories (status);
 
 CREATE TABLE product_categories
 (
-    product_id  INT,
-    category_id INT,
+    product_id  UUID,
+    category_id UUID,
     created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     status      INT DEFAULT 1,
@@ -143,7 +143,7 @@ CREATE INDEX idx_product_categories_status ON product_categories (status);
 
 CREATE TABLE roles
 (
-    id          SERIAL PRIMARY KEY,
+    id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name        VARCHAR(50) NOT NULL UNIQUE,
     description TEXT,
     created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -151,12 +151,13 @@ CREATE TABLE roles
     status      INT DEFAULT 1
 );
 
-INSERT INTO roles (name, description) VALUES ('admin', 'Administrator role');
-INSERT INTO roles (name, description) VALUES ('user', 'User role');
+INSERT INTO roles (id, name, description) VALUES ('550e8400-e29b-41d4-a716-446655440000', 'admin', 'Administrator role');
+INSERT INTO roles (id, name, description) VALUES ('550e8400-e29b-41d4-a716-446655440001', 'user', 'User role');
+
 
 CREATE TABLE users
 (
-    id         SERIAL PRIMARY KEY,
+    id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     username   VARCHAR(50)  NOT NULL UNIQUE,
     password   VARCHAR(255) NOT NULL,
     email      VARCHAR(100) NOT NULL UNIQUE,
@@ -165,8 +166,8 @@ CREATE TABLE users
     full_name TEXT,
     phone      VARCHAR(20),
     address    TEXT,
-    avatar_id  INT,
-    role_id    INT DEFAULT 2,
+    avatar_id  UUID,
+    role_id    UUID DEFAULT '550e8400-e29b-41d4-a716-446655440001',
     status     INT                   DEFAULT 1,
     created_at TIMESTAMP             DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP             DEFAULT CURRENT_TIMESTAMP,
@@ -188,7 +189,7 @@ CREATE INDEX idx_roles_status ON roles (status);
 
 CREATE TABLE permissions
 (
-    id          SERIAL PRIMARY KEY,
+    id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name        VARCHAR(50) NOT NULL UNIQUE,
     description TEXT,
     created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -203,8 +204,8 @@ CREATE INDEX idx_permissions_status ON permissions (status);
 
 CREATE TABLE role_permissions
 (
-    role_id       INT,
-    permission_id INT,
+    role_id       UUID,
+    permission_id UUID,
     created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     status        INT DEFAULT 1,
@@ -220,7 +221,7 @@ CREATE INDEX idx_role_permissions_updated_at ON role_permissions (updated_at);
 CREATE INDEX idx_role_permissions_status ON role_permissions (status);
 
 CREATE TABLE payment_methods (
-    id SERIAL PRIMARY KEY,
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name VARCHAR(100) NOT NULL,
     code VARCHAR(50) NOT NULL UNIQUE,
     description TEXT,
@@ -249,14 +250,14 @@ CREATE INDEX idx_payment_methods_status ON payment_methods (status);
 
 CREATE TABLE orders
 (
-    id               SERIAL PRIMARY KEY,
-    user_id          INT,
-    delivery_address_id INT NOT NULL,
+    id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id          UUID,
+    delivery_address_id UUID NOT NULL,
     note TEXT,
     order_date       TIMESTAMP                                                                                    DEFAULT CURRENT_TIMESTAMP,
     total_amount     TEXT,
     shipping_address TEXT,
-    payment_method_id INT,
+    payment_method_id UUID,
     created_at       TIMESTAMP                                                                                    DEFAULT CURRENT_TIMESTAMP,
     updated_at       TIMESTAMP                                                                                    DEFAULT CURRENT_TIMESTAMP,
     status           INT                                                                                          DEFAULT 1,
@@ -274,9 +275,9 @@ CREATE INDEX idx_orders_payment_method ON orders (payment_method_id);
 
 CREATE TABLE order_items
 (
-    id         SERIAL PRIMARY KEY,
-    order_id   INT,
-    product_id INT,
+    id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    order_id   UUID,
+    product_id UUID,
     quantity   INT            NOT NULL,
     price      TEXT NOT NULL,
     created_at TIMESTAMP      DEFAULT CURRENT_TIMESTAMP,
@@ -294,9 +295,9 @@ CREATE INDEX idx_order_items_status ON order_items (status);
 
 CREATE TABLE reviews
 (
-    id         SERIAL PRIMARY KEY,
-    product_id INT,
-    user_id    INT,
+    id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    product_id UUID,
+    user_id    UUID,
     rating     INT NOT NULL CHECK (rating >= 1 AND rating <= 5),
     comment    TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -315,7 +316,7 @@ CREATE INDEX idx_reviews_status ON reviews (status);
 
 CREATE TABLE coupons
 (
-    id                  SERIAL PRIMARY KEY,
+    id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     code                VARCHAR(50) UNIQUE                                                  NOT NULL,
     discount_type       VARCHAR(20) CHECK (discount_type IN ('percentage', 'fixed_amount')) NOT NULL,
     discount_value      DECIMAL(10, 2)                                                      NOT NULL,
@@ -341,9 +342,9 @@ CREATE INDEX idx_coupons_status ON coupons (status);
 
 CREATE TABLE wishlist
 (
-    id         SERIAL PRIMARY KEY,
-    user_id    INT,
-    product_id INT,
+    id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id    UUID,
+    product_id UUID,
     added_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     status     INT       DEFAULT 1,
@@ -360,7 +361,7 @@ CREATE INDEX idx_wishlist_status ON wishlist (status);
 
 CREATE TABLE tags
 (
-    id         SERIAL PRIMARY KEY,
+    id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name       VARCHAR(50) NOT NULL UNIQUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -374,8 +375,8 @@ CREATE INDEX idx_tags_status ON tags (status);
 
 CREATE TABLE product_tags
 (
-    product_id INT,
-    tag_id     INT,
+    product_id UUID,
+    tag_id     UUID,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     status     INT DEFAULT 1,
@@ -392,8 +393,8 @@ CREATE INDEX idx_product_tags_status ON product_tags (status);
 
 CREATE TABLE product_specifications
 (
-    id         SERIAL PRIMARY KEY,
-    product_id INT          NOT NULL,
+    id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    product_id UUID          NOT NULL,
     spec_name  VARCHAR(100) NOT NULL,
     spec_value TEXT         NOT NULL,
     unit       VARCHAR(50),
@@ -412,7 +413,7 @@ CREATE INDEX idx_product_specifications_status ON product_specifications (status
 
 CREATE TABLE ram
 (
-    id         SERIAL PRIMARY KEY,
+    id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name       VARCHAR(100) NOT NULL,
     type       VARCHAR(50) NOT NULL,
     capacity   INT NOT NULL,
@@ -434,7 +435,7 @@ CREATE INDEX idx_ram_status ON ram (status);
 
 CREATE TABLE hard_drives
 (
-    id         SERIAL PRIMARY KEY,
+    id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name       VARCHAR(100) NOT NULL,
     type       VARCHAR(50) NOT NULL,
     capacity   VARCHAR(50) NOT NULL,
@@ -456,8 +457,8 @@ CREATE INDEX idx_hard_drives_status ON hard_drives (status);
 
 CREATE TABLE product_ram
 (
-    product_id INT,
-    ram_id     INT,
+    product_id UUID,
+    ram_id     UUID,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     status     INT DEFAULT 1,
@@ -474,8 +475,8 @@ CREATE INDEX idx_product_ram_status ON product_ram (status);
 
 CREATE TABLE product_hard_drives
 (
-    product_id INT,
-    hard_id    INT,
+    product_id UUID,
+    hard_id    UUID,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     status     INT DEFAULT 1,
@@ -492,8 +493,8 @@ CREATE INDEX idx_product_hard_status ON product_hard_drives (status);
 
 CREATE TABLE carts
 (
-    id         SERIAL PRIMARY KEY,
-    user_id    INT NOT NULL,
+    id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id    UUID NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     status     INT DEFAULT 1,
@@ -507,9 +508,9 @@ CREATE INDEX idx_carts_status ON carts (status);
 
 CREATE TABLE cart_items
 (
-    id         SERIAL PRIMARY KEY,
-    cart_id    INT NOT NULL,
-    product_id INT NOT NULL,
+    id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    cart_id    UUID NOT NULL,
+    product_id UUID NOT NULL,
     quantity   INT NOT NULL DEFAULT 1,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -526,7 +527,7 @@ CREATE INDEX idx_cart_items_status ON cart_items (status);
 
 CREATE TABLE banners
 (
-    id         SERIAL PRIMARY KEY,
+    id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name       VARCHAR(100) NOT NULL,
     location   TEXT NOT NULL,
     position   TEXT NOT NULL,
@@ -542,9 +543,9 @@ CREATE INDEX idx_banners_status ON banners (status);
 
 CREATE TABLE banner_images
 (
-    id         SERIAL PRIMARY KEY,
-    banner_id  INT NOT NULL,
-    image_id   INT NOT NULL,
+    id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    banner_id  UUID NOT NULL,
+    image_id   UUID NOT NULL,
     status     INT NOT NULL DEFAULT 1,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -561,7 +562,7 @@ CREATE INDEX idx_banner_images_status ON banner_images (status);
 
 CREATE TABLE displays
 (
-    id          SERIAL PRIMARY KEY,
+    id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name        VARCHAR(100) NOT NULL,
     size        VARCHAR(50),
     resolution  VARCHAR(50),
@@ -579,7 +580,7 @@ CREATE INDEX idx_displays_updated_at ON displays (updated_at);
 
 CREATE TABLE cpus
 (
-    id          SERIAL PRIMARY KEY,
+    id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name        VARCHAR(100) NOT NULL,
     brand       VARCHAR(50),
     model       VARCHAR(50),
@@ -601,7 +602,7 @@ CREATE INDEX idx_cpus_updated_at ON cpus (updated_at);
 
 CREATE TABLE graphics_cards
 (
-    id          SERIAL PRIMARY KEY,
+    id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name        VARCHAR(100) NOT NULL,
     brand       VARCHAR(50),
     memory_size VARCHAR(20),
@@ -620,9 +621,9 @@ CREATE INDEX idx_graphics_cards_updated_at ON graphics_cards (updated_at);
 
 CREATE TABLE product_displays
 (
-    id          SERIAL PRIMARY KEY,
-    product_id  INT NOT NULL,
-    display_id  INT NOT NULL,
+    id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    product_id  UUID NOT NULL,
+    display_id  UUID NOT NULL,
     status      INT NOT NULL DEFAULT 1,
     created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -632,9 +633,9 @@ CREATE TABLE product_displays
 
 CREATE TABLE product_cpus
 (
-    id          SERIAL PRIMARY KEY,
-    product_id  INT NOT NULL,
-    cpu_id      INT NOT NULL,
+    id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    product_id  UUID NOT NULL,
+    cpu_id      UUID NOT NULL,
     status      INT NOT NULL DEFAULT 1,
     created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -644,9 +645,9 @@ CREATE TABLE product_cpus
 
 CREATE TABLE product_graphics_cards
 (
-    id               SERIAL PRIMARY KEY,
-    product_id       INT NOT NULL,
-    graphics_card_id INT NOT NULL,
+    id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    product_id       UUID NOT NULL,
+    graphics_card_id UUID NOT NULL,
     status           INT NOT NULL DEFAULT 1,
     created_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -656,7 +657,7 @@ CREATE TABLE product_graphics_cards
 
 CREATE TABLE settings
 (
-    id         SERIAL PRIMARY KEY,
+    id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name       VARCHAR(100) NOT NULL,
     value      TEXT,
     status     INT NOT NULL DEFAULT 1,
@@ -724,9 +725,9 @@ CREATE TABLE wards
 );
 
 CREATE TABLE user_delivery_addresses (
-    id               SERIAL PRIMARY KEY,
-    user_id          INT NOT NULL,
-    delivery_addresses_id INTEGER NOT NULL,
+    id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id          UUID NOT NULL,
+    delivery_addresses_id UUID NOT NULL,
     is_default       BOOLEAN DEFAULT FALSE,
     status           INT NOT NULL DEFAULT 1,
     created_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -735,8 +736,8 @@ CREATE TABLE user_delivery_addresses (
 
 CREATE TABLE delivery_addresses
 (
-    id               SERIAL PRIMARY KEY,
-    user_id          INT NOT NULL,
+    id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id          UUID NOT NULL,
     province_code    INT NOT NULL,
     district_code    INTEGER NOT NULL,
     ward_code        INTEGER NOT NULL,
