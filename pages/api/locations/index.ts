@@ -29,9 +29,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             const locations = await db('delivery_addresses')
                 .select(
                     'delivery_addresses.*',
-                    'user_delivery_addresses.is_default'
+                    'user_delivery_addresses.is_default',
+                    'provinces.name as province_name',
+                    'districts.name as district_name', 
+                    'wards.name as ward_name'
                 )
                 .join('user_delivery_addresses', 'delivery_addresses.id', 'user_delivery_addresses.delivery_addresses_id')
+                .leftJoin('provinces', 'delivery_addresses.province_code', 'provinces.code')
+                .leftJoin('districts', 'delivery_addresses.district_code', 'districts.code')
+                .leftJoin('wards', 'delivery_addresses.ward_code', 'wards.code')
                 .where({
                     'delivery_addresses.user_id': userId,
                     'delivery_addresses.status': 1,

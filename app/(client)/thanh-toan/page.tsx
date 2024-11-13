@@ -22,6 +22,9 @@ interface Location {
     status: number;
     created_at: string;
     updated_at: string;
+    province_name: string;
+    district_name: string;
+    ward_name: string;
 }
 
 interface LocationResponse {
@@ -222,7 +225,7 @@ const Page = () => {
                                         quantity: item.quantity,
                                         price: item.price
                                     })),
-                                    shipping_address: `${selectedLocation.address}, ${getWardName(selectedLocation.ward_code)}, ${getDistrictName(selectedLocation.district_code)}, ${getProvinceName(selectedLocation.province_code)}`,
+                                    shipping_address: `${selectedLocation.address}, ${selectedLocation.ward_name}, ${selectedLocation.district_name}, ${selectedLocation.province_name}`,
                                     payment_method_id: parseInt(paymentMethod),
                                     total_amount: total + 30000, 
                                     delivery_address_id: selectedLocation.id,
@@ -288,18 +291,6 @@ const Page = () => {
             setPaymentMethod(paymentMethods[0].id.toString());
         }
     }, [paymentMethods]);
-
-    const getProvinceName = (code: string) => {
-        return provinceData?.data.find(province => province.code === code)?.name || '';
-    };
-
-    const getDistrictName = (code: string) => {
-        return districtData?.data.find(district => district.province_code === code)?.name || '';
-    };
-
-    const getWardName = (code: string) => {
-        return wardData?.data.find(ward => ward.district_code === code)?.name || '';
-    };
 
     return (
         <div className="max-w-4xl mx-auto p-6">
@@ -501,7 +492,7 @@ const Page = () => {
                                 <div className="flex justify-between">
                                     <div className="flex-1" onClick={() => setSelectedLocation(location)}>
                                         <p className="font-semibold">Số điện thoại: {location.phone_number}</p>
-                                        <p>Địa chỉ: {location.address}, {getWardName(location.ward_code)}, {getDistrictName(location.district_code)}, {getProvinceName(location.province_code)}</p>
+                                        <p>Địa chỉ: {location.address}, {location.ward_name}, {location.district_name}, {location.province_name}</p>
                                     </div>
                                     <div className="flex items-start space-x-2 ml-4">
                                         <button 
