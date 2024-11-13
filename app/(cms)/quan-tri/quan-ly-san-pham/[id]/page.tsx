@@ -28,7 +28,7 @@ import MediaPopup from "@/components/custom/MediaPopup";
 import QuillComponent from "@/components/quill";
 
 interface Image {
-    id: number;
+    id: string;
     url: string;
     alt_text: string;
     created_at: string;
@@ -47,25 +47,25 @@ const formSchema = z.object({
     description: z.string()
         .min(1, "Mô tả không được để trống"),
     specifications: z.string().optional(),
-    categories: z.array(z.number())
+    categories: z.array(z.string())
         .min(1, "Phải chọn ít nhất một danh mục"),
-    ram_ids: z.array(z.number())
+    ram_ids: z.array(z.string())
         .min(1, "Phải chọn ít nhất một RAM"),
-    storage_ids: z.array(z.number())
+    storage_ids: z.array(z.string())
         .min(1, "Phải chọn ít nhất một ổ cứng"),
-    tag_ids: z.array(z.number())
+    tag_ids: z.array(z.string())
         .min(1, "Phải chọn ít nhất một tag"),
-    display_ids: z.array(z.number())
+    display_ids: z.array(z.string())
         .min(1, "Phải chọn ít nhất một màn hình"),
-    cpu_ids: z.array(z.number())
+    cpu_ids: z.array(z.string())
         .min(1, "Phải chọn ít nhất một CPU"),
-    graphics_card_ids: z.array(z.number())
+    graphics_card_ids: z.array(z.string())
         .min(1, "Phải chọn ít nhất một card đồ họa"),
     status: z.number().default(Status.ACTIVE),
-    thumbnail_id: z.number({
+    thumbnail_id: z.string({
         required_error: "Vui lòng chọn ảnh đại diện"
     }),
-    images: z.array(z.number())
+    images: z.array(z.string())
         .min(1, "Phải chọn ít nhất một ảnh sản phẩm")
 });
 
