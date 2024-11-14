@@ -26,13 +26,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
             const userId = verified.payload.userId;
 
+            // Get the cart and check the status of products
             const cart = await db('carts as c')
                 .leftJoin('cart_items as ci', 'c.id', 'ci.cart_id')
                 .leftJoin('products as p', 'ci.product_id', 'p.id')
                 .leftJoin('images as i', 'p.thumbnail_id', 'i.id')
                 .where('c.user_id', userId as string)
                 .where('c.status', 1)
-                .where('ci.status',1)
+                .where('ci.status', 1)
                 .select(
                     'c.id as cart_id',
                     'c.user_id',
@@ -44,12 +45,28 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     'p.name as product_name',
                     'p.price',
                     'p.slug',
-                    'i.url as thumbnail_url'
+                    'i.url as thumbnail_url',
+                    'p.status as product_status'  // Add product status to check
                 )
                 .orderBy('ci.created_at', 'desc');
 
+            // Filter out items where product status is not 1, and remove those from the cart
+            const validCartItems = cart.filter(item => item.product_status === 1);
+
+            // If there are invalid cart items (product status !== 1), remove them from cart_items
+            if (validCartItems.length !== cart.length) {
+                // Identify cart items with invalid product statuses
+                const invalidCartItems = cart.filter(item => item.product_status !== 1);
+                const invalidCartItemIds = invalidCartItems.map(item => item.cart_item_id);
+
+                // Remove invalid items from the cart_items table
+                await db('cart_items')
+                    .whereIn('id', invalidCartItemIds)
+                    .update({ status: 0, updated_at: db.fn.now() });  // Soft delete (mark as inactive)
+            }
+
             return res.status(StatusCode.OK).json(transformResponse({
-                data: cart,
+                data: validCartItems,  // Return valid cart items
                 message: 'Cart retrieved successfully',
                 statusCode: StatusCode.OK
             }));
@@ -62,6 +79,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 statusCode: StatusCode.INTERNAL_SERVER_ERROR
             }));
         }
+
     } else if (req.method === 'POST') {
         try {
             const token = req.cookies.token;
