@@ -42,6 +42,27 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             }));
         }
 
+        const product = await db('products')
+            .where('id', product_id)
+            .select('stock_quantity')
+            .first();
+
+        if (!product) {
+            return res.status(StatusCode.NOT_FOUND).json(transformResponse({
+                data: null,
+                message: 'Product not found',
+                statusCode: StatusCode.NOT_FOUND
+            }));
+        }
+
+        if (quantity > product.stock_quantity) {
+            return res.status(StatusCode.BAD_REQUEST).json(transformResponse({
+                data: null,
+                message: 'Quantity exceeds available stock',
+                statusCode: StatusCode.BAD_REQUEST
+            }));
+        }
+
         const cartItem = await db('cart_items as ci')
             .join('carts as c', 'ci.cart_id', 'c.id')
             .where({
