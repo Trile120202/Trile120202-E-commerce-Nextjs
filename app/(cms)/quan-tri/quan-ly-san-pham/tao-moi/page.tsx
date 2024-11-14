@@ -51,7 +51,7 @@ const formSchema = z.object({
         .min(1, "Mô tả không được để trống"),
     specifications: z.string().optional(),
     categories: z.array(z.string())
-        .min(1, "Phải chọn ít nhất một danh mục"),
+        .min(1, "Phải chọn một danh mục"),
     ram_ids: z.array(z.string())
         .min(1, "Phải chọn ít nhất một RAM"),
     storage_ids: z.array(z.string())
@@ -93,11 +93,11 @@ const Page = () => {
             ram_ids: [],
             storage_ids: [],
             tag_ids: [],
-            display_id: 0,
-            cpu_id: 0,
+            display_id: "",
+            cpu_id: "",
             graphics_card_ids: [],
             status: Status.ACTIVE,
-            thumbnail_id: 0,
+            thumbnail_id: "",
             images: []
         },
     });
@@ -224,7 +224,7 @@ const Page = () => {
                                                                     type="button"
                                                                     onClick={() => {
                                                                         setSelectedThumbnail(null);
-                                                                        field.onChange(0);
+                                                                        field.onChange("");
                                                                     }}
                                                                     className="absolute top-3 right-3 bg-red-500 text-white rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                                                                 >

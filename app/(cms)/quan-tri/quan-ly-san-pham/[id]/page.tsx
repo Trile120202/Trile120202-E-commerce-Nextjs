@@ -48,7 +48,7 @@ const formSchema = z.object({
         .min(1, "Mô tả không được để trống"),
     specifications: z.string().optional(),
     categories: z.array(z.string())
-        .min(1, "Phải chọn ít nhất một danh mục"),
+        .min(1, "Phải chọn một danh mục"),
     ram_ids: z.array(z.string())
         .min(1, "Phải chọn ít nhất một RAM"),
     storage_ids: z.array(z.string())
@@ -97,7 +97,7 @@ const Page = ({ params }: { params: { id: string } }) => {
             cpu_ids: [],
             graphics_card_ids: [],
             status: Status.ACTIVE,
-            thumbnail_id: 0,
+            thumbnail_id: "",
             images: []
         }
     });
@@ -125,7 +125,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                     status: 1
                 };
 
-                const images = productData.product_image_ids.map((id: number, index: number) => ({
+                const images = productData.product_image_ids.map((id: string, index: number) => ({
                     id: id,
                     url: productData.product_image_urls[index],
                     alt_text: "",
@@ -141,9 +141,9 @@ const Page = ({ params }: { params: { id: string } }) => {
 
                 const parseIds = (value: string | number[] | null | undefined) => {
                     if (!value) return [];
-                    if (Array.isArray(value)) return value;
+                    if (Array.isArray(value)) return value.map(String);
                     if (typeof value === 'string' && value.trim() !== '') {
-                        return value.split(',').map(id => parseInt(id.trim()));
+                        return value.split(',').map(id => id.trim());
                     }
                     return [];
                 };
@@ -173,8 +173,8 @@ const Page = ({ params }: { params: { id: string } }) => {
                     cpu_ids: cpuIds,
                     graphics_card_ids: graphicsCardIds,
                     status: productData.product_status || Status.ACTIVE,
-                    thumbnail_id: productData.thumbnail_id || 0,
-                    images: productData.product_image_ids || []
+                    thumbnail_id: productData.thumbnail_id?.toString() || "",
+                    images: productData.product_image_ids?.map(String) || []
                 });
             } catch (error) {
                 console.error('Error fetching product:', error);
@@ -321,10 +321,10 @@ const Page = ({ params }: { params: { id: string } }) => {
                                             <FormControl>
                                                 <SelectData
                                                     endpoint="/api/categories/all-category"
-                                                    multiple={true}
+                                                    multiple={false}
                                                     placeholder="Chọn danh mục"
-                                                    onSelect={(value) => field.onChange(value)}
-                                                    defaultValue={field.value}
+                                                    onSelect={(value) => field.onChange([value])}
+                                                    defaultValue={field.value[0]}
                                                 />
                                             </FormControl>
                                             <FormMessage />
@@ -353,7 +353,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                                                                 type="button"
                                                                 onClick={() => {
                                                                     setSelectedThumbnail(null);
-                                                                    field.onChange(0);
+                                                                    field.onChange("");
                                                                 }}
                                                                 className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
                                                             >

@@ -20,7 +20,7 @@ import { ChangeStatus } from "@/components/custom/ChangeStatus";
 import Image from 'next/image';
 
 interface Product {
-    product_id: number;
+    product_id: string;
     product_name: string;
     categories: string;
     price: string;
@@ -37,13 +37,13 @@ interface Product {
     description: string;
     specifications: string;
     product_image_urls: string[];
-    product_image_ids: number[];
-    ram_ids: number[];
-    storage_ids: number[];
-    tag_ids: number[];
-    display_ids: number[];
-    cpu_ids: number[];
-    graphics_card_ids: number[];
+    product_image_ids: string[];
+    ram_ids: string[];
+    storage_ids: string[];
+    tag_ids: string[];
+    display_ids: string[];
+    cpu_ids: string[];
+    graphics_card_ids: string[];
 }
 
 interface ApiResponse {
