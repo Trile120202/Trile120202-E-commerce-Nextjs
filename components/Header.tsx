@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { FaShoppingCart, FaClipboardList } from 'react-icons/fa';
+import { FaShoppingCart, FaClipboardList, FaUser } from 'react-icons/fa';
 
 const URLS = {
   HOME: '/',
@@ -11,9 +11,10 @@ const URLS = {
   LOGIN: '/dang-nhap',
   CART: '/gio-hang',
   ORDERS: '/don-hang',
-  SEARCH: '/tim-kiem',
+  SEARCH: '/san-pham?search=', // Updated URL for search
   AUTH_ME: '/api/auth/me',
-  AUTH_LOGOUT: '/api/auth/logout'
+  AUTH_LOGOUT: '/api/auth/logout',
+  PROFILE: '/trang-ca-nhan', // Added URL for profile
 };
 
 interface User {
@@ -67,7 +68,9 @@ export default function Header() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      router.push(`${URLS.SEARCH}?q=${encodeURIComponent(searchQuery)}`);
+      const encodedSearchQuery = encodeURIComponent(searchQuery).replace(/%20/g, '+');
+      router.push(`${URLS.SEARCH}${encodedSearchQuery}`);
+      setSearchQuery(''); 
     }
   };
 
@@ -80,6 +83,7 @@ export default function Header() {
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Tìm kiếm sản phẩm..."
           className="w-64 px-4 py-2 rounded-lg text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-400"
+          autoFocus
         />
         <button type="submit" className="absolute right-3 top-1/2 transform -translate-y-1/2">
           <svg className="w-5 h-5 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -116,6 +120,11 @@ export default function Header() {
                 <FaClipboardList className="w-5 h-5" />
               </Link>
             </li>
+            <li>
+              <Link href={URLS.PROFILE} className="flex items-center justify-center w-10 h-10 bg-blue-600 hover:bg-blue-500 rounded-lg transition duration-300">
+                <FaUser className="w-5 h-5" />
+              </Link>
+            </li>
           </>
         )}
       </ul>
@@ -131,6 +140,7 @@ export default function Header() {
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Tìm kiếm sản phẩm..."
           className="w-full px-4 py-2 rounded-lg text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-400"
+          autoFocus
         />
         <button type="submit" className="absolute right-3 top-1/2 transform -translate-y-1/2">
           <svg className="w-5 h-5 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -187,6 +197,15 @@ export default function Header() {
                 className="flex items-center justify-center bg-blue-600 hover:bg-blue-500 text-white w-10 h-10 rounded transition duration-300 mx-auto"
               >
                 <FaClipboardList className="w-5 h-5" />
+              </Link>
+            </li>
+            <li className="w-full">
+              <Link 
+                href={URLS.PROFILE} 
+                onClick={() => setIsMenuOpen(false)} 
+                className="flex items-center justify-center bg-blue-600 hover:bg-blue-500 text-white w-10 h-10 rounded transition duration-300 mx-auto"
+              >
+                <FaUser className="w-5 h-5" />
               </Link>
             </li>
           </>

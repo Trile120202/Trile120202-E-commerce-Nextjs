@@ -78,6 +78,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             if (search) {
                 query = query.where((builder) => {
                     builder.where('p.name', 'ilike', `%${search}%`)
+                        .orWhere('p.description', 'ilike', `%${search}%`)
+                        .orWhere('r.name', 'ilike', `%${search}%`)
                         .orWhere('p.description', 'ilike', `%${search}%`);
                 });
             }
