@@ -11,10 +11,10 @@ const URLS = {
   LOGIN: '/dang-nhap',
   CART: '/gio-hang',
   ORDERS: '/don-hang',
-  SEARCH: '/san-pham?search=', // Updated URL for search
+  SEARCH: '/san-pham?search=',
   AUTH_ME: '/api/auth/me',
   AUTH_LOGOUT: '/api/auth/logout',
-  PROFILE: '/trang-ca-nhan', // Added URL for profile
+  PROFILE: '/trang-ca-nhan',
 };
 
 interface User {

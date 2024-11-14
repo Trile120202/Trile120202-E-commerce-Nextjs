@@ -16,8 +16,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             const position = req.query.position as string || '';
 
             const [{ count }] = await db('banners')
-                .where('location', 'ilike', `%${location}%`) // Thêm điều kiện location
-                .where('position', 'ilike', `%${position}%`) // Thêm điều kiện position
+                .where('location', 'ilike', `%${location}%`)
+                .where('position', 'ilike', `%${position}%`)
                 .whereNot('status', -2)
                 .count();
             const totalItems = parseInt(count as string);
@@ -26,8 +26,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             const banners = await db('banners')
                 .leftJoin('banner_images', 'banners.id', 'banner_images.banner_id')
                 .leftJoin('images', 'banner_images.image_id', 'images.id')
-                .where('location', 'ilike', `%${location}%`) // Thêm điều kiện location
-                .where('position', 'ilike', `%${position}%`) // Thêm điều kiện position
+                .where('location', 'ilike', `%${location}%`)
+                .where('position', 'ilike', `%${position}%`)
                 .whereNot('banners.status', -2)
                 .select(
                     'banners.*',

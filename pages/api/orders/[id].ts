@@ -56,7 +56,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 }));
             }
 
-            // Get order items with product details
             const orderItems = await db('order_items')
                 .select(
                     'order_items.*',
