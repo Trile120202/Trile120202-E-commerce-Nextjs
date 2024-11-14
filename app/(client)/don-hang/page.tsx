@@ -8,7 +8,7 @@ import { FaBox, FaTruck, FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
 import { useToast } from '@/hooks/use-toast';
 
 interface OrderItem {
-    product_id: number;
+    product_id: string;
     product_name: string;
     quantity: number;
     price: number;
@@ -18,12 +18,12 @@ interface OrderItem {
 }
 
 interface Order {
-    id: number;
-    user_id: number;
+    id: string;
+    user_id: string;
     total_amount: number;
     status: number;
     shipping_address: string;
-    payment_method_id: number;
+    payment_method_id: string;
     delivery_address_id: number;
     note: string;
     order_date: string;

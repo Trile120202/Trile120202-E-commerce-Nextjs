@@ -18,7 +18,7 @@ interface Specification {
 
 interface Product {
     slug: string;
-    product_id: number;
+    product_id: string;
     product_name: string;
     brand: string;
     model: string;
@@ -29,11 +29,11 @@ interface Product {
     product_created_at: string;
     product_updated_at: string;
     product_status: number;
-    thumbnail_id: number;
+    thumbnail_id: string;
     thumbnail_url: string;
     thumbnail_alt_text: string;
     categories: string | null;
-    product_image_ids: number[];
+    product_image_ids: string[];
     product_image_urls: string[];
     ram_names: string | null;
     storage_names: string | null;

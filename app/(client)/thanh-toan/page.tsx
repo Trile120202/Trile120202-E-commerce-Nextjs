@@ -10,8 +10,8 @@ import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 
 interface Location {
-    id: number;
-    user_id: number;
+    id: string;
+    user_id: string;
     province_code: string;
     district_code: string;
     ward_code: string;
@@ -226,7 +226,7 @@ const Page = () => {
                                         price: item.price
                                     })),
                                     shipping_address: `${selectedLocation.address}, ${selectedLocation.ward_name}, ${selectedLocation.district_name}, ${selectedLocation.province_name}`,
-                                    payment_method_id: parseInt(paymentMethod),
+                                    payment_method_id: paymentMethod,
                                     total_amount: total + 30000, 
                                     delivery_address_id: selectedLocation.id,
                                     note: ''

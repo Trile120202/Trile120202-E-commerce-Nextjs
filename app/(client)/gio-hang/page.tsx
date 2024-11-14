@@ -8,13 +8,13 @@ import { useRouter } from 'next/navigation';
 import { FaTrash } from 'react-icons/fa';
 
 interface CartItem {
-  cart_id: number;
-  user_id: number;
+  cart_id: string;
+  user_id: string;
   created_at: string;
   updated_at: string;
-  cart_item_id: number | null;
+  cart_item_id: string | null;
   quantity: number | null;
-  product_id: number | null;
+  product_id: string | null;
   product_name: string | null;
   price: string | null;
   slug: string | null;
