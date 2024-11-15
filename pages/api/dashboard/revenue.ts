@@ -7,7 +7,7 @@ import { useAuth } from '@/hooks/useAuth';
 
 const db = knex(knexConfig);
 
-function getPeriodClause(period: string, year: number) {
+function getPeriodClause(period: string, year: number, month?: number) {
     switch (period) {
         case 'quarter1':
             return `EXTRACT(QUARTER FROM orders.created_at) = 1 AND EXTRACT(YEAR FROM orders.created_at) = ${year}`;
@@ -18,7 +18,8 @@ function getPeriodClause(period: string, year: number) {
         case 'quarter4':
             return `EXTRACT(QUARTER FROM orders.created_at) = 4 AND EXTRACT(YEAR FROM orders.created_at) = ${year}`;
         case 'month':
-            return `EXTRACT(MONTH FROM orders.created_at) = EXTRACT(MONTH FROM CURRENT_DATE) AND EXTRACT(YEAR FROM orders.created_at) = ${year}`;
+            const selectedMonth = month ?? new Date().getMonth() + 1; 
+            return `EXTRACT(MONTH FROM orders.created_at) = ${selectedMonth} AND EXTRACT(YEAR FROM orders.created_at) = ${year}`;
         case 'year':
             return `EXTRACT(YEAR FROM orders.created_at) = ${year}`;
         default:
@@ -26,8 +27,10 @@ function getPeriodClause(period: string, year: number) {
     }
 }
 
-async function getTopSellingProducts(period: string, year: number) {
-    const periodClause = getPeriodClause(period, year);
+
+
+async function getTopSellingProducts(period: string, year: number, month?: number) {
+    const periodClause = getPeriodClause(period, year, month);
 
     return db('order_items')
         .select(
@@ -51,8 +54,8 @@ async function getTopSellingProducts(period: string, year: number) {
         .limit(5);
 }
 
-async function getRevenue(period: string, year: number) {
-    const periodClause = getPeriodClause(period, year);
+async function getRevenue(period: string, year: number, month?: number) {
+    const periodClause = getPeriodClause(period, year, month);
 
     const revenue = await db('orders')
         .sum({ total: db.raw('CAST(total_amount AS numeric)') })
@@ -77,7 +80,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         try {
             const period = (req.query.period as string) || 'year';
             const year = parseInt(req.query.year as string, 10) || new Date().getFullYear();
+            const month = req.query.month ? parseInt(req.query.month as string, 10) : undefined;
 
+            // Validate the period type
             if (!['quarter1', 'quarter2', 'quarter3', 'quarter4', 'month', 'year'].includes(period)) {
                 return res.status(StatusCode.BAD_REQUEST).json(transformResponse({
                     data: null,
@@ -86,9 +91,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 }));
             }
 
+            // Fetch revenue and top-selling products concurrently
             const [revenue, topSellingProducts] = await Promise.all([
-                getRevenue(period, year),
-                getTopSellingProducts(period, year)
+                getRevenue(period, year, month),
+                getTopSellingProducts(period, year, month)
             ]);
 
             res.status(StatusCode.OK).json(transformResponse({
