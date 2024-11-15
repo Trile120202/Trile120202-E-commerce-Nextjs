@@ -78,10 +78,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
             const { name, location, position, status, imageIds } = req.body;
 
-            if (!name || !location || !position || !imageIds || !Array.isArray(imageIds)) {
+            if (!name || !location || !position) {
                 return res.status(StatusCode.BAD_REQUEST).json(transformResponse({
                     data: null,
-                    message: 'Tên banner, vị trí, định vị và danh sách ảnh không được để trống.',
+                    message: 'Tên banner, vị trí và định vị không được để trống.',
+                    statusCode: StatusCode.BAD_REQUEST,
+                }));
+            }
+
+            if (imageIds && !Array.isArray(imageIds)) {
+                return res.status(StatusCode.BAD_REQUEST).json(transformResponse({
+                    data: null,
+                    message: 'Danh sách ảnh phải là một mảng.',
                     statusCode: StatusCode.BAD_REQUEST,
                 }));
             }
@@ -102,6 +110,26 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 }));
             }
 
+            const existingBanners = await db('banners')
+                .where({
+                    location: location,
+                    position: position,
+                    status: 1
+                });
+
+            if (existingBanners.length > 0) {
+                await db('banners')
+                    .where({
+                        location: location,
+                        position: position,
+                        status: 1
+                    })
+                    .update({
+                        status: 0,
+                        updated_at: db.fn.now()
+                    });
+            }
+
             const [banner] = await db('banners')
                 .insert({
                     name,
@@ -113,15 +141,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 })
                 .returning('*');
 
-            const bannerImages = imageIds.map(imageId => ({
-                banner_id: banner.id,
-                image_id: imageId,
-                status: 1,
-                created_at: db.fn.now(),
-                updated_at: db.fn.now()
-            }));
+            if (!banner) {
+                throw new Error('Failed to create banner');
+            }
 
-            await db('banner_images').insert(bannerImages);
+            if (imageIds && imageIds.length > 0) {
+                const bannerImages = imageIds.map(imageId => ({
+                    banner_id: banner.id,
+                    image_id: imageId,
+                    status: 1,
+                    created_at: db.fn.now(),
+                    updated_at: db.fn.now()
+                }));
+
+                await db('banner_images').insert(bannerImages);
+            }
 
             const createdBanner = await db('banners')
                 .leftJoin('banner_images', 'banners.id', 'banner_images.banner_id')
