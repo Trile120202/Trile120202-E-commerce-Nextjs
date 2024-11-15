@@ -146,17 +146,29 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 }));
             }
 
-            await db.transaction(async trx => {
-                for (const item of items) {
-                    const product = await trx('products')
-                        .where('id', item.product_id)
-                        .first();
-                        
-                    if (!product || product.stock_quantity < item.quantity) {
-                        throw new Error(`Insufficient stock for product ID ${item.product_id}`);
-                    }
+            for (const item of items) {
+                const product = await db('products')
+                    .where('id', item.product_id)
+                    .first();
+
+                if (!product) {
+                    return res.status(StatusCode.BAD_REQUEST).json(transformResponse({
+                        data: null,
+                        message: `Product with ID ${item.product_id} not found`,
+                        statusCode: StatusCode.BAD_REQUEST
+                    }));
                 }
 
+                if (product.stock_quantity < item.quantity) {
+                    return res.status(StatusCode.BAD_REQUEST).json(transformResponse({
+                        data: null,
+                        message: `Sản phẩm "${product.name}" chỉ còn ${product.stock_quantity} sản phẩm trong kho`,
+                        statusCode: StatusCode.BAD_REQUEST
+                    }));
+                }
+            }
+
+            await db.transaction(async trx => {
                 const [newOrder] = await trx('orders').insert({
                     user_id: userId,
                     total_amount,
