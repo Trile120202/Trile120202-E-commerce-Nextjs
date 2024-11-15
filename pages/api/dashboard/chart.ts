@@ -18,10 +18,8 @@ async function getMonthlyRevenue(year: number) {
         .groupBy(db.raw('EXTRACT(MONTH FROM created_at)'))
         .orderBy('month');
 
-    // Initialize array with 12 months
     const revenueByMonth = Array(12).fill(0);
 
-    // Fill in actual revenue data
     monthlyRevenue.forEach(item => {
         const monthIndex = parseInt(item.month) - 1;
         revenueByMonth[monthIndex] = parseFloat(item.revenue);
