@@ -4,10 +4,19 @@ import knexConfig from '../../../knexfile';
 import { StatusCode } from "@/lib/statusCodes";
 import { transformResponse } from "@/lib/interceptors/transformInterceptor";
 import {jwtVerify} from "jose";
+import { useAuth } from '@/hooks/useAuth';
 
 const db = knex(knexConfig);
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+    const verified = await useAuth(req, res);
+            if (!verified || verified.payload.roleName !== 'admin') {
+                return res.status(StatusCode.UNAUTHORIZED).json(transformResponse({
+                    data: null,
+                    message: 'Unauthorized',
+                    statusCode: StatusCode.UNAUTHORIZED
+                }));
+    }
     if (req.method === 'GET') {
         try {
             const page = parseInt(req.query.page as string) || 1;
@@ -62,27 +71,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
     } else if (req.method === 'POST') {
         try {
-            const token = req.cookies.token;
-            if (!token) {
-                return res.status(StatusCode.UNAUTHORIZED).json(transformResponse({
-                    data: null,
-                    message: 'Unauthorized - No token provided',
-                    statusCode: StatusCode.UNAUTHORIZED
-                }));
-            }
-
-            const verified = await jwtVerify(
-                token as string,
-                new TextEncoder().encode(process.env.JWT_SECRET || 'your-secret-key')
-            );
-
-            if (!token && verified.payload.roleId===1) {
-                return res.status(StatusCode.UNAUTHORIZED).json(transformResponse({
-                    data: null,
-                    message: 'Unauthorized - No token provided',
-                    statusCode: StatusCode.UNAUTHORIZED
-                }));
-            }
             const { name, slug, content, image_id, status } = req.body;
 
             if (!name || !slug) {

@@ -4,12 +4,21 @@ import knexConfig from '../../../knexfile';
 import { StatusCode } from "@/lib/statusCodes";
 import { transformResponse } from "@/lib/interceptors/transformInterceptor";
 import {jwtVerify} from "jose";
+import { useAuth } from '@/hooks/useAuth';
 
 const db = knex(knexConfig);
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method === 'GET') {
         try {
+            const verified = await useAuth(req, res);
+            if (!verified || verified.payload.roleName !== 'admin') {
+                return res.status(StatusCode.UNAUTHORIZED).json(transformResponse({
+                    data: null,
+                    message: 'Unauthorized',
+                    statusCode: StatusCode.UNAUTHORIZED
+                }));
+            }
             const page = parseInt(req.query.page as string) || 1;
             const limit = parseInt(req.query.limit as string) || 10;
             const offset = (page - 1) * limit;
@@ -57,27 +66,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
     } else if (req.method === 'POST') {
         try {
-            const token = req.cookies.token;
-            if (!token) {
+            const verified = await useAuth(req, res);
+            if (!verified || verified.payload.roleName !== 'admin') {
                 return res.status(StatusCode.UNAUTHORIZED).json(transformResponse({
                     data: null,
-                    message: 'Unauthorized - No token provided',
+                    message: 'Unauthorized',
                     statusCode: StatusCode.UNAUTHORIZED
                 }));
             }
 
-            const verified = await jwtVerify(
-                token as string,
-                new TextEncoder().encode(process.env.JWT_SECRET || 'your-secret-key')
-            );
-
-            if (!token && verified.payload.roleId===1) {
-                return res.status(StatusCode.UNAUTHORIZED).json(transformResponse({
-                    data: null,
-                    message: 'Unauthorized - No token provided',
-                    statusCode: StatusCode.UNAUTHORIZED
-                }));
-            }
             const { name, location, position, status, imageIds } = req.body;
 
             if (!name || !location || !position || !imageIds || !Array.isArray(imageIds)) {
@@ -142,10 +139,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 statusCode: StatusCode.CREATED,
             }));
         } catch (error) {
-            console.error('Lỗi khi tạo banner:', error);
+            console.error('Error in POST handler:', error);
             return res.status(StatusCode.INTERNAL_SERVER_ERROR).json(transformResponse({
                 data: null,
-                message: 'Đã xảy ra lỗi khi tạo banner.',
+                message: 'Internal server error',
                 statusCode: StatusCode.INTERNAL_SERVER_ERROR,
             }));
         }

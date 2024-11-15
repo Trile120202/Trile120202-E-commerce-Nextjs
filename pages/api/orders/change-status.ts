@@ -34,7 +34,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
             const { orderId, status } = req.body;
 
-            if (!orderId || typeof status !== 'number' || ![1,2,3,4,5,6,7,8].includes(status)) {
+            if (!orderId || typeof status !== 'number' || ![1,2,3,4,5,6,7,8,9].includes(status)) {
                 return res.status(StatusCode.BAD_REQUEST).json(transformResponse({
                     data: null,
                     message: 'ID đơn hàng và trạng thái không hợp lệ.',

@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import Image from 'next/image';
+import { OrderStatus } from '@/lib/orderStatus';
 
 interface OrderItem {
     id: number;
@@ -125,14 +126,15 @@ const Page = ({ params }: { params: { id: string } }) => {
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="1">Chờ xác nhận</SelectItem>
-                                    <SelectItem value="2">Đã xác nhận</SelectItem>
-                                    <SelectItem value="3">Đang chuẩn bị hàng</SelectItem>
-                                    <SelectItem value="4">Đang giao hàng</SelectItem>
-                                    <SelectItem value="5">Đã giao hàng</SelectItem>
-                                    <SelectItem value="6">Đã hủy</SelectItem>
-                                    <SelectItem value="7">Hoàn trả</SelectItem>
-                                    <SelectItem value="8">Hoàn thành</SelectItem>
+                                    <SelectItem value="1">Đang chờ</SelectItem>
+                                    <SelectItem value="2">Đang xử lý</SelectItem>
+                                    <SelectItem value="3">Đang giao hàng</SelectItem>
+                                    <SelectItem value="4">Đã giao hàng</SelectItem>
+                                    <SelectItem value="5">Đã hủy</SelectItem>
+                                    <SelectItem value="6">Đang trả hàng</SelectItem>
+                                    <SelectItem value="7">Trả hàng thành công</SelectItem>
+                                    <SelectItem value="8">Trả hàng thất bại</SelectItem>
+                                    <SelectItem value="9">Thành công</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>

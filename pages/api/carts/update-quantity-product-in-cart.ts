@@ -4,10 +4,20 @@ import knexConfig from '../../../knexfile';
 import { StatusCode } from "@/lib/statusCodes";
 import { transformResponse } from "@/lib/interceptors/transformInterceptor";
 import { jwtVerify } from "jose";
+import { useAuth } from '@/hooks/useAuth';
 
 const db = knex(knexConfig);
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+    const verified = await useAuth(req, res);
+    if (!verified) {
+        return res.status(StatusCode.UNAUTHORIZED).json(transformResponse({
+            data: null,
+            message: 'Unauthorized - Invalid token',
+            statusCode: StatusCode.UNAUTHORIZED
+        }));
+    }
+    const userId = verified.payload.userId;
     if (req.method !== 'PUT') {
         return res.status(StatusCode.METHOD_NOT_ALLOWED).json(transformResponse({
             data: null,
@@ -16,21 +26,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }));
     }
 
-    const token = req.cookies.token;
-    if (!token) {
-        return res.status(StatusCode.UNAUTHORIZED).json(transformResponse({
-            data: null,
-            message: 'Unauthorized - No token provided',
-            statusCode: StatusCode.UNAUTHORIZED
-        }));
-    }
+    
 
     try {
-        const verified = await jwtVerify(
-            token,
-            new TextEncoder().encode(process.env.JWT_SECRET || 'your-secret-key')
-        );
-        const userId = verified.payload.userId;
         const { id } = req.query;
         const { product_id, cart_item_id, quantity } = req.body;
 

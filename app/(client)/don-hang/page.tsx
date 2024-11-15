@@ -6,6 +6,7 @@ import Loading from "@/components/Loading";
 import useSWR from 'swr';
 import { FaBox, FaTruck, FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
 import { useToast } from '@/hooks/use-toast';
+import { OrderStatus } from '@/lib/orderStatus';
 
 interface OrderItem {
     product_id: string;
@@ -93,47 +94,50 @@ const Page = () => {
         }
     };
 
-    const getStatusText = (status: number) => {
+    const getStatusText = (status: OrderStatus) => {
         switch(status) {
-            case 1: return 'Chờ xác nhận';
-            case 2: return 'Đang xử lý';
-            case 3: return 'Đang giao hàng';
-            case 4: return 'Đã giao hàng';
-            case 5: return 'Đã hủy';
-            case 6: return 'Đang hoàn trả';
-            case 7: return 'Hoàn trả thành công';
-            case 8: return 'Hoàn trả thất bại';
+            case OrderStatus.Pending: return 'Chờ xác nhận';
+            case OrderStatus.Processing: return 'Đang xử lý';
+            case OrderStatus.InDelivery: return 'Đang giao hàng';
+            case OrderStatus.Delivered: return 'Đã giao hàng';
+            case OrderStatus.Canceled: return 'Đã hủy';
+            case OrderStatus.Returning: return 'Đang hoàn trả';
+            case OrderStatus.ReturnSuccess: return 'Hoàn trả thành công';
+            case OrderStatus.ReturnFailed: return 'Hoàn trả thất bại';
+            case OrderStatus.Success: return 'Thành công';
             default: return 'Không xác định';
         }
     };
 
-    const getStatusColor = (status: number) => {
+    const getStatusColor = (status: OrderStatus) => {
         switch(status) {
-            case 1: return 'text-yellow-500';
-            case 2: return 'text-blue-500';
-            case 3: return 'text-purple-500';
-            case 4: return 'text-green-500';
-            case 5: return 'text-red-500';
-            case 6: return 'text-orange-500';
-            case 7: return 'text-emerald-500';
-            case 8: return 'text-rose-500';
+            case OrderStatus.Pending: return 'text-yellow-500';
+            case OrderStatus.Processing: return 'text-blue-500';
+            case OrderStatus.InDelivery: return 'text-purple-500';
+            case OrderStatus.Delivered: return 'text-green-500';
+            case OrderStatus.Canceled: return 'text-red-500';
+            case OrderStatus.Returning: return 'text-orange-500';
+            case OrderStatus.ReturnSuccess: return 'text-emerald-500';
+            case OrderStatus.ReturnFailed: return 'text-rose-500';
+            case OrderStatus.Success: return 'text-green-600';
             default: return 'text-gray-500';
         }
     };
 
-    const getStatusIcon = (status: number) => {
+    const getStatusIcon = (status: OrderStatus) => {
         switch(status) {
-            case 1:
-            case 2:
+            case OrderStatus.Pending:
+            case OrderStatus.Processing:
                 return <FaBox />;
-            case 3:
+            case OrderStatus.InDelivery:
                 return <FaTruck />;
-            case 4:
-            case 7:
+            case OrderStatus.Delivered:
+            case OrderStatus.ReturnSuccess:
+            case OrderStatus.Success:
                 return <FaCheckCircle />;
-            case 5:
-            case 6:
-            case 8:
+            case OrderStatus.Canceled:
+            case OrderStatus.Returning:
+            case OrderStatus.ReturnFailed:
                 return <FaTimesCircle />;
             default:
                 return null;

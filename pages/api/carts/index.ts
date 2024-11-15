@@ -4,28 +4,23 @@ import knexConfig from '../../../knexfile';
 import { StatusCode } from "@/lib/statusCodes";
 import { transformResponse } from "@/lib/interceptors/transformInterceptor";
 import { jwtVerify } from "jose";
+import { useAuth } from '@/hooks/useAuth';
 
 const db = knex(knexConfig);
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+    const verified = await useAuth(req, res);
+    if (!verified) {
+        return res.status(StatusCode.UNAUTHORIZED).json(transformResponse({
+            data: null,
+            message: 'Unauthorized - Invalid token',
+            statusCode: StatusCode.UNAUTHORIZED
+        }));
+    }
+    const userId = verified.payload.userId;
+            
     if (req.method === 'GET') {
         try {
-            const token = req.cookies.token;
-            if (!token) {
-                return res.status(StatusCode.UNAUTHORIZED).json(transformResponse({
-                    data: null,
-                    message: 'Unauthorized - No token provided',
-                    statusCode: StatusCode.UNAUTHORIZED
-                }));
-            }
-
-            const verified = await jwtVerify(
-                token as string,
-                new TextEncoder().encode(process.env.JWT_SECRET || 'your-secret-key')
-            );
-
-            const userId = verified.payload.userId;
-
             const cart = await db('carts as c')
                 .leftJoin('cart_items as ci', 'c.id', 'ci.cart_id')
                 .leftJoin('products as p', 'ci.product_id', 'p.id')
@@ -77,21 +72,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     } else if (req.method === 'POST') {
         try {
-            const token = req.cookies.token;
-            if (!token) {
-                return res.status(StatusCode.UNAUTHORIZED).json(transformResponse({
-                    data: null,
-                    message: 'Unauthorized - No token provided',
-                    statusCode: StatusCode.UNAUTHORIZED
-                }));
-            }
-
-            const verified = await jwtVerify(
-                token as string,
-                new TextEncoder().encode(process.env.JWT_SECRET || 'your-secret-key')
-            );
-
-            const userId = verified.payload.userId;
             const { product_id, quantity } = req.body;
 
             if (!product_id || !quantity) {

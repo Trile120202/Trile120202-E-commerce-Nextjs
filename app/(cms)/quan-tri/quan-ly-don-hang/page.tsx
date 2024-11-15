@@ -18,7 +18,7 @@ import {
     PaginationPrevious,
 } from "@/components/ui/pagination"
 import { Button } from "@/components/ui/button"
-import { FaEdit, FaTrash, FaPlus, FaSearch, FaBox, FaTruck, FaCheckCircle, FaTimesCircle } from 'react-icons/fa'
+import { FaEdit, FaTrash, FaPlus, FaSearch, FaBox, FaTruck, FaCheckCircle, FaTimesCircle, FaCheck } from 'react-icons/fa'
 import { BsThreeDots } from 'react-icons/bs'
 import {
     DropdownMenu,
@@ -165,6 +165,7 @@ const Page = () => {
             case 6: return 'Đang hoàn trả';
             case 7: return 'Hoàn trả thành công';
             case 8: return 'Hoàn trả thất bại';
+            case 9: return 'Thành công';
             default: return 'Không xác định';
         }
     };
@@ -179,6 +180,7 @@ const Page = () => {
             case 6: return 'text-orange-500 bg-orange-100';
             case 7: return 'text-emerald-500 bg-emerald-100';
             case 8: return 'text-rose-500 bg-rose-100';
+            case 9: return 'text-green-600 bg-green-100';
             default: return 'text-gray-500 bg-gray-100';
         }
     };
@@ -193,6 +195,7 @@ const Page = () => {
             case 6: return <FaBox className="mr-2 h-4 w-4 animate-pulse" />;
             case 7: return <FaCheckCircle className="mr-2 h-4 w-4" />;
             case 8: return <FaTimesCircle className="mr-2 h-4 w-4" />;
+            case 9: return <FaCheck className="mr-2 h-4 w-4" />;
             default: return null;
         }
     };
@@ -225,6 +228,7 @@ const Page = () => {
                                 <SelectItem value="6">Đang hoàn trả</SelectItem>
                                 <SelectItem value="7">Hoàn trả thành công</SelectItem>
                                 <SelectItem value="8">Hoàn trả thất bại</SelectItem>
+                                <SelectItem value="9">Thành công</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
