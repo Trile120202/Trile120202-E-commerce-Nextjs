@@ -31,7 +31,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 .whereNot('banners.status', -2)
                 .select(
                     'banners.*',
-                    db.raw('ARRAY_AGG(DISTINCT images.*) as images')
+                    db.raw('ARRAY_AGG(images.url) as images')
                 )
                 .groupBy('banners.id')
                 .offset(offset)
