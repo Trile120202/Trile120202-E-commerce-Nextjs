@@ -41,12 +41,17 @@ interface Image {
 
 const formSchema = z.object({
     name: z.string()
+        .trim()
         .min(1, "Tên sản phẩm không được để trống")
         .max(255, "Tên sản phẩm không được vượt quá 255 ký tự"),
     price: z.string()
-        .min(1, "Giá không được để trống"),
+        .trim()
+        .min(1, "Giá không được để trống")
+        .refine((val) => !isNaN(Number(val)) && Number(val) >= 1000, "Giá phải từ 1.000đ trở lên"),
     stock_quantity: z.string()
-        .min(1, "Số lượng tồn kho không được để trống"),
+        .trim()
+        .min(1, "Số lượng tồn kho không được để trống")
+        .refine((val) => !isNaN(Number(val)) && Number(val) >= 1, "Số lượng phải từ 1 trở lên"),
     description: z.string()
         .min(1, "Mô tả không được để trống"),
     specifications: z.string().optional(),
@@ -116,8 +121,9 @@ const Page = () => {
                 },
                 body: JSON.stringify({
                     ...values,
-                    price: parseFloat(values.price),
-                    stock_quantity: parseInt(values.stock_quantity),
+                    name: values.name.trim(),
+                    price: parseFloat(values.price.trim()),
+                    stock_quantity: parseInt(values.stock_quantity.trim()),
                     specifications: values.specifications ? JSON.parse(values.specifications) : null
                 }),
             });
@@ -304,6 +310,7 @@ const Page = () => {
                                                 <FormControl>
                                                     <Input 
                                                         type="number"
+                                                        min="1000"
                                                         placeholder="Nhập giá" 
                                                         {...field}
                                                         className="h-12 text-lg rounded-lg border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -323,6 +330,7 @@ const Page = () => {
                                                 <FormControl>
                                                     <Input 
                                                         type="number"
+                                                        min="1"
                                                         placeholder="Nhập số lượng" 
                                                         {...field}
                                                         className="h-12 text-lg rounded-lg border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"

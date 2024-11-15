@@ -38,15 +38,21 @@ interface Image {
 
 const formSchema = z.object({
     name: z.string()
+        .trim()
         .min(1, "Tên sản phẩm không được để trống")
         .max(255, "Tên sản phẩm không được vượt quá 255 ký tự"),
     price: z.string()
-        .min(1, "Giá không được để trống"),
+        .trim()
+        .min(1, "Giá không được để trống")
+        .refine((val) => parseInt(val) >= 1000, "Giá phải từ 1.000đ trở lên"),
     stock_quantity: z.string()
-        .min(1, "Số lượng tồn kho không được để trống"),
+        .trim()
+        .min(1, "Số lượng tồn kho không được để trống")
+        .refine((val) => parseInt(val) >= 1, "Số lượng tồn kho phải từ 1 trở lên"),
     description: z.string()
+        .trim()
         .min(1, "Mô tả không được để trống"),
-    specifications: z.string().optional(),
+    specifications: z.string().trim().optional(),
     categories: z.array(z.string())
         .min(1, "Phải chọn một danh mục"),
     ram_ids: z.array(z.string())
