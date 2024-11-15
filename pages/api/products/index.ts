@@ -3,19 +3,18 @@ import knex from 'knex';
 import knexConfig from '../../../knexfile';
 import { StatusCode } from "@/lib/statusCodes";
 import { transformResponse } from "@/lib/interceptors/transformInterceptor";
-import {jwtVerify} from "jose";
+import { useAuth } from '@/hooks/useAuth';
 
 const db = knex(knexConfig);
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method === 'GET') {
         try {
-            const token = req.cookies.token;
-
-            if (!token) {
+            const verified = await useAuth(req, res);
+            if (!verified) {
                 return res.status(StatusCode.UNAUTHORIZED).json(transformResponse({
                     data: null,
-                    message: 'Unauthorized - No token provided',
+                    message: 'Unauthorized',
                     statusCode: StatusCode.UNAUTHORIZED
                 }));
             }
@@ -140,24 +139,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         
     } else if (req.method === 'POST') {
         try {
-            const token = req.cookies.token;
-            if (!token) {
+            const verified = await useAuth(req, res);
+            if (!verified || verified.payload.roleName !== 'admin') {
                 return res.status(StatusCode.UNAUTHORIZED).json(transformResponse({
                     data: null,
-                    message: 'Unauthorized - No token provided',
-                    statusCode: StatusCode.UNAUTHORIZED
-                }));
-            }
-
-            const verified = await jwtVerify(
-                token as string,
-                new TextEncoder().encode(process.env.JWT_SECRET || 'your-secret-key')
-            );
-
-            if (!token && verified.payload.roleId===1) {
-                return res.status(StatusCode.UNAUTHORIZED).json(transformResponse({
-                    data: null,
-                    message: 'Unauthorized - No token provided',
+                    message: 'Unauthorized',
                     statusCode: StatusCode.UNAUTHORIZED
                 }));
             }
@@ -179,6 +165,30 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 thumbnail_id,
                 images
             } = req.body;
+
+            if (!name || !price || !stock_quantity || !description ) {
+                return res.status(StatusCode.BAD_REQUEST).json(transformResponse({
+                    data: null,
+                    message: 'Missing required fields',
+                    statusCode: StatusCode.BAD_REQUEST
+                }));
+            }
+
+            if (typeof price !== 'number' || price <= 0) {
+                return res.status(StatusCode.BAD_REQUEST).json(transformResponse({
+                    data: null,
+                    message: 'Invalid price',
+                    statusCode: StatusCode.BAD_REQUEST
+                }));
+            }
+
+            if (typeof stock_quantity !== 'number' || stock_quantity < 0) {
+                return res.status(StatusCode.BAD_REQUEST).json(transformResponse({
+                    data: null,
+                    message: 'Invalid stock quantity',
+                    statusCode: StatusCode.BAD_REQUEST
+                }));
+            }
 
             const slug = name.toLowerCase()
                 .normalize('NFD')

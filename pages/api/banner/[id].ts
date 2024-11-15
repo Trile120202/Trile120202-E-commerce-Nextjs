@@ -67,12 +67,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     statusCode: StatusCode.UNAUTHORIZED
                 }));
             }
+
             const { name, location, position, status, imageIds } = req.body;
 
             if (!name || !location || !position) {
                 return res.status(StatusCode.BAD_REQUEST).json(transformResponse({
                     data: null,
                     message: 'Tên banner, vị trí và định vị không được để trống.',
+                    statusCode: StatusCode.BAD_REQUEST,
+                }));
+            }
+
+            if (imageIds && !Array.isArray(imageIds)) {
+                return res.status(StatusCode.BAD_REQUEST).json(transformResponse({
+                    data: null,
+                    message: 'Danh sách ảnh phải là một mảng.',
                     statusCode: StatusCode.BAD_REQUEST,
                 }));
             }
@@ -93,6 +102,28 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 }));
             }
 
+            const existingBanners = await db('banners')
+                .where({
+                    location: location,
+                    position: position,
+                    status: 1
+                })
+                .whereNot('id', id);
+
+            if (existingBanners.length > 0) {
+                await db('banners')
+                    .where({
+                        location: location,
+                        position: position,
+                        status: 1
+                    })
+                    .whereNot('id', id)
+                    .update({
+                        status: 0,
+                        updated_at: db.fn.now()
+                    });
+            }
+
             const [updatedBanner] = await db('banners')
                 .where({ id })
                 .whereNot('status', -2)
@@ -100,8 +131,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     name,
                     location,
                     position,
-                    status,
-                    updated_at: db.fn.now(),
+                    status: status || 1,
+                    updated_at: db.fn.now()
                 })
                 .returning('*');
 
@@ -113,7 +144,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 }));
             }
 
-            if (imageIds && Array.isArray(imageIds)) {
+            if (imageIds && imageIds.length > 0) {
                 await db('banner_images').where({ banner_id: id }).delete();
                 
                 const bannerImages = imageIds.map(imageId => ({
@@ -127,26 +158,27 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 await db('banner_images').insert(bannerImages);
             }
 
-            const images = await db('banner_images')
-                .join('images', 'banner_images.image_id', 'images.id')
-                .where('banner_images.banner_id', id)
-                .select('images.*');
+            const updatedBannerWithImages = await db('banners')
+                .leftJoin('banner_images', 'banners.id', 'banner_images.banner_id')
+                .leftJoin('images', 'banner_images.image_id', 'images.id')
+                .where('banners.id', id)
+                .select(
+                    'banners.*',
+                    db.raw('ARRAY_AGG(images.*) as images')
+                )
+                .groupBy('banners.id')
+                .first();
 
-            const finalBanner = {
-                ...updatedBanner,
-                images: images || []
-            };
-
-            return res.status(StatusCode.OK).json(transformResponse({
-                data: finalBanner,
+            res.status(StatusCode.OK).json(transformResponse({
+                data: updatedBannerWithImages,
                 message: 'Cập nhật banner thành công.',
                 statusCode: StatusCode.OK,
             }));
         } catch (error) {
-            console.error(error);
+            console.error('Error in PUT handler:', error);
             return res.status(StatusCode.INTERNAL_SERVER_ERROR).json(transformResponse({
                 data: null,
-                message: 'Đã xảy ra lỗi khi cập nhật banner.',
+                message: 'Internal server error',
                 statusCode: StatusCode.INTERNAL_SERVER_ERROR,
             }));
         }
