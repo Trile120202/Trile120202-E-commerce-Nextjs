@@ -66,6 +66,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
     } else if (req.method === 'POST') {
         try {
+            // eslint-disable-next-line react-hooks/rules-of-hooks
             const verified = await useAuth(req, res);
             if (!verified || verified.payload.roleName !== 'admin') {
                 return res.status(StatusCode.UNAUTHORIZED).json(transformResponse({

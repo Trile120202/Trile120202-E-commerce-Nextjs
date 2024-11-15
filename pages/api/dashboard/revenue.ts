@@ -92,7 +92,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             const year = parseInt(req.query.year as string, 10) || new Date().getFullYear();
             const month = req.query.month ? parseInt(req.query.month as string, 10) : undefined;
 
-            // Validate the period type
             if (!['quarter1', 'quarter2', 'quarter3', 'quarter4', 'month', 'year'].includes(period)) {
                 return res.status(StatusCode.BAD_REQUEST).json(transformResponse({
                     data: null,
@@ -101,7 +100,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 }));
             }
 
-            // Fetch revenue, total orders and top-selling products concurrently
             const [revenue, totalOrders, topSellingProducts] = await Promise.all([
                 getRevenue(period, year, month),
                 getTotalOrders(period, year, month),
