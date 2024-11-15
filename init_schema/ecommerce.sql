@@ -1,5 +1,52 @@
 -- Adminer 4.8.1 PostgreSQL 14.13 (Debian 14.13-1.pgdg120+1) dump
+DROP TABLE IF EXISTS product_specifications CASCADE;
+DROP TABLE IF EXISTS product_tags CASCADE;
+DROP TABLE IF EXISTS tags CASCADE;
+DROP TABLE IF EXISTS wishlist CASCADE;
+DROP TABLE IF EXISTS coupons CASCADE;
+DROP TABLE IF EXISTS reviews CASCADE;
+DROP TABLE IF EXISTS order_items CASCADE;
+DROP TABLE IF EXISTS orders CASCADE;
+DROP TABLE IF EXISTS role_permissions CASCADE;
+DROP TABLE IF EXISTS permissions CASCADE;
+DROP TABLE IF EXISTS roles CASCADE;
+DROP TABLE IF EXISTS delivery_addresses CASCADE;
+DROP TABLE IF EXISTS user_delivery_addresses CASCADE;
+DROP TABLE IF EXISTS users CASCADE;
+DROP TABLE IF EXISTS product_categories CASCADE;
+DROP TABLE IF EXISTS categories CASCADE;
+DROP TABLE IF EXISTS product_images CASCADE;
+DROP TABLE IF EXISTS products CASCADE;
+DROP TABLE IF EXISTS images CASCADE;
+DROP TABLE IF EXISTS ram CASCADE;
+DROP TABLE IF EXISTS hard_drives CASCADE;
+DROP TABLE IF EXISTS product_ram CASCADE;
+DROP TABLE IF EXISTS product_hard_drives CASCADE;
+DROP TABLE IF EXISTS cart_items CASCADE;
+DROP TABLE IF EXISTS carts CASCADE;
+DROP TABLE IF EXISTS banners CASCADE;
+DROP TABLE IF EXISTS banner_images CASCADE;
+DROP TABLE IF EXISTS product_graphics_cards CASCADE;
+DROP TABLE IF EXISTS graphics_cards CASCADE;
+DROP TABLE IF EXISTS displays CASCADE;
+DROP TABLE IF EXISTS product_displays CASCADE;
+DROP TABLE IF EXISTS cpus CASCADE;
+DROP TABLE IF EXISTS product_cpus CASCADE;
+DROP TABLE IF EXISTS graphics_cards CASCADE;
+DROP TABLE IF EXISTS product_graphics_cards CASCADE;
+DROP TABLE IF EXISTS settings CASCADE;
+DROP TABLE IF EXISTS wards CASCADE;
+DROP TABLE IF EXISTS districts CASCADE;
+DROP TABLE IF EXISTS provinces CASCADE;
+DROP TABLE IF EXISTS payment_methods CASCADE;
+DROP TABLE IF EXISTS user_delivery_addresses CASCADE;
+DROP TABLE IF EXISTS delivery_addresses CASCADE;
 
+
+
+
+
+DROP FUNCTION IF EXISTS update_modified_column() CASCADE;
 DROP TABLE IF EXISTS "banner_images";
 CREATE TABLE "public"."banner_images" (
     "id" uuid DEFAULT gen_random_uuid() NOT NULL,
@@ -21,7 +68,10 @@ CREATE INDEX "idx_banner_images_status" ON "public"."banner_images" USING btree 
 
 CREATE INDEX "idx_banner_images_updated_at" ON "public"."banner_images" USING btree ("updated_at");
 
-TRUNCATE "banner_images";
+INSERT INTO "banner_images" ("id", "banner_id", "image_id", "status", "created_at", "updated_at") VALUES
+('0d638cb6-0780-4164-a6c2-36e1a4ed46c6',	'f249f5fb-c0cd-4dec-a98c-0a1a521d54fa',	'304c3205-f75c-4a1e-8aba-7206e07a4536',	1,	'2024-11-14 17:17:30.200675',	'2024-11-14 17:17:30.200675'),
+('22ea96af-6841-433b-a7f0-83fff066ee9e',	'f249f5fb-c0cd-4dec-a98c-0a1a521d54fa',	'62c4a6a7-35c7-4dae-94b8-f16bba02b465',	1,	'2024-11-14 17:17:30.200675',	'2024-11-14 17:17:30.200675'),
+('2ae2687a-8d5c-488b-877c-396bde5638df',	'f249f5fb-c0cd-4dec-a98c-0a1a521d54fa',	'c22dbe7e-fdd2-4780-ab2a-22dd2d5bac3d',	1,	'2024-11-14 17:17:30.200675',	'2024-11-14 17:17:30.200675');
 
 DROP TABLE IF EXISTS "banners";
 CREATE TABLE "public"."banners" (
@@ -43,7 +93,8 @@ CREATE INDEX "idx_banners_status" ON "public"."banners" USING btree ("status");
 
 CREATE INDEX "idx_banners_updated_at" ON "public"."banners" USING btree ("updated_at");
 
-TRUNCATE "banners";
+INSERT INTO "banners" ("id", "name", "location", "position", "status", "created_at", "updated_at") VALUES
+('f249f5fb-c0cd-4dec-a98c-0a1a521d54fa',	'Home Banner',	'home',	'1',	1,	'2024-11-14 17:17:30.196822',	'2024-11-14 17:17:30.196822');
 
 DROP TABLE IF EXISTS "cart_items";
 CREATE TABLE "public"."cart_items" (
@@ -67,7 +118,14 @@ CREATE INDEX "idx_cart_items_status" ON "public"."cart_items" USING btree ("stat
 
 CREATE INDEX "idx_cart_items_updated_at" ON "public"."cart_items" USING btree ("updated_at");
 
-TRUNCATE "cart_items";
+INSERT INTO "cart_items" ("id", "cart_id", "product_id", "quantity", "created_at", "updated_at", "status") VALUES
+('cb35ff1b-aa19-43a1-9a8a-a859794fedce',	'ffec2937-40b2-44b7-ab31-bf51a23cc2b0',	'f08b023b-adc3-4604-8742-acdf30ce585e',	9,	'2024-11-14 23:53:52.845256',	'2024-11-15 00:08:37.252767',	0),
+('8d3d5b0f-706e-49f8-83fc-f2942c2273ad',	'28bfdec5-27d3-432e-9d75-bb6e45c2c16b',	'a1740f18-5a59-4784-b1af-705a42803d9f',	1,	'2024-11-14 10:05:45.271211',	'2024-11-14 10:05:45.271211',	1),
+('8a587dfb-2eb8-4994-a35d-f083f2044a65',	'28bfdec5-27d3-432e-9d75-bb6e45c2c16b',	'27f381af-0752-40e6-9825-5cfaa92d5e77',	28,	'2024-11-14 16:56:27.052956',	'2024-11-14 17:00:46.722165',	0),
+('46b818f1-9eac-498c-863e-819478e2d61b',	'28bfdec5-27d3-432e-9d75-bb6e45c2c16b',	'9ce63f97-dc12-4510-9eec-d44d7ee3d547',	19,	'2024-11-14 16:14:12.533982',	'2024-11-14 17:01:05.053388',	1),
+('02bd0130-c005-4303-9898-5a0f58987773',	'28bfdec5-27d3-432e-9d75-bb6e45c2c16b',	'27f381af-0752-40e6-9825-5cfaa92d5e77',	1,	'2024-11-14 17:02:29.122718',	'2024-11-14 17:09:17.027214',	0),
+('d85494ae-c7b8-4345-b195-533ba67f8b4e',	'949c82a0-8c81-4876-aa8e-1145d11c83e9',	'27f381af-0752-40e6-9825-5cfaa92d5e77',	1,	'2024-11-15 00:24:09.975555',	'2024-11-15 00:24:19.735165',	0),
+('bd1b8abc-51e3-4987-b754-367e53605634',	'949c82a0-8c81-4876-aa8e-1145d11c83e9',	'8bede882-3d39-430d-ad0a-75658fb3c7ce',	1,	'2024-11-14 23:53:52.845821',	'2024-11-15 00:01:34.327105',	0);
 
 DROP TABLE IF EXISTS "carts";
 CREATE TABLE "public"."carts" (
@@ -87,7 +145,10 @@ CREATE INDEX "idx_carts_updated_at" ON "public"."carts" USING btree ("updated_at
 
 CREATE INDEX "idx_carts_user_id" ON "public"."carts" USING btree ("user_id");
 
-TRUNCATE "carts";
+INSERT INTO "carts" ("id", "user_id", "created_at", "updated_at", "status") VALUES
+('28bfdec5-27d3-432e-9d75-bb6e45c2c16b',	'bfece6d4-82d8-46b9-8326-c36b4bbc813d',	'2024-11-13 11:52:48.054157',	'2024-11-13 11:52:48.054157',	1),
+('949c82a0-8c81-4876-aa8e-1145d11c83e9',	'4aa6e593-4105-4a58-ab72-df464bff80aa',	'2024-11-14 23:53:52.845821',	'2024-11-14 23:53:52.845821',	1),
+('ffec2937-40b2-44b7-ab31-bf51a23cc2b0',	'4aa6e593-4105-4a58-ab72-df464bff80aa',	'2024-11-14 23:53:52.845256',	'2024-11-14 23:53:52.845256',	1);
 
 DROP TABLE IF EXISTS "categories";
 CREATE TABLE "public"."categories" (
@@ -113,7 +174,16 @@ CREATE INDEX "idx_categories_status" ON "public"."categories" USING btree ("stat
 
 CREATE INDEX "idx_categories_updated_at" ON "public"."categories" USING btree ("updated_at");
 
-TRUNCATE "categories";
+INSERT INTO "categories" ("id", "name", "slug", "content", "image_id", "created_at", "updated_at", "status") VALUES
+('d9065c79-8edf-44dd-bb74-093c08f2625c',	'ASUS',	'asus',	'',	NULL,	'2024-11-13 09:05:16.885198',	'2024-11-13 09:05:16.885198',	1),
+('9924e7a1-f06e-4eae-b7e4-c66e383a6dad',	'ASUS/VIVOBOOK',	'asus-vivobook',	'',	NULL,	'2024-11-13 09:05:31.194352',	'2024-11-13 09:05:31.194352',	1),
+('20f604c3-ea4e-45e2-a377-b84927d49e13',	'ROG',	'rog',	'',	NULL,	'2024-11-13 09:05:37.169853',	'2024-11-13 09:05:37.169853',	1),
+('d9324a74-b491-4dd7-97f4-23563f95dfcf',	'HP',	'hp',	'',	NULL,	'2024-11-13 09:12:13.363116',	'2024-11-13 09:12:13.363116',	1),
+('af5be7f8-78a8-448c-a7a5-32b22188af8c',	'DELL',	'dell',	'',	NULL,	'2024-11-13 09:12:22.470393',	'2024-11-13 09:12:22.470393',	1),
+('678b3d25-5ef7-46e5-a167-81c8c156f6d0',	'MSI',	'msi',	'',	NULL,	'2024-11-13 09:12:28.446352',	'2024-11-13 09:12:28.446352',	1),
+('49013671-b633-4f5c-9a79-6064669c6878',	'LENOVO/THING PAD',	'lenovothing-pad',	'',	NULL,	'2024-11-13 09:12:39.399806',	'2024-11-13 09:12:39.399806',	1),
+('6ba84f5e-f03d-4cef-9aa9-bb3284273883',	'ACER',	'acer',	'',	NULL,	'2024-11-13 09:13:02.20334',	'2024-11-13 09:13:02.20334',	1),
+('91121685-c766-407e-a9fb-e8705f6dd770',	'wv',	'wv',	'<p>Á</p>',	NULL,	'2024-11-15 00:04:25.99747',	'2024-11-15 00:04:25.99747',	1);
 
 DROP TABLE IF EXISTS "coupons";
 CREATE TABLE "public"."coupons" (
@@ -150,7 +220,8 @@ CREATE INDEX "idx_coupons_status" ON "public"."coupons" USING btree ("status");
 
 CREATE INDEX "idx_coupons_updated_at" ON "public"."coupons" USING btree ("updated_at");
 
-TRUNCATE "coupons";
+INSERT INTO "coupons" ("id", "code", "discount_type", "discount_value", "start_date", "end_date", "min_purchase_amount", "max_usage", "max_discount_value", "is_active", "created_at", "updated_at", "status") VALUES
+('11273d02-d22e-4882-9065-0514a86cc721',	'NEWBIE',	'percentage',	20.00,	'2024-11-12',	'2024-11-14',	2000000.00,	2,	200000.00,	't',	'2024-11-13 11:47:52.120655',	'2024-11-13 11:47:52.120655',	1);
 
 DROP TABLE IF EXISTS "cpus";
 CREATE TABLE "public"."cpus" (
@@ -179,7 +250,13 @@ CREATE INDEX "idx_cpus_status" ON "public"."cpus" USING btree ("status");
 
 CREATE INDEX "idx_cpus_updated_at" ON "public"."cpus" USING btree ("updated_at");
 
-TRUNCATE "cpus";
+INSERT INTO "cpus" ("id", "name", "brand", "model", "cores", "threads", "base_clock", "boost_clock", "cache", "status", "created_at", "updated_at") VALUES
+('0be5bf59-98f5-40f0-84c7-f88b08d7eae5',	'i7-13650HX ',	'Intel',	'Core i7-12700KF',	8,	12,	'3.0 GHz',	'4.5 GHz',	'24MB',	1,	'2024-11-13 10:57:30.606326',	'2024-11-13 10:57:30.606326'),
+('5299d63a-8a5e-40da-acab-f49c09f9c13a',	'i3-10100F',	'Intel',	'Core i3-10100F',	6,	8,	'4.5 GHz',	'3.5 GHz',	'32MB',	1,	'2024-11-13 11:12:58.321296',	'2024-11-14 15:50:53.199477'),
+('e10653af-2cec-4301-83a2-29ecee50a9ee',	'i7-14700H',	'Intel',	'Core i7-14700H',	6,	8,	'4.5 GHz',	'3.5 GHz',	'32MB',	1,	'2024-11-13 11:12:55.177239',	'2024-11-14 15:51:35.335009'),
+('fb97776e-be02-4a35-8362-11feec98e947',	'i5-13500H',	'Intel',	'Core i5-13500H',	10,	16,	'2.5 GHz',	'3.2 GHz',	'128MB',	1,	'2024-11-13 11:09:32.709642',	'2024-11-14 15:51:51.109844'),
+('3b7ee5ad-8c0e-4ed3-9f6f-c325a8f3045b',	'i3-1125G4',	'Intel',	'Core i3-1125G4',	4,	8,	'4.0 GHz',	'4.9 GHz',	'128MB',	1,	'2024-11-13 11:07:49.515514',	'2024-11-14 15:52:12.139977'),
+('cadc2cc8-498b-454d-8509-5feca20688f0',	'Ryzen 7 5800X',	'AMD',	'Ryzen 7 5800X',	6,	8,	'3.2 GHz',	'3.8 GHz',	'24MB',	1,	'2024-11-14 15:53:18.501076',	'2024-11-14 15:53:18.501076');
 
 DROP TABLE IF EXISTS "delivery_addresses";
 CREATE TABLE "public"."delivery_addresses" (
@@ -197,7 +274,9 @@ CREATE TABLE "public"."delivery_addresses" (
     CONSTRAINT "delivery_addresses_pkey" PRIMARY KEY ("id")
 ) WITH (oids = false);
 
-TRUNCATE "delivery_addresses";
+INSERT INTO "delivery_addresses" ("id", "user_id", "province_code", "district_code", "ward_code", "postal_code", "address", "phone_number", "status", "created_at", "updated_at") VALUES
+('92dab41d-a36e-4035-9df8-1d6d0da7fd91',	'bfece6d4-82d8-46b9-8326-c36b4bbc813d',	79,	778,	27481,	'',	'abc',	'0917739932',	1,	'2024-11-13 11:54:25.502755',	'2024-11-13 11:54:25.502755'),
+('e89506b9-3724-4381-8543-de3e140e2cfe',	'4aa6e593-4105-4a58-ab72-df464bff80aa',	60,	600,	23206,	'',	'số 11',	'2342323432',	1,	'2024-11-15 00:09:13.549533',	'2024-11-15 00:24:32.666861');
 
 DROP TABLE IF EXISTS "displays";
 CREATE TABLE "public"."displays" (
@@ -221,7 +300,9 @@ CREATE INDEX "idx_displays_status" ON "public"."displays" USING btree ("status")
 
 CREATE INDEX "idx_displays_updated_at" ON "public"."displays" USING btree ("updated_at");
 
-TRUNCATE "displays";
+INSERT INTO "displays" ("id", "name", "size", "resolution", "panel_type", "refresh_rate", "status", "created_at", "updated_at") VALUES
+('0847dbf3-cd1c-433f-a55f-15bfcde20c7c',	'16 inch FHD+ (1920 x 1200, WUXGA) ',	'16',	'1920x1080',	'OLED',	'144Hz',	1,	'2024-11-13 10:59:35.242946',	'2024-11-13 10:59:35.242946'),
+('db3ab93a-93a5-4137-af34-2762c864bbd1',	'15.6" FHD (1920x1080) ',	'15.6',	'1920x1080',	'IPS',	'144Hz',	1,	'2024-11-14 15:50:01.041592',	'2024-11-14 15:50:01.041592');
 
 DROP TABLE IF EXISTS "districts";
 DROP SEQUENCE IF EXISTS districts_id_seq1;
@@ -238,7 +319,6 @@ CREATE TABLE "public"."districts" (
     CONSTRAINT "districts_pkey" PRIMARY KEY ("id")
 ) WITH (oids = false);
 
-TRUNCATE "districts";
 INSERT INTO "districts" ("id", "name", "code", "division_type", "codename", "province_code", "wards") VALUES
 (1,	'Quận Ba Đình',	1,	'quận',	'quan_ba_dinh',	1,	'[]'),
 (2,	'Quận Hoàn Kiếm',	2,	'quận',	'quan_hoan_kiem',	1,	'[]'),
@@ -970,7 +1050,11 @@ CREATE INDEX "idx_graphics_cards_status" ON "public"."graphics_cards" USING btre
 
 CREATE INDEX "idx_graphics_cards_updated_at" ON "public"."graphics_cards" USING btree ("updated_at");
 
-TRUNCATE "graphics_cards";
+INSERT INTO "graphics_cards" ("id", "name", "brand", "memory_size", "memory_type", "clock_speed", "status", "created_at", "updated_at") VALUES
+('f7e01f46-cc78-48be-827e-5f493fb9e1cc',	' GeForce RTX™ 4060 8GB',	'NVIDIA',	'8GB',	'GDDR6',	'2.4 GHz',	1,	'2024-11-14 16:06:44.251529',	'2024-11-14 16:06:44.251529'),
+('54228b1e-1138-4423-b482-f03c16cec013',	'GeForce RTX™ 4050 6GB',	'NVIDIA',	'6GB',	'GDDR6',	'2.2 GHz',	1,	'2024-11-13 10:53:26.750022',	'2024-11-14 16:07:00.60062'),
+('57b7f201-481a-4e3d-a7dc-e14d4d4f02b5',	'GeForce RTX™ 4070 6GB',	'NVIDIA',	'6GB',	'GDDR6',	'2.4 GHz',	1,	'2024-11-13 10:53:09.158233',	'2024-11-14 16:07:07.959972'),
+('52686413-158a-46c8-8acd-e50e7d3bd398',	' GeForce RTX™ 4060 8GB',	'Gigabyte',	'8GB',	'GDDR6',	'2.4 GHz',	1,	'2024-11-14 16:12:50.599014',	'2024-11-14 16:12:50.599014');
 
 DROP TABLE IF EXISTS "hard_drives";
 CREATE TABLE "public"."hard_drives" (
@@ -1002,7 +1086,9 @@ CREATE INDEX "idx_hard_drives_type" ON "public"."hard_drives" USING btree ("type
 
 CREATE INDEX "idx_hard_drives_updated_at" ON "public"."hard_drives" USING btree ("updated_at");
 
-TRUNCATE "hard_drives";
+INSERT INTO "hard_drives" ("id", "name", "type", "capacity", "interface", "brand", "created_at", "updated_at", "status") VALUES
+('ae541ee0-eea9-40b2-bf1b-82738f6f6c80',	'512GB M.2 NVMe™ PCIe® 4.0 SSD',	'NVMe SSD',	'512GB',	'PCIe 4.0',	'SanDisk',	'2024-11-13 10:49:56.708316',	'2024-11-13 10:49:56.708316',	1),
+('9dd77840-cb70-4dc8-901f-5c8fb135cd8c',	'1TB PCIe® 4.0 NVMe™ M.2 SSD',	'NVMe SSD',	'1TB',	'PCIe 4.0',	'Kingston',	'2024-11-13 10:50:19.331189',	'2024-11-13 10:50:19.331189',	1);
 
 DROP TABLE IF EXISTS "images";
 CREATE TABLE "public"."images" (
@@ -1023,7 +1109,6 @@ CREATE INDEX "idx_images_updated_at" ON "public"."images" USING btree ("updated_
 
 CREATE INDEX "idx_images_url" ON "public"."images" USING btree ("url");
 
-TRUNCATE "images";
 INSERT INTO "images" ("id", "url", "alt_text", "created_at", "updated_at", "status") VALUES
 ('f47ef901-01af-4ce0-a256-04d131ae2eb1',	'https://utfs.io/f/htZOn3gdgqGNirPhXfdzKaSBlqcVv147MkQPsoA5w9tUTOed',	'asus_gaming_vivobook_k3605zf-rp634w.png',	'2024-11-11 06:00:50.650598',	'2024-11-11 06:00:50.650598',	1),
 ('8bf0ed30-56b9-4932-82b4-d981c5014b0d',	'https://utfs.io/f/htZOn3gdgqGNUD3LF0pKcdWDQf1xV7Oa4LMbJuAgyXRqFl6p',	'asus_gaming_vivobook_k3605z_k3605v_product_photo_2k_indie_black_17__96ae44616e9348c48ebadb850ae20ee0_grande.png',	'2024-11-11 06:15:30.343924',	'2024-11-11 06:15:30.343924',	1),
@@ -1084,11 +1169,7 @@ INSERT INTO "images" ("id", "url", "alt_text", "created_at", "updated_at", "stat
 ('a59bf196-f665-496b-a67d-c74c50dd63e5',	'https://utfs.io/f/htZOn3gdgqGN6O3yYKhiGmgLUXFDC6Iw9ZThno8RNHv7ka0W',	'ictus_16_80w_micasilver_nt_hdcam_nonfpr_nonodd_victusamd_coreset_front_98a4a444dccf4c959645368c89bddf69_grande.png',	'2024-11-11 16:49:46.666686',	'2024-11-11 16:49:46.666686',	1),
 ('e0fe2019-c705-4970-a9e1-7ea5806d3d55',	'https://utfs.io/f/htZOn3gdgqGNFVslBwNOfwWRvdVqkLXHP2eznSi6KgMZbI81',	'4.png',	'2024-11-13 08:24:17.665924',	'2024-11-13 08:24:47.071612',	-2);
 
-DELIMITER ;;
 
-CREATE TRIGGER "update_images_modtime" BEFORE UPDATE ON "public"."images" FOR EACH ROW EXECUTE FUNCTION update_modified_column();;
-
-DELIMITER ;
 
 DROP TABLE IF EXISTS "order_items";
 CREATE TABLE "public"."order_items" (
@@ -1113,7 +1194,14 @@ CREATE INDEX "idx_order_items_status" ON "public"."order_items" USING btree ("st
 
 CREATE INDEX "idx_order_items_updated_at" ON "public"."order_items" USING btree ("updated_at");
 
-TRUNCATE "order_items";
+INSERT INTO "order_items" ("id", "order_id", "product_id", "quantity", "price", "created_at", "updated_at", "status") VALUES
+('90afb55a-b293-4b9c-8688-677a4995ecc3',	'51d6e3b5-159a-43a1-8d24-ae62242da688',	'27f381af-0752-40e6-9825-5cfaa92d5e77',	1,	'135.00',	'2024-11-14 01:54:33.65435',	'2024-11-14 01:54:33.65435',	1),
+('dd0ff86c-d85b-49d3-aa25-584419b4a25e',	'662bf8c7-4734-4755-895f-5ec2202bd0b2',	'27f381af-0752-40e6-9825-5cfaa92d5e77',	1,	'135.00',	'2024-11-14 02:05:09.831846',	'2024-11-14 02:05:09.831846',	1),
+('31639880-cef4-4271-a712-f7ae53b458ee',	'662bf8c7-4734-4755-895f-5ec2202bd0b2',	'72b983b9-8267-44e5-8269-862561258c31',	1,	'1000000.00',	'2024-11-14 02:05:09.831846',	'2024-11-14 02:05:09.831846',	1),
+('27e31f06-9b74-4a44-81aa-de1217c5bd70',	'17fbe05e-aa16-4e26-b2c2-d6ab1cf0fea0',	'72b983b9-8267-44e5-8269-862561258c31',	1,	'1000000.00',	'2024-11-14 02:05:54.891437',	'2024-11-14 02:05:54.891437',	1),
+('41bf6cf5-6981-4084-980b-fdcba19b30e5',	'edea099f-dc49-4904-b55d-b8126300f0e2',	'27f381af-0752-40e6-9825-5cfaa92d5e77',	1,	'1000000.00',	'2024-11-14 02:07:55.453133',	'2024-11-14 02:07:55.453133',	1),
+('50291d66-0876-4bc9-9a00-7cbb3e75d228',	'490a438f-badd-483a-9d24-4b145c662899',	'27f381af-0752-40e6-9825-5cfaa92d5e77',	7,	'21000000',	'2024-11-15 00:09:18.084566',	'2024-11-15 00:09:18.084566',	1),
+('b8f42018-aafa-4b46-9f80-12737c6a835e',	'92c1678b-78ca-4613-9fc1-8001c5d2ef64',	'9ce63f97-dc12-4510-9eec-d44d7ee3d547',	1,	'40699000',	'2024-11-15 00:24:36.569561',	'2024-11-15 00:24:36.569561',	1);
 
 DROP TABLE IF EXISTS "orders";
 CREATE TABLE "public"."orders" (
@@ -1145,7 +1233,13 @@ CREATE INDEX "idx_orders_updated_at" ON "public"."orders" USING btree ("updated_
 
 CREATE INDEX "idx_orders_user_id" ON "public"."orders" USING btree ("user_id");
 
-TRUNCATE "orders";
+INSERT INTO "orders" ("id", "user_id", "delivery_address_id", "note", "order_date", "total_amount", "shipping_address", "payment_method_id", "created_at", "updated_at", "status") VALUES
+('51d6e3b5-159a-43a1-8d24-ae62242da688',	'bfece6d4-82d8-46b9-8326-c36b4bbc813d',	'92dab41d-a36e-4035-9df8-1d6d0da7fd91',	'',	'2024-11-14 01:54:33.65435',	'30135',	'abc, Phường Tân Quy, Quận 7, Thành phố Hồ Chí Minh',	'f5aeca2b-a32d-4f2a-9dc6-91d6c6ec92db',	'2024-11-14 01:54:33.65435',	'2024-11-14 01:54:33.65435',	1),
+('662bf8c7-4734-4755-895f-5ec2202bd0b2',	'bfece6d4-82d8-46b9-8326-c36b4bbc813d',	'92dab41d-a36e-4035-9df8-1d6d0da7fd91',	'',	'2024-11-14 02:05:09.831846',	'1030135',	'abc, Phường Tân Quy, Quận 7, Thành phố Hồ Chí Minh',	'f5aeca2b-a32d-4f2a-9dc6-91d6c6ec92db',	'2024-11-14 02:05:09.831846',	'2024-11-14 02:05:09.831846',	1),
+('17fbe05e-aa16-4e26-b2c2-d6ab1cf0fea0',	'bfece6d4-82d8-46b9-8326-c36b4bbc813d',	'92dab41d-a36e-4035-9df8-1d6d0da7fd91',	'',	'2024-11-14 02:05:54.891437',	'1030000',	'abc, Phường Tân Quy, Quận 7, Thành phố Hồ Chí Minh',	'f5aeca2b-a32d-4f2a-9dc6-91d6c6ec92db',	'2024-11-14 02:05:54.891437',	'2024-11-14 02:05:54.891437',	1),
+('490a438f-badd-483a-9d24-4b145c662899',	'4aa6e593-4105-4a58-ab72-df464bff80aa',	'e89506b9-3724-4381-8543-de3e140e2cfe',	'',	'2024-11-15 00:09:18.084566',	'147030000',	'sdfdsfdsf, Xã Nam Chính, Huyện Đức Linh, Tỉnh Bình Thuận',	'f5aeca2b-a32d-4f2a-9dc6-91d6c6ec92db',	'2024-11-15 00:09:18.084566',	'2024-11-15 00:09:50.412427',	5),
+('edea099f-dc49-4904-b55d-b8126300f0e2',	'bfece6d4-82d8-46b9-8326-c36b4bbc813d',	'92dab41d-a36e-4035-9df8-1d6d0da7fd91',	'',	'2024-11-14 02:07:55.453133',	'1030000',	'abc, Phường Tân Quy, Quận 7, Thành phố Hồ Chí Minh',	'f5aeca2b-a32d-4f2a-9dc6-91d6c6ec92db',	'2024-11-14 02:07:55.453133',	'2024-11-15 00:23:33.201012',	9),
+('92c1678b-78ca-4613-9fc1-8001c5d2ef64',	'4aa6e593-4105-4a58-ab72-df464bff80aa',	'e89506b9-3724-4381-8543-de3e140e2cfe',	'',	'2024-11-15 00:24:36.569561',	'40729000',	'số 11, Xã Nam Chính, Huyện Đức Linh, Tỉnh Bình Thuận',	'f5aeca2b-a32d-4f2a-9dc6-91d6c6ec92db',	'2024-11-15 00:24:36.569561',	'2024-11-15 00:27:51.889634',	9);
 
 DROP TABLE IF EXISTS "payment_methods";
 CREATE TABLE "public"."payment_methods" (
@@ -1174,7 +1268,6 @@ CREATE INDEX "idx_payment_methods_status" ON "public"."payment_methods" USING bt
 
 CREATE INDEX "idx_payment_methods_updated_at" ON "public"."payment_methods" USING btree ("updated_at");
 
-TRUNCATE "payment_methods";
 INSERT INTO "payment_methods" ("id", "name", "code", "description", "is_active", "icon_url", "provider", "config", "created_at", "updated_at", "status") VALUES
 ('f5aeca2b-a32d-4f2a-9dc6-91d6c6ec92db',	'Thanh toán khi nhận hàng',	'cod',	'Thanh toán tiền mặt khi nhận hàng',	't',	'/icons/cod.png',	'internal',	'{"fee": 0}',	'2024-11-13 07:57:58.003236',	'2024-11-13 07:57:58.003236',	1),
 ('3cac6396-1387-44f6-a37c-d8f6106d9eb7',	'Chuyển khoản ngân hàng',	'bank_transfer',	'Chuyển khoản qua tài khoản ngân hàng',	't',	'/icons/bank.png',	'internal',	'{"bank_name": "Vietcombank", "account_name": "CÔNG TY TNHH ABC", "account_number": "1234567890"}',	'2024-11-13 07:57:58.003236',	'2024-11-13 07:57:58.003236',	1),
@@ -1202,7 +1295,6 @@ CREATE INDEX "idx_permissions_status" ON "public"."permissions" USING btree ("st
 
 CREATE INDEX "idx_permissions_updated_at" ON "public"."permissions" USING btree ("updated_at");
 
-TRUNCATE "permissions";
 
 DROP TABLE IF EXISTS "product_categories";
 CREATE TABLE "public"."product_categories" (
@@ -1224,7 +1316,16 @@ CREATE INDEX "idx_product_categories_status" ON "public"."product_categories" US
 
 CREATE INDEX "idx_product_categories_updated_at" ON "public"."product_categories" USING btree ("updated_at");
 
-TRUNCATE "product_categories";
+INSERT INTO "product_categories" ("product_id", "category_id", "created_at", "updated_at", "status") VALUES
+('9ce63f97-dc12-4510-9eec-d44d7ee3d547',	'20f604c3-ea4e-45e2-a377-b84927d49e13',	'2024-11-14 15:44:00.609168',	'2024-11-14 15:44:00.609168',	1),
+('a1740f18-5a59-4784-b1af-705a42803d9f',	'49013671-b633-4f5c-9a79-6064669c6878',	'2024-11-14 15:59:02.497256',	'2024-11-14 15:59:02.497256',	1),
+('d4ab497a-fb51-4656-9dab-9eca3214baec',	'678b3d25-5ef7-46e5-a167-81c8c156f6d0',	'2024-11-14 16:02:19.289067',	'2024-11-14 16:02:19.289067',	1),
+('27f381af-0752-40e6-9825-5cfaa92d5e77',	'20f604c3-ea4e-45e2-a377-b84927d49e13',	'2024-11-14 16:04:53.244145',	'2024-11-14 16:04:53.244145',	1),
+('72b983b9-8267-44e5-8269-862561258c31',	'd9324a74-b491-4dd7-97f4-23563f95dfcf',	'2024-11-14 16:22:52.746072',	'2024-11-14 16:22:52.746072',	1),
+('ca049f04-3324-4d37-b164-351b3cccb7de',	'678b3d25-5ef7-46e5-a167-81c8c156f6d0',	'2024-11-14 17:06:28.458183',	'2024-11-14 17:06:28.458183',	1),
+('ca80d7c3-c576-4e70-88c8-71748b675578',	'af5be7f8-78a8-448c-a7a5-32b22188af8c',	'2024-11-14 17:09:03.327861',	'2024-11-14 17:09:03.327861',	1),
+('8bede882-3d39-430d-ad0a-75658fb3c7ce',	'9924e7a1-f06e-4eae-b7e4-c66e383a6dad',	'2024-11-14 17:11:32.741467',	'2024-11-14 17:11:32.741467',	1),
+('f08b023b-adc3-4604-8742-acdf30ce585e',	'9924e7a1-f06e-4eae-b7e4-c66e383a6dad',	'2024-11-14 17:13:27.971249',	'2024-11-14 17:13:27.971249',	1);
 
 DROP TABLE IF EXISTS "product_cpus";
 CREATE TABLE "public"."product_cpus" (
@@ -1237,7 +1338,16 @@ CREATE TABLE "public"."product_cpus" (
     CONSTRAINT "product_cpus_pkey" PRIMARY KEY ("id")
 ) WITH (oids = false);
 
-TRUNCATE "product_cpus";
+INSERT INTO "product_cpus" ("id", "product_id", "cpu_id", "status", "created_at", "updated_at") VALUES
+('8990fd1c-844b-47c9-8979-00b3011f6b6d',	'9ce63f97-dc12-4510-9eec-d44d7ee3d547',	'0be5bf59-98f5-40f0-84c7-f88b08d7eae5',	1,	'2024-11-14 15:44:00.609168',	'2024-11-14 15:44:00.609168'),
+('73bc6bcb-fc25-4b31-ad5f-6d277df6d64f',	'a1740f18-5a59-4784-b1af-705a42803d9f',	'fb97776e-be02-4a35-8362-11feec98e947',	1,	'2024-11-14 15:59:02.497256',	'2024-11-14 15:59:02.497256'),
+('b09aeb47-e694-4055-849a-6fe465222141',	'd4ab497a-fb51-4656-9dab-9eca3214baec',	'fb97776e-be02-4a35-8362-11feec98e947',	1,	'2024-11-14 16:02:19.289067',	'2024-11-14 16:02:19.289067'),
+('828b76f7-f576-4fb6-9dde-b51c9211cedc',	'27f381af-0752-40e6-9825-5cfaa92d5e77',	'0be5bf59-98f5-40f0-84c7-f88b08d7eae5',	1,	'2024-11-14 16:04:53.244145',	'2024-11-14 16:04:53.244145'),
+('91f89262-4036-40b6-aeaf-6c9109abf7a6',	'72b983b9-8267-44e5-8269-862561258c31',	'e10653af-2cec-4301-83a2-29ecee50a9ee',	1,	'2024-11-14 16:22:52.746072',	'2024-11-14 16:22:52.746072'),
+('2aa2c0a0-8a2c-4f9d-93aa-9cb58683606d',	'ca049f04-3324-4d37-b164-351b3cccb7de',	'5299d63a-8a5e-40da-acab-f49c09f9c13a',	1,	'2024-11-14 17:06:28.458183',	'2024-11-14 17:06:28.458183'),
+('5210099e-d237-41ac-9ae7-ddd055f61c1b',	'ca80d7c3-c576-4e70-88c8-71748b675578',	'cadc2cc8-498b-454d-8509-5feca20688f0',	1,	'2024-11-14 17:09:03.327861',	'2024-11-14 17:09:03.327861'),
+('03175143-0b97-4a70-990c-6aafe44c8e7f',	'8bede882-3d39-430d-ad0a-75658fb3c7ce',	'fb97776e-be02-4a35-8362-11feec98e947',	1,	'2024-11-14 17:11:32.741467',	'2024-11-14 17:11:32.741467'),
+('41f7b1ed-a644-400f-ad71-5bcb13b11a5f',	'f08b023b-adc3-4604-8742-acdf30ce585e',	'fb97776e-be02-4a35-8362-11feec98e947',	1,	'2024-11-14 17:13:27.971249',	'2024-11-14 17:13:27.971249');
 
 DROP TABLE IF EXISTS "product_displays";
 CREATE TABLE "public"."product_displays" (
@@ -1250,7 +1360,16 @@ CREATE TABLE "public"."product_displays" (
     CONSTRAINT "product_displays_pkey" PRIMARY KEY ("id")
 ) WITH (oids = false);
 
-TRUNCATE "product_displays";
+INSERT INTO "product_displays" ("id", "product_id", "display_id", "status", "created_at", "updated_at") VALUES
+('38817f49-332a-4f93-b046-1dfe7995d653',	'9ce63f97-dc12-4510-9eec-d44d7ee3d547',	'0847dbf3-cd1c-433f-a55f-15bfcde20c7c',	1,	'2024-11-14 15:44:00.609168',	'2024-11-14 15:44:00.609168'),
+('67a4e1e5-b83f-4d6d-b5b8-a1661ad8f66c',	'a1740f18-5a59-4784-b1af-705a42803d9f',	'db3ab93a-93a5-4137-af34-2762c864bbd1',	1,	'2024-11-14 15:59:02.497256',	'2024-11-14 15:59:02.497256'),
+('ea5e41a8-1f05-421a-947f-92c827ec0a3c',	'd4ab497a-fb51-4656-9dab-9eca3214baec',	'db3ab93a-93a5-4137-af34-2762c864bbd1',	1,	'2024-11-14 16:02:19.289067',	'2024-11-14 16:02:19.289067'),
+('5f38fa64-3d4e-477c-bb9b-2e7967cf2ed7',	'27f381af-0752-40e6-9825-5cfaa92d5e77',	'0847dbf3-cd1c-433f-a55f-15bfcde20c7c',	1,	'2024-11-14 16:04:53.244145',	'2024-11-14 16:04:53.244145'),
+('6173db79-8beb-4512-b31d-548b211d345a',	'72b983b9-8267-44e5-8269-862561258c31',	'0847dbf3-cd1c-433f-a55f-15bfcde20c7c',	1,	'2024-11-14 16:22:52.746072',	'2024-11-14 16:22:52.746072'),
+('715b3fb5-5734-4b3a-aa81-1f93e8485a73',	'ca049f04-3324-4d37-b164-351b3cccb7de',	'db3ab93a-93a5-4137-af34-2762c864bbd1',	1,	'2024-11-14 17:06:28.458183',	'2024-11-14 17:06:28.458183'),
+('31d2dbdf-5b62-4c1d-8c21-9fdc3da5a02f',	'ca80d7c3-c576-4e70-88c8-71748b675578',	'db3ab93a-93a5-4137-af34-2762c864bbd1',	1,	'2024-11-14 17:09:03.327861',	'2024-11-14 17:09:03.327861'),
+('e6ac7e11-c4a5-4687-8347-68ed13da001f',	'8bede882-3d39-430d-ad0a-75658fb3c7ce',	'db3ab93a-93a5-4137-af34-2762c864bbd1',	1,	'2024-11-14 17:11:32.741467',	'2024-11-14 17:11:32.741467'),
+('13ffc471-aad7-428d-8901-756c05bba1db',	'f08b023b-adc3-4604-8742-acdf30ce585e',	'db3ab93a-93a5-4137-af34-2762c864bbd1',	1,	'2024-11-14 17:13:27.971249',	'2024-11-14 17:13:27.971249');
 
 DROP TABLE IF EXISTS "product_graphics_cards";
 CREATE TABLE "public"."product_graphics_cards" (
@@ -1263,7 +1382,16 @@ CREATE TABLE "public"."product_graphics_cards" (
     CONSTRAINT "product_graphics_cards_pkey" PRIMARY KEY ("id")
 ) WITH (oids = false);
 
-TRUNCATE "product_graphics_cards";
+INSERT INTO "product_graphics_cards" ("id", "product_id", "graphics_card_id", "status", "created_at", "updated_at") VALUES
+('9d5b143d-152c-4f51-ac06-9810de74ee92',	'9ce63f97-dc12-4510-9eec-d44d7ee3d547',	'57b7f201-481a-4e3d-a7dc-e14d4d4f02b5',	1,	'2024-11-14 15:44:00.609168',	'2024-11-14 15:44:00.609168'),
+('0a06b8fe-b962-4f9d-8ccc-62435bd822df',	'a1740f18-5a59-4784-b1af-705a42803d9f',	'54228b1e-1138-4423-b482-f03c16cec013',	1,	'2024-11-14 15:59:02.497256',	'2024-11-14 15:59:02.497256'),
+('aa579841-5db2-4df8-9346-769c463cfb35',	'd4ab497a-fb51-4656-9dab-9eca3214baec',	'54228b1e-1138-4423-b482-f03c16cec013',	1,	'2024-11-14 16:02:19.289067',	'2024-11-14 16:02:19.289067'),
+('17e4bd48-ea72-4550-aa28-b47858636f3a',	'27f381af-0752-40e6-9825-5cfaa92d5e77',	'54228b1e-1138-4423-b482-f03c16cec013',	1,	'2024-11-14 16:04:53.244145',	'2024-11-14 16:04:53.244145'),
+('2cb6dd06-4d20-4d46-8ab9-00777f8d5832',	'72b983b9-8267-44e5-8269-862561258c31',	'54228b1e-1138-4423-b482-f03c16cec013',	1,	'2024-11-14 16:22:52.746072',	'2024-11-14 16:22:52.746072'),
+('8b22d32c-2627-4005-b1b6-ab3831c4945b',	'ca049f04-3324-4d37-b164-351b3cccb7de',	'54228b1e-1138-4423-b482-f03c16cec013',	1,	'2024-11-14 17:06:28.458183',	'2024-11-14 17:06:28.458183'),
+('0497db19-0ca0-4cd7-97a8-3b55e6f0826f',	'ca80d7c3-c576-4e70-88c8-71748b675578',	'52686413-158a-46c8-8acd-e50e7d3bd398',	1,	'2024-11-14 17:09:03.327861',	'2024-11-14 17:09:03.327861'),
+('80e8d899-b087-42d5-bc52-77e450a2136d',	'8bede882-3d39-430d-ad0a-75658fb3c7ce',	'54228b1e-1138-4423-b482-f03c16cec013',	1,	'2024-11-14 17:11:32.741467',	'2024-11-14 17:11:32.741467'),
+('4b116de0-ba6c-4f84-806c-5153e7445ad4',	'f08b023b-adc3-4604-8742-acdf30ce585e',	'52686413-158a-46c8-8acd-e50e7d3bd398',	1,	'2024-11-14 17:13:27.971249',	'2024-11-14 17:13:27.971249');
 
 DROP TABLE IF EXISTS "product_hard_drives";
 CREATE TABLE "public"."product_hard_drives" (
@@ -1285,7 +1413,16 @@ CREATE INDEX "idx_product_hard_status" ON "public"."product_hard_drives" USING b
 
 CREATE INDEX "idx_product_hard_updated_at" ON "public"."product_hard_drives" USING btree ("updated_at");
 
-TRUNCATE "product_hard_drives";
+INSERT INTO "product_hard_drives" ("product_id", "hard_id", "created_at", "updated_at", "status") VALUES
+('9ce63f97-dc12-4510-9eec-d44d7ee3d547',	'ae541ee0-eea9-40b2-bf1b-82738f6f6c80',	'2024-11-14 15:44:00.609168',	'2024-11-14 15:44:00.609168',	1),
+('a1740f18-5a59-4784-b1af-705a42803d9f',	'ae541ee0-eea9-40b2-bf1b-82738f6f6c80',	'2024-11-14 15:59:02.497256',	'2024-11-14 15:59:02.497256',	1),
+('d4ab497a-fb51-4656-9dab-9eca3214baec',	'ae541ee0-eea9-40b2-bf1b-82738f6f6c80',	'2024-11-14 16:02:19.289067',	'2024-11-14 16:02:19.289067',	1),
+('27f381af-0752-40e6-9825-5cfaa92d5e77',	'9dd77840-cb70-4dc8-901f-5c8fb135cd8c',	'2024-11-14 16:04:53.244145',	'2024-11-14 16:04:53.244145',	1),
+('72b983b9-8267-44e5-8269-862561258c31',	'9dd77840-cb70-4dc8-901f-5c8fb135cd8c',	'2024-11-14 16:22:52.746072',	'2024-11-14 16:22:52.746072',	1),
+('ca049f04-3324-4d37-b164-351b3cccb7de',	'ae541ee0-eea9-40b2-bf1b-82738f6f6c80',	'2024-11-14 17:06:28.458183',	'2024-11-14 17:06:28.458183',	1),
+('ca80d7c3-c576-4e70-88c8-71748b675578',	'ae541ee0-eea9-40b2-bf1b-82738f6f6c80',	'2024-11-14 17:09:03.327861',	'2024-11-14 17:09:03.327861',	1),
+('8bede882-3d39-430d-ad0a-75658fb3c7ce',	'ae541ee0-eea9-40b2-bf1b-82738f6f6c80',	'2024-11-14 17:11:32.741467',	'2024-11-14 17:11:32.741467',	1),
+('f08b023b-adc3-4604-8742-acdf30ce585e',	'ae541ee0-eea9-40b2-bf1b-82738f6f6c80',	'2024-11-14 17:13:27.971249',	'2024-11-14 17:13:27.971249',	1);
 
 DROP TABLE IF EXISTS "product_images";
 CREATE TABLE "public"."product_images" (
@@ -1311,7 +1448,49 @@ CREATE INDEX "idx_product_images_status" ON "public"."product_images" USING btre
 
 CREATE INDEX "idx_product_images_updated_at" ON "public"."product_images" USING btree ("updated_at");
 
-TRUNCATE "product_images";
+INSERT INTO "product_images" ("id", "product_id", "image_id", "display_order", "created_at", "updated_at", "status") VALUES
+('f94b6527-5a01-4769-8c72-dcc5afb10fb8',	'9ce63f97-dc12-4510-9eec-d44d7ee3d547',	'0a0394f7-b581-4dc9-8178-eeb23b382f30',	1,	'2024-11-14 15:44:00.609168',	'2024-11-14 15:44:00.609168',	1),
+('a2bf25dc-01d1-436c-8954-aba71553926d',	'9ce63f97-dc12-4510-9eec-d44d7ee3d547',	'0dda4a33-fed4-4b6b-b926-7e3316f89bf7',	2,	'2024-11-14 15:44:00.609168',	'2024-11-14 15:44:00.609168',	1),
+('7a0689ec-b82c-4915-a5c5-8d836e484748',	'9ce63f97-dc12-4510-9eec-d44d7ee3d547',	'3e466929-6cd5-45eb-9316-2cc58f3f53e1',	3,	'2024-11-14 15:44:00.609168',	'2024-11-14 15:44:00.609168',	1),
+('9d7b16fa-0a5b-41c8-9330-994e121285fe',	'9ce63f97-dc12-4510-9eec-d44d7ee3d547',	'd8dcbc5c-0254-4727-87fd-ba9c20ae0085',	4,	'2024-11-14 15:44:00.609168',	'2024-11-14 15:44:00.609168',	1),
+('4eb8e48c-8d8d-4248-bd7f-2f49f0005177',	'9ce63f97-dc12-4510-9eec-d44d7ee3d547',	'dde95dd9-6545-4450-82a0-09f3b70649ae',	5,	'2024-11-14 15:44:00.609168',	'2024-11-14 15:44:00.609168',	1),
+('d729a244-4150-4894-8ab0-725c52d50193',	'a1740f18-5a59-4784-b1af-705a42803d9f',	'8bf0ed30-56b9-4932-82b4-d981c5014b0d',	1,	'2024-11-14 15:59:02.497256',	'2024-11-14 15:59:02.497256',	1),
+('e9cf8586-2f5c-440d-a81a-1867f2b060b4',	'a1740f18-5a59-4784-b1af-705a42803d9f',	'18045938-b864-4922-a09e-cb0a6741e4b9',	2,	'2024-11-14 15:59:02.497256',	'2024-11-14 15:59:02.497256',	1),
+('27aa625f-ad3e-4a52-bcc6-c37150bd6083',	'a1740f18-5a59-4784-b1af-705a42803d9f',	'f3125e08-bb30-4f00-90fc-0243e7a81433',	3,	'2024-11-14 15:59:02.497256',	'2024-11-14 15:59:02.497256',	1),
+('ce41daa4-bac9-4d19-b335-20342cc8b574',	'a1740f18-5a59-4784-b1af-705a42803d9f',	'3c30bf18-94dc-4792-b35e-9d23e6d8027e',	4,	'2024-11-14 15:59:02.497256',	'2024-11-14 15:59:02.497256',	1),
+('a236063a-34f4-4770-9732-e6f284f86791',	'a1740f18-5a59-4784-b1af-705a42803d9f',	'd0d703d7-e695-486c-8674-c50f224e5cc3',	5,	'2024-11-14 15:59:02.497256',	'2024-11-14 15:59:02.497256',	1),
+('e91798c4-cbd0-4f3e-8099-d14368519590',	'a1740f18-5a59-4784-b1af-705a42803d9f',	'61df47bd-c391-4aad-95cf-f67aa2417a1e',	6,	'2024-11-14 15:59:02.497256',	'2024-11-14 15:59:02.497256',	1),
+('bbffb659-c895-4f8d-89bd-b700a310c808',	'a1740f18-5a59-4784-b1af-705a42803d9f',	'a332b746-045f-4a11-a97a-bbb1d612aeb1',	7,	'2024-11-14 15:59:02.497256',	'2024-11-14 15:59:02.497256',	1),
+('be22be39-f5f3-4d36-97f9-e5e247c8cab5',	'd4ab497a-fb51-4656-9dab-9eca3214baec',	'61c0d156-bdf7-4a48-b415-4dbd97d2d0f9',	1,	'2024-11-14 16:02:19.289067',	'2024-11-14 16:02:19.289067',	1),
+('95370ea2-b751-465d-acbb-236d99412b7a',	'd4ab497a-fb51-4656-9dab-9eca3214baec',	'96348f7a-b39c-4cdd-a1ef-ccda7e2fcde0',	2,	'2024-11-14 16:02:19.289067',	'2024-11-14 16:02:19.289067',	1),
+('93736f52-7122-422f-b73d-5954380ea560',	'd4ab497a-fb51-4656-9dab-9eca3214baec',	'9d22d2cc-05df-441c-9cd9-11bb05572f4f',	3,	'2024-11-14 16:02:19.289067',	'2024-11-14 16:02:19.289067',	1),
+('0f672214-cd39-46e5-99c0-18e437da8752',	'd4ab497a-fb51-4656-9dab-9eca3214baec',	'417b2666-51d7-4ef4-b6a4-15c638a48142',	4,	'2024-11-14 16:02:19.289067',	'2024-11-14 16:02:19.289067',	1),
+('4ceda5d5-ea7f-4d04-9d22-7d5221efaee0',	'27f381af-0752-40e6-9825-5cfaa92d5e77',	'0a0394f7-b581-4dc9-8178-eeb23b382f30',	1,	'2024-11-14 16:04:53.244145',	'2024-11-14 16:04:53.244145',	1),
+('18b9ec75-f21c-403b-bd00-508ac41c704e',	'27f381af-0752-40e6-9825-5cfaa92d5e77',	'0dda4a33-fed4-4b6b-b926-7e3316f89bf7',	2,	'2024-11-14 16:04:53.244145',	'2024-11-14 16:04:53.244145',	1),
+('604e48a7-5c4b-4b5f-ae05-67d6c6e9b2b4',	'27f381af-0752-40e6-9825-5cfaa92d5e77',	'3e466929-6cd5-45eb-9316-2cc58f3f53e1',	3,	'2024-11-14 16:04:53.244145',	'2024-11-14 16:04:53.244145',	1),
+('477e600d-6cb4-4ee1-ac2f-4520b827fb45',	'27f381af-0752-40e6-9825-5cfaa92d5e77',	'dde95dd9-6545-4450-82a0-09f3b70649ae',	4,	'2024-11-14 16:04:53.244145',	'2024-11-14 16:04:53.244145',	1),
+('9a61a70f-4466-4aef-870c-e69ba03967de',	'72b983b9-8267-44e5-8269-862561258c31',	'a59bf196-f665-496b-a67d-c74c50dd63e5',	1,	'2024-11-14 16:22:52.746072',	'2024-11-14 16:22:52.746072',	1),
+('b1b3876d-0822-4fc2-a17c-5277b08bfd4c',	'72b983b9-8267-44e5-8269-862561258c31',	'c5cbc2dd-7c46-4818-9e3c-03eca9d31ffe',	2,	'2024-11-14 16:22:52.746072',	'2024-11-14 16:22:52.746072',	1),
+('0998ae63-d871-4294-a3d5-ec0eec4c23e6',	'72b983b9-8267-44e5-8269-862561258c31',	'c8c192cb-6cbb-44fd-97ae-f06afc939abd',	3,	'2024-11-14 16:22:52.746072',	'2024-11-14 16:22:52.746072',	1),
+('4d85eb8e-c9cd-497c-aa72-5ed1d054a320',	'ca049f04-3324-4d37-b164-351b3cccb7de',	'5b536112-7c82-4b94-8070-c716ce646c40',	1,	'2024-11-14 17:06:28.458183',	'2024-11-14 17:06:28.458183',	1),
+('dbb70831-5517-4a2a-855c-112d2b153cd8',	'ca049f04-3324-4d37-b164-351b3cccb7de',	'd9d7af00-2b98-4a56-b699-341efe5bffa5',	2,	'2024-11-14 17:06:28.458183',	'2024-11-14 17:06:28.458183',	1),
+('543999b1-e78d-4fd3-957f-88d3d5af7b74',	'ca049f04-3324-4d37-b164-351b3cccb7de',	'61c0d156-bdf7-4a48-b415-4dbd97d2d0f9',	3,	'2024-11-14 17:06:28.458183',	'2024-11-14 17:06:28.458183',	1),
+('2c2951af-d54a-4d61-962f-905a2f6ba3e8',	'ca049f04-3324-4d37-b164-351b3cccb7de',	'5770e2a4-f4d5-4df5-a698-3b7b545a1934',	4,	'2024-11-14 17:06:28.458183',	'2024-11-14 17:06:28.458183',	1),
+('fc8b3e3a-8582-4dce-9aa8-39855c857b8c',	'ca80d7c3-c576-4e70-88c8-71748b675578',	'f16f310b-8ce7-44ce-8116-4a9482633fb4',	1,	'2024-11-14 17:09:03.327861',	'2024-11-14 17:09:03.327861',	1),
+('add60769-aeff-458e-bc79-4964e41484eb',	'ca80d7c3-c576-4e70-88c8-71748b675578',	'4a99f797-5783-4988-9a74-4a4af0778a08',	2,	'2024-11-14 17:09:03.327861',	'2024-11-14 17:09:03.327861',	1),
+('1fe228b5-8c98-4c0d-93f7-233e4c86ad6a',	'ca80d7c3-c576-4e70-88c8-71748b675578',	'0ad6ec50-a443-455e-a92d-2b330ab8d535',	3,	'2024-11-14 17:09:03.327861',	'2024-11-14 17:09:03.327861',	1),
+('443d7d83-8207-4f55-9775-e34e0ac7cf18',	'ca80d7c3-c576-4e70-88c8-71748b675578',	'a332b746-045f-4a11-a97a-bbb1d612aeb1',	4,	'2024-11-14 17:09:03.327861',	'2024-11-14 17:09:03.327861',	1),
+('c4f57757-80b2-4746-9d25-b6ecde8964e5',	'ca80d7c3-c576-4e70-88c8-71748b675578',	'3ddefbaa-286d-4b75-a4ba-bfa6d1789919',	5,	'2024-11-14 17:09:03.327861',	'2024-11-14 17:09:03.327861',	1),
+('6ee3e457-4b3a-4ca0-bbad-7af303549043',	'8bede882-3d39-430d-ad0a-75658fb3c7ce',	'b7b9c6bd-cfde-4a07-9636-d55976cdfd6f',	1,	'2024-11-14 17:11:32.741467',	'2024-11-14 17:11:32.741467',	1),
+('f2bb7886-333a-4abb-9100-3ca0ed0748ea',	'8bede882-3d39-430d-ad0a-75658fb3c7ce',	'4b4760ca-4740-4d16-a08b-71b683821f9c',	2,	'2024-11-14 17:11:32.741467',	'2024-11-14 17:11:32.741467',	1),
+('5d9e736d-43ca-4583-8f4a-8595793ed8f4',	'8bede882-3d39-430d-ad0a-75658fb3c7ce',	'0daa0fed-b0d3-4fb2-bf24-8968b2079db2',	3,	'2024-11-14 17:11:32.741467',	'2024-11-14 17:11:32.741467',	1),
+('c99e496b-8a94-431d-b86d-2f4b554db923',	'8bede882-3d39-430d-ad0a-75658fb3c7ce',	'5770e2a4-f4d5-4df5-a698-3b7b545a1934',	4,	'2024-11-14 17:11:32.741467',	'2024-11-14 17:11:32.741467',	1),
+('ec50bc28-58a9-4c29-bb01-562f3437ac47',	'8bede882-3d39-430d-ad0a-75658fb3c7ce',	'd48c78fe-cb08-442c-9a70-55a462680e98',	5,	'2024-11-14 17:11:32.741467',	'2024-11-14 17:11:32.741467',	1),
+('252ecac7-5359-449e-af7d-fa8eac1fb217',	'8bede882-3d39-430d-ad0a-75658fb3c7ce',	'a66631e0-9045-4e80-9bd1-7e82f16761f9',	6,	'2024-11-14 17:11:32.741467',	'2024-11-14 17:11:32.741467',	1),
+('c2588484-bd30-41aa-b7a5-0319f1a33289',	'f08b023b-adc3-4604-8742-acdf30ce585e',	'79068a5c-2c75-4e2c-b67a-3583607f669b',	1,	'2024-11-14 17:13:27.971249',	'2024-11-14 17:13:27.971249',	1),
+('736b7f73-e8da-4a2d-8aaa-b26cb2c7f592',	'f08b023b-adc3-4604-8742-acdf30ce585e',	'8bf0ed30-56b9-4932-82b4-d981c5014b0d',	2,	'2024-11-14 17:13:27.971249',	'2024-11-14 17:13:27.971249',	1),
+('da4028ab-c4c2-4558-ba5d-fcbc660a66ca',	'f08b023b-adc3-4604-8742-acdf30ce585e',	'11c04438-a969-406d-994b-4548ae01e56f',	3,	'2024-11-14 17:13:27.971249',	'2024-11-14 17:13:27.971249',	1),
+('0cc25a94-3158-4e1c-bd88-1472dcf72518',	'f08b023b-adc3-4604-8742-acdf30ce585e',	'5770e2a4-f4d5-4df5-a698-3b7b545a1934',	4,	'2024-11-14 17:13:27.971249',	'2024-11-14 17:13:27.971249',	1);
 
 DROP TABLE IF EXISTS "product_ram";
 CREATE TABLE "public"."product_ram" (
@@ -1333,7 +1512,16 @@ CREATE INDEX "idx_product_ram_status" ON "public"."product_ram" USING btree ("st
 
 CREATE INDEX "idx_product_ram_updated_at" ON "public"."product_ram" USING btree ("updated_at");
 
-TRUNCATE "product_ram";
+INSERT INTO "product_ram" ("product_id", "ram_id", "created_at", "updated_at", "status") VALUES
+('9ce63f97-dc12-4510-9eec-d44d7ee3d547',	'ad2c14b9-c58a-4564-9dd8-8a84cd31def9',	'2024-11-14 15:44:00.609168',	'2024-11-14 15:44:00.609168',	1),
+('a1740f18-5a59-4784-b1af-705a42803d9f',	'158ff646-6716-4589-bf73-7ed2664e48d9',	'2024-11-14 15:59:02.497256',	'2024-11-14 15:59:02.497256',	1),
+('d4ab497a-fb51-4656-9dab-9eca3214baec',	'0e68969b-3123-41ab-9d90-0e48451cbbf0',	'2024-11-14 16:02:19.289067',	'2024-11-14 16:02:19.289067',	1),
+('27f381af-0752-40e6-9825-5cfaa92d5e77',	'ad2c14b9-c58a-4564-9dd8-8a84cd31def9',	'2024-11-14 16:04:53.244145',	'2024-11-14 16:04:53.244145',	1),
+('72b983b9-8267-44e5-8269-862561258c31',	'0e68969b-3123-41ab-9d90-0e48451cbbf0',	'2024-11-14 16:22:52.746072',	'2024-11-14 16:22:52.746072',	1),
+('ca049f04-3324-4d37-b164-351b3cccb7de',	'869ae7ea-1f6b-4566-aee1-3d2a4290b9e6',	'2024-11-14 17:06:28.458183',	'2024-11-14 17:06:28.458183',	1),
+('ca80d7c3-c576-4e70-88c8-71748b675578',	'0e68969b-3123-41ab-9d90-0e48451cbbf0',	'2024-11-14 17:09:03.327861',	'2024-11-14 17:09:03.327861',	1),
+('8bede882-3d39-430d-ad0a-75658fb3c7ce',	'0e68969b-3123-41ab-9d90-0e48451cbbf0',	'2024-11-14 17:11:32.741467',	'2024-11-14 17:11:32.741467',	1),
+('f08b023b-adc3-4604-8742-acdf30ce585e',	'0e68969b-3123-41ab-9d90-0e48451cbbf0',	'2024-11-14 17:13:27.971249',	'2024-11-14 17:13:27.971249',	1);
 
 DROP TABLE IF EXISTS "product_specifications";
 CREATE TABLE "public"."product_specifications" (
@@ -1359,7 +1547,6 @@ CREATE INDEX "idx_product_specifications_status" ON "public"."product_specificat
 
 CREATE INDEX "idx_product_specifications_updated_at" ON "public"."product_specifications" USING btree ("updated_at");
 
-TRUNCATE "product_specifications";
 
 DROP TABLE IF EXISTS "product_tags";
 CREATE TABLE "public"."product_tags" (
@@ -1381,14 +1568,32 @@ CREATE INDEX "idx_product_tags_tag_id" ON "public"."product_tags" USING btree ("
 
 CREATE INDEX "idx_product_tags_updated_at" ON "public"."product_tags" USING btree ("updated_at");
 
-TRUNCATE "product_tags";
+INSERT INTO "product_tags" ("product_id", "tag_id", "created_at", "updated_at", "status") VALUES
+('9ce63f97-dc12-4510-9eec-d44d7ee3d547',	'1bf4e55d-e390-4eab-ae51-38de5e5464a5',	'2024-11-14 15:44:00.609168',	'2024-11-14 15:44:00.609168',	1),
+('9ce63f97-dc12-4510-9eec-d44d7ee3d547',	'8345f3d5-ddac-44b9-8143-31769b91e2db',	'2024-11-14 15:44:00.609168',	'2024-11-14 15:44:00.609168',	1),
+('a1740f18-5a59-4784-b1af-705a42803d9f',	'1bf4e55d-e390-4eab-ae51-38de5e5464a5',	'2024-11-14 15:59:02.497256',	'2024-11-14 15:59:02.497256',	1),
+('d4ab497a-fb51-4656-9dab-9eca3214baec',	'1bf4e55d-e390-4eab-ae51-38de5e5464a5',	'2024-11-14 16:02:19.289067',	'2024-11-14 16:02:19.289067',	1),
+('27f381af-0752-40e6-9825-5cfaa92d5e77',	'1bf4e55d-e390-4eab-ae51-38de5e5464a5',	'2024-11-14 16:04:53.244145',	'2024-11-14 16:04:53.244145',	1),
+('27f381af-0752-40e6-9825-5cfaa92d5e77',	'75194ec7-334c-4b78-9c15-b9e9cafc1551',	'2024-11-14 16:04:53.244145',	'2024-11-14 16:04:53.244145',	1),
+('27f381af-0752-40e6-9825-5cfaa92d5e77',	'bfdc34f3-0c17-4bd8-bb77-95434f81d036',	'2024-11-14 16:04:53.244145',	'2024-11-14 16:04:53.244145',	1),
+('72b983b9-8267-44e5-8269-862561258c31',	'75194ec7-334c-4b78-9c15-b9e9cafc1551',	'2024-11-14 16:22:52.746072',	'2024-11-14 16:22:52.746072',	1),
+('72b983b9-8267-44e5-8269-862561258c31',	'8345f3d5-ddac-44b9-8143-31769b91e2db',	'2024-11-14 16:22:52.746072',	'2024-11-14 16:22:52.746072',	1),
+('72b983b9-8267-44e5-8269-862561258c31',	'bfdc34f3-0c17-4bd8-bb77-95434f81d036',	'2024-11-14 16:22:52.746072',	'2024-11-14 16:22:52.746072',	1),
+('ca049f04-3324-4d37-b164-351b3cccb7de',	'75194ec7-334c-4b78-9c15-b9e9cafc1551',	'2024-11-14 17:06:28.458183',	'2024-11-14 17:06:28.458183',	1),
+('ca049f04-3324-4d37-b164-351b3cccb7de',	'bfdc34f3-0c17-4bd8-bb77-95434f81d036',	'2024-11-14 17:06:28.458183',	'2024-11-14 17:06:28.458183',	1),
+('ca80d7c3-c576-4e70-88c8-71748b675578',	'8345f3d5-ddac-44b9-8143-31769b91e2db',	'2024-11-14 17:09:03.327861',	'2024-11-14 17:09:03.327861',	1),
+('8bede882-3d39-430d-ad0a-75658fb3c7ce',	'75194ec7-334c-4b78-9c15-b9e9cafc1551',	'2024-11-14 17:11:32.741467',	'2024-11-14 17:11:32.741467',	1),
+('8bede882-3d39-430d-ad0a-75658fb3c7ce',	'bfdc34f3-0c17-4bd8-bb77-95434f81d036',	'2024-11-14 17:11:32.741467',	'2024-11-14 17:11:32.741467',	1),
+('8bede882-3d39-430d-ad0a-75658fb3c7ce',	'8345f3d5-ddac-44b9-8143-31769b91e2db',	'2024-11-14 17:11:32.741467',	'2024-11-14 17:11:32.741467',	1),
+('f08b023b-adc3-4604-8742-acdf30ce585e',	'75194ec7-334c-4b78-9c15-b9e9cafc1551',	'2024-11-14 17:13:27.971249',	'2024-11-14 17:13:27.971249',	1),
+('f08b023b-adc3-4604-8742-acdf30ce585e',	'bfdc34f3-0c17-4bd8-bb77-95434f81d036',	'2024-11-14 17:13:27.971249',	'2024-11-14 17:13:27.971249',	1);
 
 DROP TABLE IF EXISTS "products";
 CREATE TABLE "public"."products" (
     "id" uuid DEFAULT gen_random_uuid() NOT NULL,
     "name" character varying(255) NOT NULL,
     "slug" character varying(255) NOT NULL,
-    "price" numeric(10,2) NOT NULL,
+    "price" text NOT NULL,
     "description" text,
     "specifications" jsonb,
     "stock_quantity" integer DEFAULT '0' NOT NULL,
@@ -1416,13 +1621,17 @@ CREATE INDEX "idx_products_status" ON "public"."products" USING btree ("status")
 
 CREATE INDEX "idx_products_status_thumb" ON "public"."products" USING btree ("status", "thumbnail_id");
 
-TRUNCATE "products";
+INSERT INTO "products" ("id", "name", "slug", "price", "description", "specifications", "stock_quantity", "thumbnail_id", "created_at", "updated_at", "status") VALUES
+('a1740f18-5a59-4784-b1af-705a42803d9f',	' Lenovo LOQ 15IRX9 83DV00UGVN',	'-lenovo-loq-15irx9-83dv00ugvn',	'29899000',	'<h2 class="ql-align-justify"><strong>Thông số kỹ thuật:</strong></h2><p><a href="https://gearvn.com/collections/cpu-bo-vi-xu-ly" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);"><strong>CPU</strong></a>Intel® Core™ i7-13650HX, 14C (6P + 8E) / 20T, P-core 2.6 / 4.9GHz, E-core 1.9 / 3.6GHz, 24MB<a href="https://gearvn.com/collections/ram-pc" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);"><strong>RAM</strong></a>24GB (2x12GB) DDR5-4800 SO-DIMM (2x SO-DIMM socket, up to 32GB SDRAM)<a href="https://gearvn.com/collections/hdd-o-cung-laptop" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);"><strong>Ổ cứng</strong></a>512GB&nbsp;<a href="https://gearvn.com/collections/ssd-o-cung-the-ran" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">SSD</a>&nbsp;M.2 2242 PCIe 4.0x4 NVMe (2 Slots: M2 2242 PCIe 4.0 x4 Slot/ M.2 2280 PCIe 4.0 x4 Slot)<a href="https://gearvn.com/collections/vga-card-man-hinh" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);"><strong>Card đồ họa</strong></a>NVIDIA® GeForce RTX™ 4050 6GB GDDR6, Boost Clock 2370MHz, TGP 105W<a href="https://gearvn.com/pages/man-hinh" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);"><strong>Màn hình</strong></a>15.6" FHD (1920x1080) IPS 300nits Anti-glare,&nbsp;<strong>100% sRGB</strong>, 144Hz, G-SYNC®<strong>Cổng kết nối</strong>3x USB-A (USB 5Gbps / USB 3.2 Gen 1)</p><p>1x USB-C® (USB 10Gbps / USB 3.2 Gen 2), with PD 140W and DisplayPort™ 1.4</p><p>1x HDMI® 2.1, up to 8K/60Hz</p><p>1x Headphone / microphone combo jack (3.5mm)</p><p>1x Ethernet (RJ-45)</p><p>1x Power connector<a href="https://gearvn.com/collections/ban-phim-may-tinh" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);"><strong>Bàn phím</strong></a>4-Zone RGB Backlit, English<strong>Audio</strong>High Definition (HD) Audio, Realtek® ALC3287 codec<strong>Chuẩn Lan</strong>100/1000M<strong>Wifi + Bluetooth</strong>Wi-Fi 6 11ax, 2x2 + BT5.1<a href="https://gearvn.com/collections/webcam" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);"><strong>Webcam</strong></a>FHD 1080p with E-shutter<strong>Hệ điều hành&nbsp;&nbsp;&nbsp;</strong><a href="https://gearvn.com/blogs/thu-thuat-giai-dap/windows-11-22h2" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">Windows 11</a>&nbsp;Home<strong>Pin</strong>Integrated 60Wh (4 Cell)<strong>Trọng lượng</strong>2.4 kg<strong>Màu sắc</strong>Luna Grey<strong>Chất liệu</strong>PC-ABS (Top), PC-ABS (Bottom)<strong>Kích thước&nbsp;&nbsp;&nbsp;</strong>359.6 x 264.8 x 22.1-25.2 mm</p><p><br></p><h2 class="ql-align-justify"><strong>Đánh giá chi tiết laptop gaming Lenovo LOQ 15IRX9 83DV00D5VN</strong></h2><p class="ql-align-justify">Thành danh với những series Legion,&nbsp;<a href="https://gearvn.com/collections/laptop-ideapad-gaming" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);"><strong>Ideapad Gaming</strong></a>, thương hiệu Lenovo đã ghi điểm trong lòng những game thủ về phân khúc laptop gaming. Không dừng lại tại đó, Lenovo đã tiếp tục cho ra mắt series laptop gaming mới mang tên&nbsp;<a href="https://gearvn.com/collections/laptop-gaming-lenovo-loq" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);"><strong>LOQ</strong></a>&nbsp;cùng những sự nâng cấp lý tưởng. Đó sẽ là tâm điểm mà GEARVN sẽ đem đến cho các bạn với chiếc&nbsp;<strong>Lenovo LOQ 15IRX9 83DV00D5VN</strong>.</p><h2 class="ql-align-justify"><strong>Vẻ ngoài đẹp mắt với những cải tiến sắc nét</strong></h2><p class="ql-align-justify">Những đường nét đơn giản đã có trên Legion và Ideapad Gaming thì nay đã được cách tân trên Lenovo LOQ 15IRX9 83DV00D5VN. Những góc cạnh được thiết kế với sự mềm mại, thân thiện nhất định giữa người dùng phổ thông và game thủ, đem đến sự tinh tế cùng với yêu cầu về vẻ ngoài mạnh mẽ.</p><p class="ql-align-center"><img src="https://file.hstatic.net/200000722513/file/gearvn-laptop-gaming-lenovo-loq-15irx9-83dv000mvn-__4__44e428e1645b4dbf977378b6e6f31af1_1024x1024.jpg"></p><p class="ql-align-justify">Phần logo của Lenovo LOQ 15IRX9 83DV00D5VN cũng được thay đổi với concept và độ nhận diện thương hiệu của dòng&nbsp;<a href="https://gearvn.com/pages/laptop-gaming" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);"><strong>laptop gaming</strong></a>&nbsp;mới đến từ nhà Lenovo. Biểu tượng được làm sáng bóng trên nền mặt A mang gam màu Xám Storm Grey trở thành điểm nhấn khó có thể bỏ qua khi vội vàng lướt qua.</p><h2 class="ql-align-justify"><strong>Hiệu năng xử lý mạnh mẽ với Intel Gen 13</strong></h2><p class="ql-align-justify">Để đảm bảo cho quá trình xử lý mượt mà của mọi tác vụ trên Lenovo LOQ 15IRX9 83DV00D5VN, sức mạnh của i7-13650HX được tin tưởng và trở thành một phần của chiếc&nbsp;<a href="https://gearvn.com/collections/laptop" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);"><strong>laptop</strong></a>.&nbsp;</p><p class="ql-align-center"><img src="https://file.hstatic.net/200000722513/file/gearvn-laptop-gaming-lenovo-loq-15irx9-83dv000mvn-__19__7dc79e5dc7f9431688a50a9b5a6db860_1024x1024.jpg"></p><p class="ql-align-justify">Với xung nhịp tối đa có thể lên tới 4.9GHz, chiếc&nbsp;<a href="https://gearvn.com/collections/laptop-lenovo-hoc-tap-va-lam-viec" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);"><strong>laptop Lenovo</strong></a>&nbsp;tự tin thử sức cùng mọi công việc từ người dùng với con chip&nbsp;<a href="https://gearvn.com/collections/cpu-intel-13th-gen" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);"><strong>Intel Gen 13</strong></a>&nbsp;này. Đảm bảo tốc độ render lý tưởng, khả năng xử lý dữ liệu cho mọi ứng dụng và tựa game hay đó là tốc độ xử lý công việc trên sản phẩm nhà Lenovo.&nbsp;</p><p class="ql-align-justify">Đặc biệt, là một “chiến binh” đến với thế giới cùng hậu tố HX mạnh mẽ, i7-13650HX đã có thể khẳng định cho mình khả năng cân bằng hoàn hảo giữa hiệu suất trong xử lý và khả năng làm mát lý tưởng.</p><h2 class="ql-align-justify"><strong>Sức mạnh hoàn hảo</strong></h2><p class="ql-align-justify">Đã là một chiếc laptop gaming thì chắc chắn chúng ta sẽ không thể thiếu một chiếc card đồ họa mạnh mẽ và trên Lenovo LOQ 15IRX9 83DV00D5VN đó chính là RTX 4050 với 6GB GDDR6.&nbsp;</p><p class="ql-align-justify">Sức mạnh tuyệt vời đến từ&nbsp;<a href="https://gearvn.com/collections/laptop-rtx-40-series" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);"><strong>dòng card RTX 40 Series</strong></a>&nbsp;đảm bảo hiệu quả xử lý đồ họa trên mọi khung hình ở những tựa game AAA, hứa hẹn những chi tiết sắc nét nhất. Ngoài ra, đây còn là điều kiện lý tưởng cho những công việc liên quan đến hình ảnh và video giúp bạn thoải mái chỉnh sửa hình ảnh, edit video.</p><p class="ql-align-justify"><img src="https://file.hstatic.net/200000722513/file/gearvn-laptop-gaming-lenovo-loq-15irx9-83dv000mvn-__20__c421a4273aef4098bb197e41d68241fa_1024x1024.jpg"></p><p class="ql-align-justify">Đi kèm trên Lenovo LOQ 15IRX9 83DV00D5VN sẽ là không gian lưu trữ 512GB SSD. Một bộ nhớ vừa vặn cho những nhu cầu sử dụng phổ biến nhất trên một chiếc laptop gaming. Không những thế, Lenovo còn cho bạn không gian để dễ dàng nâng cấp bộ nhớ trong tương lai.</p><h2 class="ql-align-justify"><strong>Những khung hình tuyệt vời trên màn 15.6 inch</strong></h2><p class="ql-align-justify">Lenovo LOQ 15IRX9 83DV00D5VN sở hữu cho mình chiếc&nbsp;<a href="https://gearvn.com/pages/man-hinh" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);"><strong>màn hình</strong></a>&nbsp;15.6 inch với những tiêu chuẩn lý tưởng cho khả năng hiển thị hình ảnh. Độ sáng 300nits giúp cho mọi chi tiết trở nên rõ nét và tươi sáng hơn trên chiếc laptop.&nbsp;</p><p class="ql-align-center"><img src="https://file.hstatic.net/200000722513/file/gearvn-laptop-gaming-lenovo-loq-15irx9-83dv000mvn-__21__d277705f94744ee59bb4f13972ab20ae_1024x1024.jpg"></p><p class="ql-align-justify">Đi cùng với đó là tiêu chuẩn 45% NTSC và G-Sync đảm bản cho mọi khung hình trở nên tuyệt hảo nhất trong mắt người dùng. Là “trợ thủ” đắc lực cho mọi game thủ, Lenovo LOQ 15IRX9 83DV00D5VN đem đến tần số quét&nbsp;<a href="https://gearvn.com/collections/man-hinh-144hz" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);"><strong>144Hz</strong></a>&nbsp;đảm bảo mọi hành động được ghi lại một cách mượt mà, bắt trọn mọi khoảnh khắc trong mọi trận đấu căng thẳng.</p><h2 class="ql-align-justify"><strong>Đầy đủ những kết nối đa dụng</strong></h2><p class="ql-align-justify">Mang đến đầy đủ những kết nối thông dụng nhất, Lenovo LOQ 15IRX9 83DV00D5VN giúp bạn có thể dễ dàng tương tác với mọi thiết bị ngoại vị đi kèm như:</p><ul><li class="ql-align-justify">Cổng USB-A 3.2 Gen 1 và USB-C 3.2 Gen 2 đảm bảo kết nối với những thiết bị&nbsp;<a href="https://gearvn.com/collections/ban-phim-may-tinh" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);"><strong>bàn phím</strong></a>,&nbsp;<a href="https://gearvn.com/collections/chuot-may-tinh" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);"><strong>chuột máy tính</strong></a>.</li><li class="ql-align-justify">Cổng&nbsp;<a href="https://gearvn.com/collections/day-cap-hdmi" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);"><strong>HDMI</strong></a>&nbsp;hỗ trợ xuất hình có độ phân giải lên đến 8K 60Hz.</li><li class="ql-align-justify">Combo jack audio 3.5mm hỗ trợ kết nối với những thiết bị audio như&nbsp;<a href="https://gearvn.com/collections/tai-nghe-may-tinh" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);"><strong>tai nghe</strong></a>,&nbsp;<a href="https://gearvn.com/collections/loa" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);"><strong>loa vi tính</strong></a>.</li><li>Cổng RJ-45<img src="https://file.hstatic.net/200000722513/file/gearvn-laptop-gaming-lenovo-loq-15irx9-83dv000mvn-__17__bdf9676d755c40d09c780642a3d905f5_1024x1024.jpg"></li></ul><p><br></p>',	NULL,	10000,	'c378842d-8028-4d0a-b041-e9df8811b3e4',	'2024-11-14 06:05:08.158164',	'2024-11-14 15:59:02.497256',	1),
+('d4ab497a-fb51-4656-9dab-9eca3214baec',	'MSI Prestige 13 AI Evo A1MG 062VN',	'msi-prestige-13-ai-evo-a1mg-062vn',	'30679998',	'<h2><strong>THÔNG SỐ KĨ THUẬT:</strong></h2><p><a href="https://gearvn.com/collections/cpu-bo-vi-xu-ly" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);"><strong>CPU</strong></a><span style="color: rgb(0, 0, 0);">Intel® Core™ Ultra 7 processor 155H with Intel® AI Boost (NPU) 16 cores (6 P-cores + 8 E-cores + 2 Low Power E-cores), Max Turbo Frequency 4.8 GHz</span><a href="https://gearvn.com/collections/ram-pc" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);"><strong>RAM</strong></a><span style="color: rgb(0, 0, 0);">32GB LPDDR5 6400MHz (không nâng cấp)</span><a href="https://gearvn.com/collections/o-cung-di-dong-hdd-box" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);"><strong>Ổ lưu trữ</strong></a><span style="color: rgb(0, 0, 0);">1TB NVMe PCIe Gen4x4 SSD&nbsp;(1 x slots M.2 NVMe PCIe Gen4)</span><a href="https://gearvn.com/collections/vga-card-man-hinh" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);"><strong>Card đồ họa</strong></a><span style="color: rgb(0, 0, 0);">Intel® Arc™ graphics</span></p><p><span style="color: rgb(0, 0, 0);">(Intel® Arc™ graphics requires configuration with 16GB dual-channel memory or above)</span><a href="https://gearvn.com/pages/man-hinh" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);"><strong>Màn hình</strong></a><span style="color: rgb(0, 0, 0);">13.3" 2.8K (2880 x 1800), OLED, VESA DisplayHDR™ 500 Certified, 100% DCI-P3 (Typical)</span></p><p><br></p><p><strong style="color: rgb(0, 0, 0);">Cổng giao tiếp</strong>2x Type-C (USB / DP / Thunderbolt™ 4) with PD charging</p><p>1x Type-A USB3.2 Gen1</p><p>1x HDMI™ 2.1 (8K @ 60Hz / 4K @ 120Hz)</p><p>1x Micro SD</p><p>1x Mic-in/Headphone-out Combo Jack<a href="https://gearvn.com/collections/ban-phim-may-tinh" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);"><strong>Bàn phím</strong></a><span style="color: rgb(0, 0, 0);">Single Backlit Keyboard (White)</span><strong style="color: rgb(0, 0, 0);">Audio</strong><span style="color: rgb(0, 0, 0);">2x 2W Audio Speaker Hi-Res Audio Ready, DTS Audio Processing</span></p><p><span style="color: rgb(0, 0, 0);">Spatial Array Microphone (3 Mic)</span><strong style="color: rgb(0, 0, 0);">LAN</strong><span style="color: rgb(0, 0, 0);">None</span><strong style="color: rgb(0, 0, 0);">Wifi + Bluetooth</strong><span style="color: rgb(0, 0, 0);">Intel® Killer™ Wi-Fi 7 BE1750, Bluetooth v5.4</span><a href="https://gearvn.com/collections/webcam" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);"><strong>Webcam</strong></a><span style="color: rgb(0, 0, 0);">IR FHD type (30fps@1080p) with HDR</span></p><p><span style="color: rgb(0, 0, 0);">3D Noise Reduction+ (3DNR+)</span><strong>Bảo mật</strong><span style="color: rgb(0, 0, 0);">Fingerprint Security</span></p><p><span style="color: rgb(0, 0, 0);">Discrete Trusted Platform Module (dTPM) 2.0</span></p><p><span style="color: rgb(0, 0, 0);">Firmware Trusted Platform Module (fTPM) 2.0</span></p><p><span style="color: rgb(0, 0, 0);">Webcam Shutter, Kensington Lock</span><strong style="color: rgb(0, 0, 0);">Pin</strong><span style="color: rgb(0, 0, 0);">4-Cell 75 Whrs</span><strong style="color: rgb(0, 0, 0);">Trọng lượng</strong><strong>sd</strong><span style="color: rgb(0, 0, 0);">0.99 kg</span><strong style="color: rgb(0, 0, 0);">Hệ điều hành</strong><span style="color: rgb(0, 0, 0);">Windows 11 Home</span><strong style="color: rgb(0, 0, 0);">Màu sắc</strong><span style="color: rgb(0, 0, 0);">Stellar Gray</span><strong style="color: rgb(0, 0, 0);">Kích thước</strong><span style="color: rgb(0, 0, 0);">299 x 210 x 16.9 mm</span></p><h2 class="ql-align-justify"><strong>Đánh giá chi tiết&nbsp;laptop MSI Prestige 13 AI Evo A1MG 062VN</strong></h2><p>Công nghệ phát triển&nbsp;<a href="https://gearvn.com/collections/laptop" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">laptop</a>&nbsp;chưa bao giờ dừng lại khi những chiếc laptop liên tục được cải tiến, đặc biệt là laptop doanh nhân. Và ở đó sẽ luôn tồn tại những cái tên vô cùng nổi tiếng trong dòng sản phẩm công nghệ này, điển hình là MSI với thế hệ Prestige 13. Với model&nbsp;<strong>A1MG 062VN</strong>&nbsp;hiện đại, chúng ta sẽ trông chờ những điều gì có trên chiếc laptop này? Cùng&nbsp;<strong>GEARVN</strong>&nbsp;tìm hiểu ngay sau đây !</p><h3><strong>Hoàn thiện từ những tinh túy cao cấp</strong></h3><p>Về mặt ngoại hình, MSI Prestige 13 AI Evo A1MG 062VN giữ vững sự sang trọng đối với một chiếc laptop doanh nhân. Những đường nét được hoàn thiện với sự thân thiện nhất định dành cho môi trường văn phòng làm việc chuyên nghiệp, và không thể thiếu trên mặt A đó là logo MSI hiện đại dành cho những chiếc&nbsp;<a href="https://gearvn.com/pages/laptop-van-phong" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">laptop văn phòng</a>&nbsp;hiện nay.</p><p class="ql-align-center"><img src="https://file.hstatic.net/200000722513/file/gearvn-laptop-msi-prestige-13-ai-evo-a1mg-062vn-1_8a314cc3c4b943b189e465aae752c94b_grande.jpg"></p><p>Tính di động của những chiếc&nbsp;<a href="https://gearvn.com/collections/laptop-doanh-nhan" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">laptop doanh nhân</a>&nbsp;là điều khó có thể bỏ qua và MSI Prestige 13 AI Evo A1MG 062VN sẽ mang đến cho bạn trọng lượng nhẹ nhàng nhờ vào hợp kim nhôm và magie. Tất cả hòa quyện với nhau để cùng cấu thành nên chiếc laptop thông qua phương pháp đúc ép liên tục; từ đó tạo nên bộ khung máy toàn diện, giảm thiểu những khe hở và gia tăng độ cứng và độ bền.</p><h3><strong>Sức mạnh mới đến từ AI</strong></h3><p>Với việc trang bị cho mình con chip Intel Core Ultra 7 155H, MSI Prestige 13 AI Evo A1MG 062VN khẳng định về khả năng xử lý của mình những nhân và luồng xử lý cao cấp, thông minh từ công nghệ AI. Không chỉ là những P-cores và E-cores đã nổi tiếng về khả năng xử lý trên những dòng CPU trước đây mà NPU có trong vi xử lý còn giúp bạn xử lý tác vụ cùng những trợ thủ AI tốt hơn và nhanh hơn. Điều này giúp đem lại hiệu quả tối ưu nhất trong mọi công việc.</p><p class="ql-align-center"><img src="https://file.hstatic.net/200000722513/file/gearvn-laptop-msi-prestige-13-ai-evo-a1mg-062vn-4_ce57e208b154408c89a52ecc4038e144_grande.jpg"></p><p>Không chỉ đảm bảo về mặt hiệu năng, MSI Prestige 13 AI Evo A1MG 062VN còn trang bị cho mình dung lượng bộ nhớ lưu trữ uy tín với 32GB RAM và 1TB&nbsp;<a href="https://gearvn.com/collections/ssd-m-2-pcie-gen-3x4" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">SSD NVMe</a>. Dung lượng 32GB RAM cho phép bạn thoải mái sử dụng giữa nhiều tác vụ với nhau một cách mượt mà kết hợp cùng không gian lưu trữ rộng lớn lên đến 1TB cho phép bạn thoải mái cất giữ những dữ liệu quan trọng trong quá trình làm việc.</p><h3><strong>Không gian hiển thị sắc nét</strong></h3><p>MSI Prestige 13 AI Evo A1MG 062VN mang tới cho chúng ta khung hình 13 inch với độ phân giải lên đế 2.8K cùng tấm nền OLED cao cấp. Mọi chi tiết và hình ảnh mang đến sự chân thật và sắc nét tuyệt vời, điều này được chứng minh thông qua những công nghệ hiển thị điểm số và chứng nhận mà chiếc&nbsp;<a href="https://gearvn.com/collections/laptop-msi-gaming" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">laptop MSI</a>&nbsp;đã đạt được. Ngoài ra, MSI Prestige 13 AI Evo A1MG 062VN sở hữu cho mình tỷ lệ vàng của màn hình là 16:10 cho không gian hiển thị tối ưu với mọi công việc.</p><p class="ql-align-center"><img src="https://file.hstatic.net/200000722513/file/gearvn-laptop-msi-prestige-13-ai-evo-a1mg-062vn-2_6121405ab33140109580349e20b50e36_grande.jpg"></p>',	NULL,	500,	'a6707f3e-51a3-4f93-a60d-a37ad53d0896',	'2024-11-14 05:02:21.035588',	'2024-11-14 16:02:19.289067',	1),
+('72b983b9-8267-44e5-8269-862561258c31',	'HP VICTUS 16-r0129TX 8C5N4PA',	'hp-victus-16-r0129tx-8c5n4pa',	'29900000',	'<h2 class="ql-align-justify"><strong>Đánh giá chi tiết laptop gaming&nbsp;HP VICTUS 16-r0129TX 8C5N4PA</strong></h2><p class="ql-align-justify"><strong>Laptop gaming HP VICTUS 16-r0129TX 8C5N4PA</strong>&nbsp;là một sự lựa chọn tốt cho những game thủ đang tìm kiếm một chiếc&nbsp;<a href="https://gearvn.com/collections/laptop" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">laptop</a>&nbsp;xách tay mạnh mẽ với hiệu suất ổn định và giá cả hợp lý và&nbsp;ưu điểm về màn hình lớn 16 inch.&nbsp;Dưới đây&nbsp;<a href="https://gearvn.com/" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">GEARVN</a>&nbsp;giới thiệu đến bạn&nbsp;một số thông tin chi tiết về sản phẩm này.</p><p class="ql-align-center"><img src="https://product.hstatic.net/200000722513/product/khung-laptop-23_339c9e6bca2e43d095a928ff49b26b6d_grande.png"></p><h3 class="ql-align-justify"><strong>Thiết kế sang trọng, tinh tế</strong></h3><p>HP VICTUS 16-r0129TX 8C5N4PA là 1 chiếc&nbsp;<a href="https://gearvn.com/pages/laptop-gaming" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">laptop gaming</a>&nbsp;được thiết kế với trọng lượng vô cùng lý tưởng&nbsp;<strong>2.3kg</strong>&nbsp;và độ dày chỉ có&nbsp;<strong>23.9mm</strong>, chiếc laptop này thực sự là một người bạn đồng hành lý tưởng cho những ai thích di dộng. Với trọng lượng vừa phải, tạo nên cảm giác thoải mái cho người dùng khi mang theo, tạo điều kiện linh hoạt cho người sử dụng ở nhiều địa điểm khác nhau.</p><p>&nbsp;</p><p class="ql-align-center"><img src="https://file.hstatic.net/200000722513/file/52399_laptop_hp_gaming_victus_16_s0078ax_2_b09dccaa11db4756b67e86f1cb6a7cbf_grande.jpg"></p><h3><strong>Hiệu năng mạnh mẽ từ chip Intel</strong></h3><p>HP VICTUS 16-r0129TX 8C5N4PA được trang bị&nbsp;<a href="https://gearvn.com/collections/cpu-bo-vi-xu-ly?hang=intel" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">CPU&nbsp;Intel</a>&nbsp;Core&nbsp;<strong>i7-13700H</strong>, hỗ trợ tốc độ tối đa lên đến&nbsp;<strong>5.0GHz</strong>,&nbsp;<a href="https://gearvn.com/collections/vga-card-man-hinh" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">card đồ họa</a>&nbsp;<strong>NVIDIA® GeForce RTX™ 3050 6GB GDDR6</strong>&nbsp;kết hợp&nbsp;<strong>16GB</strong>&nbsp;<a href="https://gearvn.com/collections/ram-laptop" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">RAM</a>&nbsp;có thể đáp ứng chơi mượt các tựa game esport và AAA nặng&nbsp;ở mức cài đặt khá, không quá cao.&nbsp;Ổ cứng&nbsp;<a href="https://gearvn.com/collections/day-cap-hdmi" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">SSD</a>&nbsp;<strong>512GB NVMe PCIe</strong>&nbsp;tốc độ cao giúp khởi động máy, load game và ứng dụng nhanh chóng.</p><p class="ql-align-center"><img src="https://product.hstatic.net/200000722513/product/victus-16-s0078ax-8c5n7pa-r5-7640hs_1_bbf8ff87056f48bf9310a4a2609e1ffe_bb9c35f3801843a8866f910106d6d3f8_grande.png"></p><h3><strong>Màn hình kích thước lớn</strong></h3><p>HP VICTUS 16-r0129TX 8C5N4PA được trang bị&nbsp;<a href="https://gearvn.com/pages/man-hinh" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">màn hình</a>&nbsp;<strong>16 inch</strong>&nbsp;<a href="https://gearvn.com/collections/do-phan-giai-full-hd-1080p" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">Full HD</a>&nbsp;<strong>(1920 x 1080) IPS</strong>&nbsp;cung cấp không gian lớn cho trải nghiệm game sắc nét, chân thực. Công nghệ chống&nbsp;chói kết hợp tần số quét&nbsp;<a href="https://gearvn.com/collections/man-hinh-144hz" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">144Hz</a>&nbsp;cho ra độ phân giải cao và khả năng tái tạo màu sắc tuyệt vời. Độ sáng&nbsp;<strong>250 nits</strong>&nbsp;giúp bạn dễ dàng sử dụng máy ở nhiều điều kiện môi trường ánh sáng khác nhau.</p><p class="ql-align-center"><img src="https://product.hstatic.net/200000722513/product/victus-16-s0078ax-8c5n7pa-r5-7640hs_2_a2117f21f3124c3297286e75f974eb4e_7980ad39136b43f187b169439e580140_grande.png"></p><p><br></p>',	NULL,	9998,	'7adede1b-ba6b-4097-ba35-0e6edca6122b',	'2024-11-13 11:06:42.228792',	'2024-11-14 16:22:52.746072',	1),
+('ca049f04-3324-4d37-b164-351b3cccb7de',	'MSI Modern 14 C11M 011VN',	'msi-modern-14-c11m-011vn',	'14990000',	'<h2><strong>Đánh giá chi tiết laptop&nbsp;MSI Modern 14 C11M 011VN</strong></h2><p>Một trong những siêu phẩm&nbsp;<a href="https://gearvn.com/collections/laptop-hoc-tap-va-lam-viec-tu-15tr-den-20tr" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">laptop học tập làm việc</a>&nbsp;mới nhất đến từ nhà MSI là MSI Modern 14 C11M 011VN. Sở hữu thiết kế năng động cấu hình mạnh mẽ đến từ con chip gen 12 đáp ứng mọi nhu cầu công việc hằng ngày.</p><p class="ql-align-center"><img src="https://file.hstatic.net/1000026716/file/gearvn-laptop-msi-modern-14-c11m-011vn-1_7fcd931dfd0a4624b86cbd70877a960a.png"></p><h3><strong>Thiết kế laptop nhỏ gọn&nbsp;</strong></h3><p><a href="https://gearvn.com/collections/msi-modern-14-series" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">MSI Modern 14</a>&nbsp;được đầu tư thiết kế nhằm tối ưu trải nghiệm và phục vụ nhu cầu di chuyển mỗi ngày của người dùng. Trọng lượng chỉ khoảng 1.3kg thuận lợi trong việc bỏ vào balo và mang đi cứ lúc nào. Kiểu dáng sang trọng với tông màu đen thời thượng kết hợp từng đường nét chau chuốt tỉ mỉ tạo ra một nét đẹp đầy phong cách. Bắt kịp xu hướng và thị hiếu của các bạn trẻ ngày nay.&nbsp;</p><p class="ql-align-center"><img src="https://file.hstatic.net/1000026716/file/gearvn-laptop-msi-modern-14-c11m-011vn-2_933ad04a410f42fca743ffb23b4d1e41.png"></p><h3><strong>Hiệu năng tối đa&nbsp;</strong></h3><p>MSI Modern 14 C11M&nbsp;xử lý mọi tác vụ được yêu cầu nhờ vào con chip Intel Core Alder Lake Gen 11. Xung nhịp tối đa 4.1GHz xử lý nhanh gọn mọi yêu cầu. Đồng hành cùng với CPU là chiếc card đồ họa tích hợp Intel UHD Graphics. Không quá mạnh mẽ như những chiếc card đồ họa rời trên những con&nbsp;<a href="https://gearvn.com/collections/laptop-msi-gaming" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">MSI Gaming</a>&nbsp;nhưng cũng&nbsp;đủ để mang lại trải nghiệm tuyệt vời trên một chiếc laptop phổ thông.</p><h3><strong>Âm thanh sống động&nbsp;</strong></h3><p>Không chỉ phục vụ nhu cầu công việc, MSI Modern 14 còn hỗ trợ người dùng giải trí tốt hơn với âm thanh sắc nét. Tận hưởng không gian nghe nhạc sống động khi nhà MSI hỗ trợ mẫu âm thanh lên đến 24bit/192kHz.&nbsp;</p><h3><strong>Bàn phím gõ thoải mái</strong></h3><p>Hành trình phím 1.5mm cùng với độ phản hồi tốt giúp đem tới trải nghiệm gõ phím tuyệt vời&nbsp;trên Modern 14. Bàn phím có đèn nền cực sáng, cho phép bạn dễ dàng nhận diện ngay cả trong môi trường tối.</p><p class="ql-align-center"><img src="https://file.hstatic.net/1000026716/file/gearvn-laptop-msi-modern-14-c11m-011vn-3_8c1d47286187471c97dda4c794b99a5a.png"></p><h3><strong>Kết nối&nbsp;đa dạng</strong></h3><p>Trang bị 2 cổng USB-A và cổng USB Type C, dễ dàng kết nối theo nhu cầu của bạn. Đầu đọc&nbsp;thẻ&nbsp;micro SD và cổng xuất hình HDMI giúp thuận tiện hơn trong việc chụp hình, để bạn có thể thoải mái tận hưởng mọi khoảnh khắc cuộc sống.</p><p>Với thiết kế tinh tế, sang trọng MSI Modern 14&nbsp;là sự lựa chọn hàng đầu với&nbsp;<a href="https://gearvn.com/collections/laptop-hoc-sinh-sinh-vien" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">laptop sinh viên</a>&nbsp;dành cho&nbsp;giới trẻ, giúp mang đến một vẻ ngoài siêu nổi bật và tràn đầy cá tính. Cũng như đủ sức chinh phục mọi khách hàng với vẻ ngoài chuyên nghiệp, tự tin. Sản phẩm phù hợp với giới văn phòng, hay những bạn trẻ mong muốn sử dụng một chiếc máy thanh lịch và nổi bật giữa đám đông.</p>',	NULL,	30,	'5b536112-7c82-4b94-8070-c716ce646c40',	'2024-11-14 17:06:28.458183',	'2024-11-14 17:06:28.458183',	1),
+('ca80d7c3-c576-4e70-88c8-71748b675578',	'Dell G15 5525 R7H165W11GR3060',	'dell-g15-5525-r7h165w11gr3060',	'25990000',	'<h2><strong>Đánh giá chi tiết laptop gaming Dell G15 5525 R5H085W11GR3050</strong></h2><p class="ql-align-justify"><a href="https://gearvn.com/pages/laptop-gaming" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">Laptop gaming</a>&nbsp;Dell G15 5525 R5H085W11GR3050&nbsp;là sản phẩm nằm trong phân khúc&nbsp;<a href="https://gearvn.com/collections/laptop-gaming-gia-tu-25-den-35-trieu" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">laptop gaming 25 đến&nbsp;30 triệu</a>&nbsp;và là thế hệ&nbsp;chơi game tiếp theo của Dell. Vốn nổi tiếng với những chiếc&nbsp;<a href="https://gearvn.com/pages/laptop-van-phong" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">laptop văn phòng</a>&nbsp;thì nay Dell mang đến cho game thủ một lựa chọn mới đầy tính năng, cấu hình mạnh mẽ và đương đầu với vô số tựa game dễ dàng.&nbsp;Vậy Dell G15 5525 sẽ được trang bị những gì? Hãy cùng&nbsp;<a href="https://gearvn.com/" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">GEARVN</a>&nbsp;tìm hiểu nhé!</p><p class="ql-align-center"><img src="https://file.hstatic.net/1000026716/file/gearvn-laptop-gaming-dell-g15-5525-r7h165w11gr3060-1_869fb02188c74cffbcfc17f24f6f31f5.png"></p><h3 class="ql-align-justify"><strong>Thiết kế mới lạ, độc đáo</strong></h3><p class="ql-align-justify">Thiết kế độc lạ so với những dòng laptop gaming khác, đơn giản và không quá cầu kì, nhưng Dell G15 5525 vẫn được chau chuốt khi sở hữu vẻ ngoài mạnh mẽ với màu Dark Shadow Grey cùng thiết kế bản lề nối với màn hình độc đáo. Thiết kế của&nbsp;<a href="https://gearvn.com/collections/dell-gaming-g-series" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">Dell G15</a>&nbsp;khiến ta liên tưởng đến ngay dòng sản phẩm cao cấp Alienware trước đây của Dell.</p><p class="ql-align-center"><img src="https://file.hstatic.net/1000026716/file/gearvn-laptop-gaming-dell-g15-5525-r5h085w11gr3050-5_0e1250305b354626b281af4c742324d1.png"></p><h3 class="ql-align-justify"><strong>Hiệu năng mạnh mẽ, vượt trội</strong></h3><p class="ql-align-justify">Dòng&nbsp;<a href="https://gearvn.com/collections/laptop-dell" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">laptop Dell</a>&nbsp;này được trang bị cấu hình mạnh mẽ giúp cho các game thủ chiến game mượt mà. Đó là sức mạnh đến từ CPU AMD Ryzen 7 6800H<span style="color: rgb(0, 0, 0);">&nbsp;</span>đi cùng là card đồ họa RTX 3060. Bộ vi xử lý đảm bảo tốc độ xử lý các tác vụ, RTX 3060 thì đem lại đồ họa đỉnh cao trên những tựa game AAA, tất cả hướng đến trải nghiệm chơi game tuyệt vời nhất cho người dùng.</p><p class="ql-align-center"><img src="https://file.hstatic.net/1000026716/file/gearvn-laptop-gaming-dell-g15-5525-r5h085w11gr3050-4_9dde0bdc0a9548c2bb91ea33f7514dc6.png"></p><h3 class="ql-align-justify"><strong>Nâng tầm trải nghiệm thị giác</strong></h3><p class="ql-align-justify">Dell G15 5525&nbsp;sở hữu màn hình&nbsp;<a href="https://gearvn.com/collections/do-phan-giai-full-hd-1080p" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">Full HD</a>&nbsp;có kích thước 15.6 inch, độ phân giải 1920x1080 và độ sáng đạt 250 nits đem lại những khung hình sắc nét, chi tiết trên từng khung hình. Và một thứ làm nên sự khác biệt giữa màn hình của một chiếc laptop gaming và&nbsp;<a href="https://gearvn.com/collections/laptop-cao-cap-mong-nhe" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">laptop mỏng nhẹ</a>&nbsp;thông thường&nbsp;là tần số quét, khi Dell G15 mang lại tần số quét lên đến 120Hz cho cảm giác sử dụng mượt mà, thích mắt hơn và đặc biệt trong những tựa game FPS, đó sẽ là lợi thế của bạn khi sở hữu&nbsp;em nó.</p><p class="ql-align-center"><img src="https://file.hstatic.net/1000026716/file/gearvn-laptop-gaming-dell-g15-5525-r5h085w11gr3050-2_85dc072cdc5c4a2b9bbba00f2af7857b_grande.png"></p><h3 class="ql-align-justify"><strong>Bộ bàn phím với độ nhạy cao</strong></h3><p class="ql-align-justify">Sở hữu bàn phím gõ sâu, cực kỳ nhạy và chính xác. Độ cao phím vừa phải phù hợp cho mọi kích cỡ tay, xung quanh còn được viền thêm dàn đèn LED để hỗ trợ tối đa khi bạn làm việc hoặc chơi game trong điều kiện thiếu ánh sáng.&nbsp;</p><p class="ql-align-center"><img src="https://file.hstatic.net/1000026716/file/gearvn-laptop-gaming-dell-g15-5525-r5h085w11gr3050-3_6c73e42a5cd54c9a919c60c15e792854.png"></p><h3 class="ql-align-justify"><strong>Thiết kế tản nhiệt thông minh</strong></h3><p class="ql-align-justify">Những khe&nbsp;<a href="https://gearvn.com/collections/tan-nhiet-khi" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">tản nhiệt</a>&nbsp;được đặt ở mặt dưới, 2 bên cạnh sau và đằng trước của&nbsp;G15 5525. Giúp đem lại khả năng tản nhiệt tối ưu, cân bằng nhiệt độ và cho hiệu năng sử dụng lâu dài với chiếc laptop gaming từ Dell, hạn chế việc quá tải hoặc nhiệt cao gây hư hại cho máy.</p><p class="ql-align-center"><img src="https://file.hstatic.net/1000026716/file/gearvn-laptop-gaming-dell-g15-5525-r5h085w11gr3050-7_44625ee38d1a4b11915a8fd5d76deffd.png"></p><p><br></p>',	NULL,	450,	'e5137e50-9d32-4cbd-b825-6adeea254f88',	'2024-11-14 17:09:03.327861',	'2024-11-14 17:09:03.327861',	1),
+('8bede882-3d39-430d-ad0a-75658fb3c7ce',	'ASUS Vivobook 16X K3605ZC RP564W',	'asus-vivobook-16x-k3605zc-rp564w',	'18760000',	'<p class="ql-align-justify"><strong>Đánh giá chi tiết laptop ASUS Vivobook&nbsp;16X K3605ZC RP564W</strong></p><p class="ql-align-justify">ASUS Vivobook 16X K3605ZC RP564W là một chiếc&nbsp;<a href="https://gearvn.com/collections/laptop" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">laptop</a>&nbsp;được thiết kế để đáp ứng nhu cầu giải trí và làm việc hiệu năng cao của người dùng. Với bộ vi xử lý Intel® Core™ i5 thế hệ 12 mạnh mẽ, card đồ họa NVIDIA® GeForce RTX™ 3050 4GB, màn hình 16 inch WUXGA 144Hz sắc nét và bàn phím backlit, Vivobook 16X K3605ZC RP564W là lựa chọn hoàn hảo cho game thủ và những người sáng tạo nội dung.</p><p class="ql-align-center"><img src="https://file.hstatic.net/200000722513/file/1_2048x2048.jpg"></p><p>&nbsp;</p><p><strong>Thiết kế mỏng nhẹ, tiện lợi mang đi mọi nơi</strong></p><p>Cũng như nhiều dòng&nbsp;<a href="https://gearvn.com/collections/laptop-asus-vivobook-series" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">Asus Vivobook</a>&nbsp;khác của hãng,&nbsp;16X K3605ZC RP564W sở hữu thiết kế hiện đại và trẻ trung, ngoài ra máy còn được chăm chút với&nbsp;tông màu xám&nbsp;chủ đạo. Vỏ máy được làm từ nhựa cứng cáp, tạo cảm giác chắc chắn và bền bỉ. Máy có trọng lượng 1.8kg và độ dày 1.89cm, khá nhẹ nhàng so với một chiếc laptop gaming.</p><p class="ql-align-center"><img src="https://file.hstatic.net/200000722513/file/4_2048x2048.jpg"></p><p>&nbsp;</p><p><strong>Hiệu năng mạnh mẽ với&nbsp;Intel® Core™ i5 -12500H</strong></p><p>Vivobook 16X K3605ZC RP564W được trang bị bộ vi xử lý&nbsp;<a href="https://gearvn.com/collections/cpu-intel-core-i5" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">Intel® Core™ i5</a>&nbsp;-12500H thế hệ 12 mới nhất, cung cấp hiệu năng mạnh mẽ để xử lý các tác vụ nặng như chơi game, chỉnh sửa video và đồ họa. Máy đi kèm với 16GB RAM DDR4 3200MHz và 512GB SSD NVMe PCIe 4.0, giúp đảm bảo khả năng đa nhiệm mượt mà và khởi động ứng dụng nhanh chóng.</p><p class="ql-align-center"><img src="https://file.hstatic.net/200000722513/file/2_2048x2048.jpg"></p><p>Card đồ họa&nbsp;<a href="https://gearvn.com/collections/nvidia-geforce-rtx" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">NVIDIA® GeForce RTX</a>&nbsp;3050 4GB cho phép bạn chơi các tựa game AAA ở cài đặt trung bình đến cao với tốc độ khung hình ổn định. Máy cũng hỗ trợ công nghệ NVIDIA® Optimus™ để tiết kiệm pin khi không sử dụng card đồ họa rời.</p><p><strong>Màn hình sắc nét với độ phân giải cao</strong></p><p>Vivobook 16X K3605ZC RP564W sở hữu màn hình 16 inch WUXGA (1920 x 1200) với độ phân giải cao và tấm&nbsp;<a href="https://gearvn.com/blogs/thu-thuat-giai-dap/cong-nghe-man-hinh-ips-la-gi" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">nền IPS</a>&nbsp;- level cho hình ảnh sắc nét, màu sắc sống động và góc nhìn rộng. Tần số quét 144Hz giúp giảm thiểu hiện tượng xé hình và nhòe ảnh khi chơi game hoặc xem video hành động.</p><p class="ql-align-center"><img src="https://file.hstatic.net/200000722513/file/3_2048x2048.jpg"></p><p class="ql-align-center">&nbsp;</p><p><strong>Bàn phím nổi bật với&nbsp;đèn nền LED RGB</strong></p><p>Bàn phím của Vivobook 16X K3605ZC RP564W có hành trình phím sâu, độ nảy tốt và đèn nền LED RGB giúp bạn dễ dàng thao tác trong môi trường thiếu sáng. Bàn phím cũng được trang bị bàn phím số riêng, tiện lợi cho việc nhập liệu số liệu.</p><p>Công nghệ kháng vi khuẩn ASUS Antimicrobial được chứng minh là có khả năng ức chế 99% sự phát triển của vi khuẩn15 với hiệu quả bảo vệ tối thiểu ba năm.</p><p class="ql-align-center"><img src="https://file.hstatic.net/200000722513/file/11_2048x2048.jpg"></p><p><strong>Cổng kết nối đa dạng</strong></p><p>Vivobook 16X K3605ZC RP564W được trang bị đầy đủ các cổngkết nối thông dụng như Wi-Fi 6, Bluetooth 5.2, USB Type-C, USB Type-A,&nbsp;<a href="https://gearvn.com/collections/day-cap-hdmi" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">HDMI</a>, khe cắm&nbsp;<a href="https://gearvn.com/collections/the-nho-usb" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">thẻ nhớ</a>&nbsp;microSD,... giúp bạn dễ dàng kết nối với các thiết bị ngoại vi khác.</p><p class="ql-align-center"><img src="https://file.hstatic.net/200000722513/file/6_2048x2048.jpg"></p><p><strong>Tản nhiệt:</strong></p><p>Để duy trì nhiệt độ của máy tính xách tay mát mẻ trong mọi tình huống, công nghệ tản nhiệt ASUS IceCool trên Vivobook 16X OLED sử dụng các ống dẫn nhiệt nâng cấp 8 mm, 6 mm và 4 mm*, và một quạt IceBlade giúp tăng khả năng dẫn nhiệt một cách hiệu quả. Quạt 87 cánh và bộ cánh quạt được làm từ polymer tinh thể lỏng, tức là chúng nhẹ và mỏng hơn so với quạt thông thường. Kết quả cuối cùng chính là CPU Intel Core và GPU NVIDIA có thể chạy thoải mái lên tới TDP kết hợp 70 W nhanh chóng4 ở chế độ Hiệu năng — mà không gây nghẽn cổ chai!</p><p class="ql-align-center"><img src="https://file.hstatic.net/200000722513/file/8_2048x2048.jpg"></p><p><br></p>',	NULL,	400,	'f47ef901-01af-4ce0-a256-04d131ae2eb1',	'2024-11-14 17:11:32.741467',	'2024-11-14 17:11:32.741467',	1),
+('f08b023b-adc3-4604-8742-acdf30ce585e',	'ASUS Vivobook 15 OLED A1505VA MA468W',	'asus-vivobook-15-oled-a1505va-ma468w',	'17990000',	'<h2 class="ql-align-justify"><strong>Đánh giá chi tiết laptop Asus Vivobook 15&nbsp;OLED A1505VA L1114W</strong></h2><p class="ql-align-justify"><a href="https://gearvn.com/collections/laptop-asus-vivobook-series" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">Asus Vivobook</a>&nbsp;15&nbsp;OLED A1505VA L1114W mang lại trải nghiệm hình ảnh tốt hơn với trang bị màn hình OLED. Thiết kế mỏng nhẹ cùng cấu hình mạnh mẽ cho phép người dùng nâng cao hiệu suất khi làm việc.</p><p class="ql-align-center"><img src="https://product.hstatic.net/200000722513/product/ava_cc377fa319f54e5884151ee493e0f2c1_large.png"></p><h3 class="ql-align-justify"><strong>Thiết kế sang trọng, độc đáo</strong></h3><p class="ql-align-justify">Laptop Asus Vivobook 15&nbsp;OLED sở hữu một màu đen sang trọng với thiết kế vuông vắn đầy tinh tế. Bản lề được thiết kế tự tạo một góc nghiêng vừa phải khi mở nắp máy tính lên. Trọng lượng nhẹ khoảng 1.7kg với bề dày máy tính là 1.99cm tạo điều kiện hơn cho người dùng bỏ vào balo và mang vác đi bất cứ đâu.</p><p class="ql-align-center"><img src="https://file.hstatic.net/1000026716/file/gearvn-laptop-asus-vivobook-15x-oled-a1505va-l1114w-5_8300cc128b0d43889a184733364a7ae7.png"></p><h3 class="ql-align-justify"><strong>Cấu hình vượt trội</strong></h3><p class="ql-align-justify">Sử dụng CPU Intel core i5-13500H thế hệ 13 mạnh mẽ cho phép Asus OLED Vivobook 15&nbsp;OLED giải quyết mọi tác vụ văn phòng cơ bản đến nâng cao. Việc làm đồ họa cơ bản trên máy cũng được hỗ trợ với VGA tích hợp&nbsp;<a href="https://gearvn.com/blogs/thu-thuat-giai-dap/intel-iris-xe-graphics-la-gi" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">Intel® Iris Xe Graphics</a>. 16GB RAM DDR4 xử lý đa nhiệm nhanh chóng cho những thao tác mượt mà. Bộ lưu trữ 512GB thỏa sức lưu trữ các dữ liệu quan trọng mà người dùng cần.</p><p class="ql-align-center"><img src="https://file.hstatic.net/1000026716/file/gearvn-laptop-asus-vivobook-15x-oled-a1505va-l1114w-3_1a7d5544b1ea49b1ad35fbc7060fb05f.png"></p><p class="ql-align-justify">&nbsp;</p><h3 class="ql-align-justify"><strong>Hệ thống tản nhiệt hiệu quả trên Asus Vivobook 15&nbsp;OLED A1505VA L1114W</strong></h3><p class="ql-align-justify">Để duy trì mọi hoạt động và công suất làm việc từ các linh kiện một cách tốt nhất nhà Asus đã trang bị thêm hệ thống tản nhiệt trên laptop Asus Vivobook 15&nbsp;OLED. Công nghệ tản nhiệt Asus IceCool hiệu quả khi sử dụng 6 ống dẫn nhiệt và bộ quạt IceBlade 87 cánh được làm bằng Polyme tinh thể lỏng cao cấp. Tất cả góp phần trong việc dẫn các khí nóng được sản sinh trong quá trình vận hành máy từ các linh kiện bên trong thân máy. Từ đó tối ưu hóa công việc một cách trơn tru và mượt mà nhất cho người dùng.</p><p class="ql-align-center"><img src="https://file.hstatic.net/1000026716/file/gearvn-laptop-asus-vivobook-15x-oled-a1505va-l1114w-7_043a2b1ae151414d81408f0ac4bb0af4.png"></p><h3 class="ql-align-justify"><strong>Chất lượng hình ảnh chân thực</strong></h3><p class="ql-align-justify">Asus Vivobook 15&nbsp;sở hữu màn hình OLED&nbsp;<a href="https://gearvn.com/collections/do-phan-giai-full-hd-1080p" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">Full HD</a>&nbsp;với độ phân giải 1920 x 1080. Tỷ lệ màn hình 16:9 cùng thiết kế viền mỏng mở ra tầm nhìn thoải mái hơn trên một sản phẩm laptop mỏng nhẹ. Độ sáng 600 nits hỗ trợ hình ảnh hiển thị luôn tốt trong nhiều điều kiện ánh sáng. Vivobook 15&nbsp;OLED đạt chuẩn PANTONE Validated và dải màu&nbsp;<a href="https://gearvn.com/blogs/thu-thuat-giai-dap/dci-p3-la-gi" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">DCI-P3</a>&nbsp;100% mang lại độ chính xác về màu sắc cao. Trải nghiệm xem phim hay chiến những tựa game chân thực đến từng chi tiết.&nbsp;</p><p class="ql-align-center"><img src="https://file.hstatic.net/1000026716/file/gearvn-laptop-asus-vivobook-15x-oled-a1505va-l1114w-2_7d5124bd14c74402b494fb96094e9970.png"></p><h3 class="ql-align-justify"><strong>Bàn phím và bảo mật</strong></h3><p class="ql-align-justify">Đây có lẽ là sản phẩm&nbsp;<a href="https://gearvn.com/collections/laptop-hoc-sinh-sinh-vien" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">laptop cho sinh viên</a>&nbsp;hoàn hảo với thiết kế bàn phím thoải mái. Hành trình phím sâu với đầy đủ các phím để việc gõ máy trên Asus Vivobook 15 OLED thuận lợi không khác gì những dòng&nbsp;<a href="https://gearvn.com/pages/ban-phim-may-tinh" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">bàn phím cơ</a>&nbsp;rời có trên thị trường. Cảm biến vân tay được tích hợp với bàn di chuột trải nghiệm mở máy nhanh hơn chỉ với 1 chạm.</p><p class="ql-align-center"><img src="https://file.hstatic.net/1000026716/file/gearvn-laptop-asus-vivobook-15x-oled-a1505va-l1114w-4_f688a5fafed04e4c8bd53f7315b0de2d.png"></p><p><br></p>',	NULL,	100,	'c0fef1c4-19cd-4967-bf81-9fd93ebc98b9',	'2024-11-14 17:13:27.971249',	'2024-11-14 17:13:27.971249',	1),
+('27f381af-0752-40e6-9825-5cfaa92d5e77',	' ASUS ROG Strix G16 G614JU N4132W',	'-asus-rog-strix-g16-g614ju-n4132w',	'21000000',	'<h2 class="ql-align-justify"><strong>Đánh giá chi tiết laptop gaming ASUS ROG Strix G16 G614JU N4132W</strong></h2><p class="ql-align-justify"><a href="https://gearvn.com/pages/laptop-gaming" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">Laptop gaming</a>&nbsp;ngày nay được rất nhiều khách hàng lựa chọn nhằm phục vụ nhu cầu giải trí cao với các tựa game cấu hình nặng mà những chiếc&nbsp;<a href="https://gearvn.com/pages/laptop-van-phong" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">laptop văn phòng</a>&nbsp;không thể đáp ứng được. ASUS ROG Strix G16 G614JU N4132W được ra đời nhằm mang đến những phút giây thăng hoa cho người dùng được thỏa sức đắm chìm vào các tựa game yêu thích của họ.</p><p class="ql-align-center">&nbsp;</p><h3 class="ql-align-justify"><strong>Thiết kế mạnh mẽ đầy cá tính</strong></h3><p class="ql-align-justify"><a href="https://gearvn.com/collections/laptop-gaming-asus" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">Laptop Asus ROG</a>&nbsp;Strix được thiết kế vô cùng đẹp mắt với nắp máy tính làm từ nhôm cao cấp. Logo đặt lệch sang một bên làm điểm nhấn cho sự mạnh mẽ về hiệu năng cũng như thiết kế.</p><p class="ql-align-justify">Phần đáy được cắt xén tỉ mỉ với những đường rãnh cắt ngang hỗ trợ giữ máy cố định trên mặt bàn để quá trình chơi game lâu dài của người dùng không bị xê dịch gây sai sót ngoài ý muốn. Phần nghỉ tay của máy tính còn được phủ một lớp nhung soft-touch duy trì cảm giác dễ chịu cho 2 cánh tay khi sử dụng liên tục.</p><p class="ql-align-center"><img src="https://file.hstatic.net/1000026716/file/gearvn-laptop-gaming-asus-rog-strix-g16-g614ju-n3135w-5_8d3304bd7e1848a0b6f7ea946ecd7d5f.png"></p><h3 class="ql-align-justify"><strong>Cấu hình vượt trội cho trải nghiệm tối đa</strong></h3><p class="ql-align-justify"><a href="https://gearvn.com/collections/laptop-asus" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">Laptop Asus</a>&nbsp;ROG Strix G16&nbsp;sử dụng bộ xử lý Intel® Core™ i7-13650HX&nbsp;kết hợp cùng VGA NVIDIA Geforce GTX 4050 mang tới khả năng xử lý đa nhiệm một cách mượt mà.&nbsp;</p><p class="ql-align-justify">Một trong những dòng bàn phím&nbsp;<a href="https://gearvn.com/collections/laptop-gaming-asus-rog-strix-g" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">ASUS ROG Strix G16</a>&nbsp;sở hữu ổ&nbsp;cứng SSD 512GB M.2 NVMe™ PCIe® 3.0 và bộ nhớ RAM 16GB DDR4 4800MHz hỗ trợ tốc độ load nhanh đến chóng mặt. Các tựa game như: PUBG, GTA 5, War Tank, God of War,... đều không thể làm khó được chiếc laptop này.&nbsp;</p><p class="ql-align-center"><img src="https://file.hstatic.net/1000026716/file/gearvn-laptop-gaming-asus-rog-strix-g16-g614ju-n3135w-3_0f8502b9369642e88ab29ec8234a6ba3.png"></p><h3 class="ql-align-justify"><strong>Tản nhiệt hiệu quả cao&nbsp;</strong></h3><p class="ql-align-justify">Việc chơi game hay tải nặng trên máy tính luôn gây tình trạng nóng máy giảm hiệu suất, vì vậy&nbsp;<a href="https://gearvn.com/collections/tan-nhiet-khi" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">tản nhiệt</a>&nbsp;là cách tối ưu để có được hiệu suất làm việc tốt trong mọi lúc. CPU được thiết kế keo tản nhiệt lỏng trực tiếp làm mát tốt hơn các loại kem tản nhiệt gốm truyền thống. Bên cạnh đó còn 7&nbsp;ống đồng và hệ thống 3 quạt tản nhiệt&nbsp;tạo điều kiện dẫn nhiệt được tốt hơn cho các linh kiện bên trong máy. Độ ồn không quá 45dB cho một không gian yên tĩnh để Asus ROG Strix G16&nbsp;vận hành mạnh mẽ và ổn định hơn.&nbsp;</p><p class="ql-align-center"><img src="https://file.hstatic.net/1000026716/file/gearvn-laptop-gaming-asus-rog-strix-g16-g614ju-n3135w-11_700621e338a7421ea2a4d955a7099886_grande.png"></p><h3 class="ql-align-justify"><strong>Hỗ trợ LED RGB rực rỡ trên laptop ASUS ROG Strix G16 G614JU N4132W</strong></h3><p class="ql-align-justify">Để làm nên không gian tuyệt vời cùng chiếc laptop Asus ROG Strix G16&nbsp;thì hiệu ứng đèn&nbsp;<a href="https://gearvn.com/collections/fan-led-trang-tri" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">LED RGB</a>&nbsp;là không thể thiếu. Phần viền đáy được trang bị dải đèn nổi bật mang đến hiệu ứng ánh sáng đầy tinh tế. Người dùng có thể cài đặt Aura Sync để thiết lập các chế độ game lý tưởng cho môi trường sống động đa sắc màu với các thiết bị tương thích.&nbsp;</p><p class="ql-align-center"><img src="https://file.hstatic.net/1000026716/file/gearvn-laptop-gaming-asus-rog-strix-g16-g614ju-n3135w-6_fdbbb73c02cf4a5eabf40299584484e9.png"></p><h3 class="ql-align-justify"><strong>Trải nghiệm màn hình Full HD tràn viền</strong></h3><p class="ql-align-justify">Dòng&nbsp;<a href="https://gearvn.com/collections/laptop-gaming-asus-rog-strix-g" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">Asus ROG Strix G</a>&nbsp;này được chính hãng thiết kế màn hình 16 inch QHD+ 16:10 2560 x 1600 cực kỳ sắc nét và tần số quét 240Hz, cho bạn tự tin chiến tốt các game FPS, AAA hot nhất hiện tại. Với độ phân giải cao và chuẩn màu 100% DCI-P3, bạn có thể làm việc với các tác vụ đồ họa.&nbsp;</p><p class="ql-align-justify">Phần viền mỏng 4,5mm ở 3 cạnh cho tầm nhìn rộng hơn, tránh bị phân tâm bởi các yếu tố bên ngoài. Hình ảnh được kết xuất ra vô cùng đẹp mắt với màu sắc tươi sáng cho những lần chiến game hoàn hảo.</p><p class="ql-align-center"><img src="https://file.hstatic.net/1000026716/file/gearvn-laptop-gaming-asus-rog-strix-g16-g614ju-n3135w-2_0d7557252fea432e9c4ca1fa7df28df5.png"></p><p class="ql-align-justify">Đó là một vài điểm đặc biệt mà chiếc laptop gaming cao cấp đáng&nbsp;sở hữu. Asus ROG Strix G16&nbsp;đưa trải nghiệm người dùng lên cao hơn với những trang bị được&nbsp;ưu ái từ hãng. Cấu hình vượt trội, hiệu năng hấp dẫn, không gian tuyệt vời cùng LED RGB thu hút mọi sự quan tâm của các game thủ.</p><p class="ql-align-justify">Xem nhiều sản phẩm&nbsp;<a href="https://gearvn.com/collections/laptop" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">laptop</a>&nbsp;uy tín chất lượng hơn tại GEARVN!</p>',	NULL,	15,	'0e214d53-00f0-4c31-995b-0a696ca9bda8',	'2024-11-13 11:06:20.853722',	'2024-11-15 00:09:50.412427',	1),
+('9ce63f97-dc12-4510-9eec-d44d7ee3d547',	'ASUS STRIX SCAR 18 W567G',	'asus-strix-scar-18-w567g',	'40699000',	'<p><a href="https://gearvn.com/collections/cpu-bo-vi-xu-ly" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(0, 0, 0);"><strong>CPU</strong></a><span style="color: rgb(0, 0, 0);">Intel® Core™ i7-13650HX Processor 2.6 GHz 24M&nbsp;Cache, up to 4.9 GHz, 14 cores: 6 P-cores and 8 E-cores)</span><a href="https://gearvn.com/collections/ram-pc" rel="noopener noreferrer" target="_blank" style="color: rgb(0, 0, 0); background-color: transparent;"><strong>RAM</strong></a><span style="color: rgb(0, 0, 0);">16GB (1x16GB) DDR5 4800Mhz (2 khe,&nbsp;nâng cấp tối đa&nbsp;32GB)&nbsp;</span><a href="https://gearvn.com/collections/ssd-laptop" rel="noopener noreferrer" target="_blank" style="color: rgb(0, 0, 0); background-color: transparent;"><strong>Ổ lưu trữ</strong></a><span style="color: rgb(0, 0, 0);">1TB PCIe® 4.0 NVMe™ M.2 Performance SSD (2 khe, nâng cấp tối đa 2TB)</span><a href="https://gearvn.com/collections/vga-card-man-hinh" rel="noopener noreferrer" target="_blank" style="color: rgb(0, 0, 0); background-color: transparent;"><strong>Card đồ họa</strong></a><span style="color: rgb(0, 0, 0);">NVIDIA® GeForce RTX™ 4050 Laptop GPU 6GB GDDR6 (194 AI TOPs)&nbsp;</span></p><p><span style="color: rgb(0, 0, 0);">ROG Boost: 2420MHz* at 140W (2370MHz Boost Clock+50MHz OC, 115W+25W Dynamic Boost)</span><a href="https://gearvn.com/pages/man-hinh" rel="noopener noreferrer" target="_blank" style="color: rgb(0, 0, 0); background-color: transparent;"><strong>Màn hình</strong></a><span style="color: rgb(0, 0, 0);">18" QHD+ 16:10 (2560 x 1600, WQXGA),&nbsp;IPS-level,&nbsp;240Hz 3ms,&nbsp;Anti-glare display,&nbsp;DCI-P3:100%,&nbsp;Pantone Validated,&nbsp;ROG Nebula Display</span><strong style="color: rgb(0, 0, 0);">Cổng giao tiếp</strong><span style="color: rgb(0, 0, 0);">1x Thunderbolt™ 4 support DisplayPort™</span></p><p><span style="color: rgb(0, 0, 0);">1x USB 3.2 Gen 2 Type-C support DisplayPort™ / power delivery / G-SYNC</span></p><p><span style="color: rgb(0, 0, 0);">2x USB 3.2 Gen 2 Type-A</span></p><p><span style="color: rgb(0, 0, 0);">1x RJ45 LAN port</span></p><p><span style="color: rgb(0, 0, 0);">1x HDMI 2.1 FRL</span></p><p><span style="color: rgb(0, 0, 0);">1x 3.5mm Combo Audio Jack</span><a href="https://gearvn.com/collections/ban-phim-may-tinh" rel="noopener noreferrer" target="_blank" style="color: rgb(0, 0, 0); background-color: transparent;"><strong>Bàn phím</strong></a><span style="color: rgb(0, 0, 0);">Backlit Chiclet Keyboard Per-Key RGB</span><a href="https://gearvn.com/collections/thiet-bi-tai-nghe-loa-audio-chuyen-nghiep" rel="noopener noreferrer" target="_blank" style="color: rgb(0, 0, 0); background-color: transparent;"><strong>Audio</strong></a><span style="color: rgb(0, 0, 0);">Smart Amp Technology</span></p><p><span style="color: rgb(0, 0, 0);">Dolby Atmos</span><strong style="color: rgb(0, 0, 0);">LAN</strong><span style="color: rgb(0, 0, 0);">10/100/1000/2500 Mbps</span><strong style="color: rgb(0, 0, 0);">Wifi</strong><span style="color: rgb(0, 0, 0);">Wi-Fi 6E(802.11ax) (Triple band) 2*2</span><strong style="color: rgb(0, 0, 0);">Bluetooth</strong><span style="color: rgb(0, 0, 0);">Bluetooth® 5.3 Wireless Card</span><a href="https://gearvn.com/collections/webcam" rel="noopener noreferrer" target="_blank" style="color: rgb(0, 0, 0); background-color: transparent;"><strong>Webcam</strong></a><span style="color: rgb(0, 0, 0);">720P HD Camera</span><strong style="color: rgb(0, 0, 0);">Hệ điều hành</strong><a href="https://gearvn.com/products/phan-mem-windows-11-home-online-dwnld-nr-kw9-00664" rel="noopener noreferrer" target="_blank" style="color: rgb(0, 0, 0); background-color: transparent;">Windows 11 Home</a><strong style="color: rgb(0, 0, 0);">Pin</strong><span style="color: rgb(0, 0, 0);">90WHrs, 4S1P, 4-cell Li-ion</span><strong style="color: rgb(0, 0, 0);">Trọng lượng</strong></p><p><br></p><p>A</p><p><strong>b</strong></p><p><span style="color: rgb(0, 0, 0);">3.0 Kg</span><strong style="color: rgb(0, 0, 0);">Màu sắc</strong><span style="color: rgb(0, 0, 0);">Eclipse Gray</span><strong style="color: rgb(0, 0, 0);">Kích thước</strong></p><p><br></p><p>c</p><p><br></p><p>3<span style="color: rgb(0, 0, 0);">9.9 x 29.4 x 2.31 ~ 3.08 cm</span></p><p><br></p><h2 class="ql-align-justify"><strong>Đánh giá chi tiết laptop gaming ASUS ROG Strix G18 G814JI N6007W</strong></h2><p class="ql-align-justify">ASUS ROG là dòng&nbsp;<a href="https://gearvn.com/pages/laptop-gaming" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">laptop gaming</a>&nbsp;làm mưa làm gió trong trên thị trường laptop, đặc biệt là các game thủ.&nbsp;<strong>ASUS ROG Strix G18 G814JI N6007W&nbsp;</strong>sở hữu thiết kế mạnh mẽ đậm chất gaming cùng hiệu năng vượt trội đáp ứng mọi yêu cầu game cần&nbsp;cấu hình cao cùng hàng hoạt những&nbsp;công nghệ hàng đầu&nbsp;sẽ dẫn lối cộng đồng game thủ vào những đấu trường ảo đỉnh cao nhất.&nbsp;</p><p class="ql-align-center"><img src="https://file.hstatic.net/200000722513/file/ava_a9786abce9c9457cad07cd719268240c_grande.png"></p><h3 class="ql-align-justify"><strong>Thiết kế đậm chất gaming</strong></h3><p class="ql-align-justify"><a href="https://gearvn.com/collections/laptop-asus" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">Laptop Asus</a>&nbsp;ROG Strix G18 có thiết kế mạnh mẽ với tông màu&nbsp;<strong>Eclipse Gray</strong>&nbsp;cá tính. Logo ROG kim loại được đặt nghiêng về một bên tạo điểm nhấn tính tế cho dòng sản phẩm này. Máy có thiết kế vuông&nbsp;vắn tạo nên sự chắc chắn được đi viền&nbsp;<strong>LED RGB</strong>&nbsp;xung quanh ấn tượng và tỏa sáng hơn. Với trọng lượng chỉ&nbsp;<strong>3.0kg</strong>&nbsp;Asus ROG Strix G18&nbsp;thuận lợi cho việc di chuyển thường xuyên, hỗ trợ tốt cho&nbsp;những ai cầu thay đổi không gian làm việc, giải trí&nbsp;liên tục.</p><p class="ql-align-center"><img src="https://file.hstatic.net/1000026716/file/gearvn-laptop-gaming-asus-rog-strix-g18-g814ji-n6063w-3_746c16c7db7c47b396195084aec3159d.png"></p><h3 class="ql-align-justify"><strong>Sở hữu hiệu năng mạnh mẽ</strong></h3><p class="ql-align-justify">Asus ROG Strix G18 được trang bị con chip&nbsp;<a href="https://gearvn.com/collections/cpu-bo-vi-xu-ly?hang=intel" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">Intel®</a>&nbsp;Core™&nbsp;<strong>i9-14900HX</strong>&nbsp;<strong>(24C/32T)</strong>&nbsp;với tốc độ xung nhịp tối đa lên đến&nbsp;<strong>5.8GHz</strong>&nbsp;mang lại khả năng xử lý mọi tác vụ nhanh chóng.&nbsp;<a href="https://gearvn.com/collections/vga-card-man-hinh" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">Card đồ họa</a>&nbsp;<strong>NVIDIA&nbsp;GeForce RTX&nbsp;4070</strong>&nbsp;đảm bảo bạn luôn có thể chơi game, giải trí, làm việc một cách mượt mà nhất. Trong thời điểm hiện nay gần như mọi tựa game AAA đều không thể làm khó được chiếc laptop gaming Asus ROG Strix G18 này.</p><p class="ql-align-center"><img src="https://file.hstatic.net/1000026716/file/gearvn-laptop-gaming-asus-rog-strix-g18-g814ji-n6063w-6_fe0584ab88c74c28a39379f9e5ccf666.png"></p><p class="ql-align-justify">Được trang bị&nbsp;<strong>32GB</strong>&nbsp;<a href="https://gearvn.com/collections/ram-laptop" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">RAM</a>, Asus ROG Strix G18 có khả năng đa nhiệm đáng nể. Người dùng sẽ được trải nghiệm cảm giác chạy nhiều ứng dụng cùng lúc, chuyển đổi giữa nhiều cửa sổ cũng không lo bị đứng máy hay chậm&nbsp;so với bình thường. Đặc biệt với&nbsp;<a href="https://gearvn.com/collections/ssd-laptop" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">SSD</a>&nbsp;<strong>1TB</strong>&nbsp;<strong>PCIe gen 4</strong>, người dùng có thể thoải mái lưu trữ game mà không lo thiếu dung lượng.</p><p class="ql-align-center"><img src="https://file.hstatic.net/1000026716/file/gearvn-laptop-gaming-asus-rog-strix-g18-g814ji-n6063w-7_33df20adfdc646fcbc16a996e9ddc8ea.png"></p><h3 class="ql-align-justify"><strong>Bàn phím rực rỡ với hệ thống đèn RGB</strong></h3><p class="ql-align-justify"><a href="https://gearvn.com/collections/ban-phim-may-tinh" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">Bàn phím</a>&nbsp;của Asus ROG Strix G18 được trang bị bộ đèn LED với hiệu ứng&nbsp;RGB từng phím&nbsp;vô cùng đẹp mắt. Nó không chỉ giúp trải nghiệm đánh máy thú vị hơn mà còn tăng độ chính xác khi làm việc, giải trí trong điều kiện thiếu sáng. Bàn phím tiêu chuẩn của máy có độ nảy tốt cho cảm giác gõ êm tay, mượt mà tăng tốc khả năng lướt phím&nbsp;khi chơi game và làm việc.</p><p class="ql-align-center"><img src="https://file.hstatic.net/1000026716/file/gearvn-laptop-gaming-asus-rog-strix-g18-g814ji-n6063w-4_71ff3b903ad64b99af5e8eb5fd2de4d7.png"></p><h3 class="ql-align-justify"><strong>Màn hình sắc nét viền cực mỏng</strong></h3><p class="ql-align-justify"><a href="https://gearvn.com/collections/laptop" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">Laptop</a>&nbsp;Asus ROG Strix G18 có kích thước&nbsp;<a href="https://gearvn.com/pages/man-hinh" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">màn hình</a>&nbsp;<strong>18 inch</strong>&nbsp;với tỷ lệ khung hình hoàn hảo&nbsp;<strong>16:10</strong>&nbsp;cho góc nhìn thoải mái hơn cho người dùng. Độ phân giải cao&nbsp;<strong>2560 x 1600</strong>&nbsp;và&nbsp;<strong>100% DCI-P3</strong>,&nbsp;<a href="https://gearvn.com/collections/man-hinh-240hz" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">240Hz</a>&nbsp;mang đến chất lượng hình ảnh sắc nét đầy chân thật đáng kể. Dù ở góc nhìn thế nào hình ảnh và màu sắc luôn được đảm bảo nguyên vẹn bởi tấm nền&nbsp;<strong>IPS</strong>, đồng thời bảo vệ cho đôi mắt khi sử dụng trong thời gian dài bằng&nbsp;<strong>công nghệ chống chói Anti-glare</strong>.</p><p class="ql-align-center"><img src="https://file.hstatic.net/1000026716/file/gearvn-laptop-gaming-asus-rog-strix-g18-g814ji-n6063w-5_81428a0339904302ba06a1cfdb14e82e.png"></p>',	NULL,	999,	'0e214d53-00f0-4c31-995b-0a696ca9bda8',	'2024-11-14 14:54:14.719299',	'2024-11-15 00:24:36.569561',	1);
 
-DELIMITER ;;
-
-CREATE TRIGGER "update_product_modtime" BEFORE UPDATE ON "public"."products" FOR EACH ROW EXECUTE FUNCTION update_modified_column();;
-
-DELIMITER ;
 
 DROP TABLE IF EXISTS "provinces";
 DROP SEQUENCE IF EXISTS provinces_id_seq1;
@@ -1439,7 +1648,6 @@ CREATE TABLE "public"."provinces" (
     CONSTRAINT "provinces_pkey" PRIMARY KEY ("id")
 ) WITH (oids = false);
 
-TRUNCATE "provinces";
 INSERT INTO "provinces" ("id", "name", "code", "division_type", "codename", "phone_code", "districts") VALUES
 (1,	'Thành phố Hà Nội',	1,	'thành phố trung ương',	'thanh_pho_ha_noi',	24,	'[]'),
 (2,	'Tỉnh Hà Giang',	2,	'tỉnh',	'tinh_ha_giang',	219,	'[]'),
@@ -1535,7 +1743,15 @@ CREATE INDEX "idx_ram_type" ON "public"."ram" USING btree ("type");
 
 CREATE INDEX "idx_ram_updated_at" ON "public"."ram" USING btree ("updated_at");
 
-TRUNCATE "ram";
+INSERT INTO "ram" ("id", "name", "type", "capacity", "speed", "brand", "created_at", "updated_at", "status") VALUES
+('ad2c14b9-c58a-4564-9dd8-8a84cd31def9',	'16GB (1x16GB) DDR5 4800MHz',	'DDR5',	16,	4800,	'Team Group',	'2024-11-13 09:40:42.88942',	'2024-11-13 09:40:42.88942',	1),
+('ed50b2c6-29ae-4005-bc1b-6ccd1cca3eb6',	'RAM Laptop Kingston 8GB - DDR5 - 4800MHz ',	'DDR5',	8,	4800,	'Kingston',	'2024-11-13 10:49:06.822291',	'2024-11-13 10:49:06.822291',	1),
+('6dc3b91e-7b0f-4cf6-ad6d-727c6f89abd1',	'RAM Desktop G.Skill Ripjaws V 8GB DDR4 3200 MHz ',	'DDR4',	8,	3200,	'G.Skill',	'2024-11-13 10:50:22.520241',	'2024-11-13 10:50:22.520241',	1),
+('9c0cf326-d37f-4385-96c3-fae7eb941d95',	'RAM Lexar LD4AS008G-B2666GSSC 8 GB-DDR4-2666 MHz',	'DDR4',	8,	2666,	'Lexar',	'2024-11-13 11:01:40.881065',	'2024-11-13 11:01:52.476378',	-2),
+('158ff646-6716-4589-bf73-7ed2664e48d9',	'8 GB-DDR4-2666 MHz',	'DDR4',	8,	2666,	'Lexar',	'2024-11-13 11:01:36.99232',	'2024-11-14 15:53:43.32476',	1),
+('869ae7ea-1f6b-4566-aee1-3d2a4290b9e6',	'8 GB-DDR4-2400 MHz',	'DDR4',	8,	2400,	'Lexar',	'2024-11-13 10:53:28.693195',	'2024-11-14 15:54:04.688029',	1),
+('0e68969b-3123-41ab-9d90-0e48451cbbf0',	'16 GB  DDR5 4800MHZ ',	'DDR5',	16,	4800,	'Kingston',	'2024-11-13 10:52:29.551182',	'2024-11-14 15:54:21.685391',	1),
+('1e466985-cede-4c8a-be30-4ddd98ee0d28',	'8GB  DDR5 3200MHz ',	'DDR5',	8,	3200,	'Adata',	'2024-11-13 10:51:11.36851',	'2024-11-14 15:54:58.345584',	1);
 
 DROP TABLE IF EXISTS "reviews";
 CREATE TABLE "public"."reviews" (
@@ -1562,7 +1778,6 @@ CREATE INDEX "idx_reviews_updated_at" ON "public"."reviews" USING btree ("update
 
 CREATE INDEX "idx_reviews_user_id" ON "public"."reviews" USING btree ("user_id");
 
-TRUNCATE "reviews";
 
 DROP TABLE IF EXISTS "role_permissions";
 CREATE TABLE "public"."role_permissions" (
@@ -1584,7 +1799,6 @@ CREATE INDEX "idx_role_permissions_status" ON "public"."role_permissions" USING 
 
 CREATE INDEX "idx_role_permissions_updated_at" ON "public"."role_permissions" USING btree ("updated_at");
 
-TRUNCATE "role_permissions";
 
 DROP TABLE IF EXISTS "roles";
 CREATE TABLE "public"."roles" (
@@ -1606,7 +1820,6 @@ CREATE INDEX "idx_roles_status" ON "public"."roles" USING btree ("status");
 
 CREATE INDEX "idx_roles_updated_at" ON "public"."roles" USING btree ("updated_at");
 
-TRUNCATE "roles";
 INSERT INTO "roles" ("id", "name", "description", "created_at", "updated_at", "status") VALUES
 ('550e8400-e29b-41d4-a716-446655440000',	'admin',	'Administrator role',	'2024-11-13 08:33:51.517618',	'2024-11-13 08:33:51.517618',	1),
 ('550e8400-e29b-41d4-a716-446655440001',	'user',	'User role',	'2024-11-13 08:33:51.530166',	'2024-11-13 08:33:51.530166',	1);
@@ -1628,7 +1841,6 @@ CREATE INDEX "idx_settings_name" ON "public"."settings" USING btree ("name");
 
 CREATE INDEX "idx_settings_status" ON "public"."settings" USING btree ("status");
 
-TRUNCATE "settings";
 INSERT INTO "settings" ("id", "name", "value", "status", "created_at", "updated_at") VALUES
 ('bf00f01c-45a1-4f1a-ad89-a7def2ee62a5',	'site_name',	'Laptop Store',	1,	'2024-11-13 07:57:59.793165',	'2024-11-13 07:57:59.793165'),
 ('aa1353a9-0972-4cfb-b51f-28522a9d4193',	'site_description',	'Cửa hàng laptop chính hãng',	1,	'2024-11-13 07:57:59.793165',	'2024-11-13 07:57:59.793165'),
@@ -1670,7 +1882,12 @@ CREATE INDEX "idx_tags_status" ON "public"."tags" USING btree ("status");
 
 CREATE INDEX "idx_tags_updated_at" ON "public"."tags" USING btree ("updated_at");
 
-TRUNCATE "tags";
+INSERT INTO "tags" ("id", "name", "created_at", "updated_at", "status") VALUES
+('f6caed8c-14cb-408a-ac1b-76a583e38517',	'văn phòng',	'2024-11-13 10:50:45.769074',	'2024-11-13 10:50:45.769074',	1),
+('8345f3d5-ddac-44b9-8143-31769b91e2db',	'gaming',	'2024-11-13 10:50:54.867541',	'2024-11-13 10:50:54.867541',	1),
+('bfdc34f3-0c17-4bd8-bb77-95434f81d036',	'mỏng nhẹ',	'2024-11-13 10:51:09.828254',	'2024-11-13 10:51:09.828254',	1),
+('75194ec7-334c-4b78-9c15-b9e9cafc1551',	'sinh viên',	'2024-11-13 10:51:16.681635',	'2024-11-13 10:51:16.681635',	1),
+('1bf4e55d-e390-4eab-ae51-38de5e5464a5',	'đồ họa',	'2024-11-13 10:51:22.825171',	'2024-11-13 10:51:22.825171',	1);
 
 DROP TABLE IF EXISTS "user_delivery_addresses";
 CREATE TABLE "public"."user_delivery_addresses" (
@@ -1684,7 +1901,9 @@ CREATE TABLE "public"."user_delivery_addresses" (
     CONSTRAINT "user_delivery_addresses_pkey" PRIMARY KEY ("id")
 ) WITH (oids = false);
 
-TRUNCATE "user_delivery_addresses";
+INSERT INTO "user_delivery_addresses" ("id", "user_id", "delivery_addresses_id", "is_default", "status", "created_at", "updated_at") VALUES
+('7735eb56-c8f5-4335-9660-d05e73f885fd',	'bfece6d4-82d8-46b9-8326-c36b4bbc813d',	'92dab41d-a36e-4035-9df8-1d6d0da7fd91',	'f',	1,	'2024-11-13 11:54:25.505973',	'2024-11-13 11:54:25.505973'),
+('ed6ae12a-5a77-47d9-953b-c1968866519e',	'4aa6e593-4105-4a58-ab72-df464bff80aa',	'e89506b9-3724-4381-8543-de3e140e2cfe',	'f',	1,	'2024-11-15 00:09:13.553104',	'2024-11-15 00:24:32.669689');
 
 DROP TABLE IF EXISTS "users";
 CREATE TABLE "public"."users" (
@@ -1719,9 +1938,9 @@ CREATE INDEX "idx_users_updated_at" ON "public"."users" USING btree ("updated_at
 
 CREATE INDEX "idx_users_username" ON "public"."users" USING btree ("username");
 
-TRUNCATE "users";
 INSERT INTO "users" ("id", "username", "password", "email", "first_name", "last_name", "full_name", "phone", "address", "avatar_id", "role_id", "status", "created_at", "updated_at") VALUES
-('bfece6d4-82d8-46b9-8326-c36b4bbc813d',	'admin',	'$2b$10$e.1iu46rLRcRjj1xAmkjOeevQH69VnBUdeFJsx1UghNgHupjoDy16',	'admin@gmail.com',	NULL,	NULL,	'Admin',	NULL,	NULL,	NULL,	'550e8400-e29b-41d4-a716-446655440000',	1,	'2024-11-13 08:37:47.806602',	'2024-11-13 08:37:47.806602');
+('bfece6d4-82d8-46b9-8326-c36b4bbc813d',	'admin',	'$2b$10$e.1iu46rLRcRjj1xAmkjOeevQH69VnBUdeFJsx1UghNgHupjoDy16',	'admin@gmail.com',	NULL,	NULL,	'Admin',	NULL,	NULL,	NULL,	'550e8400-e29b-41d4-a716-446655440000',	1,	'2024-11-13 08:37:47.806602',	'2024-11-14 16:27:55.327336'),
+('4aa6e593-4105-4a58-ab72-df464bff80aa',	'trile',	'$2b$10$NcNc3x9XzshG8LRce6LQgu1aG//XI9pvZGtZw94Lg6girDMaogVcy',	'trile@gmail.com',	NULL,	NULL,	'Trí Lê',	NULL,	NULL,	NULL,	'550e8400-e29b-41d4-a716-446655440001',	1,	'2024-11-14 23:47:24.10096',	'2024-11-14 23:47:24.10096');
 
 DROP TABLE IF EXISTS "wards";
 DROP SEQUENCE IF EXISTS wards_id_seq1;
@@ -1737,7 +1956,6 @@ CREATE TABLE "public"."wards" (
     CONSTRAINT "wards_pkey" PRIMARY KEY ("id")
 ) WITH (oids = false);
 
-TRUNCATE "wards";
 INSERT INTO "wards" ("id", "name", "code", "division_type", "codename", "district_code") VALUES
 (1,	'Phường Phúc Xá',	1,	'phường',	'phuong_phuc_xa',	1),
 (2,	'Phường Trúc Bạch',	4,	'phường',	'phuong_truc_bach',	1),
@@ -12360,7 +12578,6 @@ CREATE INDEX "idx_wishlist_updated_at" ON "public"."wishlist" USING btree ("upda
 
 CREATE INDEX "idx_wishlist_user_id" ON "public"."wishlist" USING btree ("user_id");
 
-TRUNCATE "wishlist";
 
 ALTER TABLE ONLY "public"."banner_images" ADD CONSTRAINT "banner_images_banner_id_fkey" FOREIGN KEY (banner_id) REFERENCES banners(id) ON DELETE CASCADE NOT DEFERRABLE;
 ALTER TABLE ONLY "public"."banner_images" ADD CONSTRAINT "banner_images_image_id_fkey" FOREIGN KEY (image_id) REFERENCES images(id) ON DELETE CASCADE NOT DEFERRABLE;
@@ -12412,4 +12629,4 @@ ALTER TABLE ONLY "public"."users" ADD CONSTRAINT "users_role_id_fkey" FOREIGN KE
 
 ALTER TABLE ONLY "public"."wishlist" ADD CONSTRAINT "wishlist_product_id_fkey" FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE NOT DEFERRABLE;
 
--- 2024-11-13 08:52:54.69698+00
+-- 2024-11-15 04:02:15.267977+00

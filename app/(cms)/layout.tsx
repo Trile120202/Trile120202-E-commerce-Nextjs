@@ -45,11 +45,11 @@ const Sidebar = () => {
             <aside className={`bg-gradient-to-b from-blue-600 to-blue-800 text-white w-72 min-h-screen p-6 fixed inset-y-0 left-0 transform transition-transform duration-300 ease-in-out z-40 overflow-y-auto ${
                 isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
             } lg:static lg:translate-x-0 shadow-xl`}>
-                <div className="mb-8 text-2xl lg:text-3xl font-bold text-center pt-4">
+                <Link href="/quan-tri" className="block mb-8 text-2xl lg:text-3xl font-bold text-center pt-4">
                     <span className="bg-clip-text text-transparent bg-gradient-to-r from-white to-blue-200">
                         Z-Shop Admin
                     </span>
-                </div>
+                </Link>
                 <nav className="mt-8">
                     <ul className="space-y-2">
                         {menuItems.map((item, index) => (
@@ -91,16 +91,36 @@ const Sidebar = () => {
         </>
     );
 };
-
 const Layout = ({ children }: { children: React.ReactNode }) => {
+    const handleLogout = async () => {
+        try {
+            const response = await fetch('/api/auth/logout', {
+                method: 'POST'
+            });
+            
+            if (response.ok) {
+                localStorage.removeItem('token');
+                window.location.href = '/';
+            }
+        } catch (error) {
+            console.error('Logout failed:', error);
+        }
+    };
+
     return (
         <div className="flex min-h-screen bg-gray-50">
             <Sidebar/>
             <div className="flex-1 flex flex-col">
-                <header className="bg-white shadow-lg p-6 pl-20 lg:pl-6">
+                <header className="bg-white shadow-lg p-6 pl-20 lg:pl-6 flex justify-between items-center">
                     <h1 className="text-xl lg:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-blue-800">
                         CMS Dashboard
                     </h1>
+                    <button 
+                        onClick={handleLogout}
+                        className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+                    >
+                        Đăng xuất
+                    </button>
                 </header>
                 <main className="flex-1 p-6 lg:p-8 bg-gray-100 overflow-x-hidden">
                     {children}
