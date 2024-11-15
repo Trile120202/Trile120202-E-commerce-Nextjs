@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button"
@@ -13,11 +13,20 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Card, CardHeader, CardTitle } from "@/components/ui/card"
-import useApi from '@/lib/useApi';
 import DataTable from "@/components/custom/datatable";
 import { useToast } from "@/hooks/use-toast";
 import { ChangeStatus } from "@/components/custom/ChangeStatus";
 import Image from 'next/image';
+import {
+    Pagination,
+    PaginationContent,
+    PaginationEllipsis,
+    PaginationItem,
+    PaginationLink,
+    PaginationNext,
+    PaginationPrevious,
+} from "@/components/ui/pagination"
+import useSWR from 'swr';
 
 interface Product {
     product_id: string;
@@ -58,6 +67,8 @@ interface ApiResponse {
     };
 }
 
+const fetcher = (url: string) => fetch(url).then(res => res.json());
+
 const Page = () => {
     const router = useRouter();
     const { toast } = useToast();
@@ -67,23 +78,12 @@ const Page = () => {
     const [selectedId, setSelectedId] = useState<number | null>(null);
     const [statusFilter, setStatusFilter] = useState<string>('all');
 
-    const { data, loading, error, fetchData } = useApi<ApiResponse>(
+    const { data, error, mutate } = useSWR<ApiResponse>(
         `/api/products?page=${currentPage}&limit=${limit}&search=${encodeURIComponent(searchKeyword)}&status=${statusFilter}`,
-        { method: 'GET' }
+        fetcher
     );
 
-    useEffect(() => {
-        try {
-            fetchData();
-        } catch (err) {
-            console.error('Error fetching products:', err);
-            toast({
-                variant: "destructive",
-                title: "Lỗi",
-                description: "Có lỗi xảy ra khi tải dữ liệu sản phẩm"
-            });
-        }
-    }, [currentPage, searchKeyword, limit, statusFilter]);
+    const loading = !data && !error;
 
     const handleEdit = (id: number) => {
         router.push(`/quan-tri/quan-ly-san-pham/${id}`);
@@ -234,7 +234,7 @@ const Page = () => {
                         id={row.product_id}
                         isOpen={selectedId === row.product_id}
                         onClose={() => setSelectedId(null)}
-                        onSuccess={fetchData}
+                        onSuccess={mutate}
                         endpoint="/api/products/update-status"
                         status={-2}
                         title="Xác nhận xóa sản phẩm"
@@ -298,14 +298,35 @@ const Page = () => {
                                     options: [4, 10, 20, 50, 100]
                                 }
                             }}
-                            pagination={{
-                                currentPage: data?.pagination?.currentPage || 1,
-                                pageSize: data?.pagination?.pageSize || 10,
-                                totalItems: parseInt(data?.pagination?.totalItems || '0'),
-                                totalPages: data?.pagination?.totalPages || 1,
-                                onPageChange: setCurrentPage
-                            }}
                         />
+                        <div className="mt-4">
+                            <Pagination>
+                                <PaginationContent>
+                                    <PaginationItem>
+                                        <PaginationPrevious 
+                                            onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                                            disabled={currentPage === 1}
+                                        />
+                                    </PaginationItem>
+                                    {Array.from({length: data?.pagination?.totalPages || 0}, (_, i) => i + 1).map((page) => (
+                                        <PaginationItem key={page}>
+                                            <PaginationLink 
+                                                onClick={() => setCurrentPage(page)}
+                                                isActive={currentPage === page}
+                                            >
+                                                {page}
+                                            </PaginationLink>
+                                        </PaginationItem>
+                                    ))}
+                                    <PaginationItem>
+                                        <PaginationNext 
+                                            onClick={() => setCurrentPage(prev => Math.min(data?.pagination?.totalPages || 1, prev + 1))}
+                                            disabled={currentPage === (data?.pagination?.totalPages || 1)}
+                                        />
+                                    </PaginationItem>
+                                </PaginationContent>
+                            </Pagination>
+                        </div>
                     </div>
                 </Card>
             </div>
