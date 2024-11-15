@@ -36,6 +36,7 @@ export default function CMSPage() {
         totalOrders: 0,
         topSellingProducts: []
     });
+    const [chartData, setChartData] = useState<{ name: string; total: number; }[]>([]);
     const [period, setPeriod] = useState('year');
     const [year, setYear] = useState(new Date().getFullYear());
     const [month, setMonth] = useState<number | undefined>();
@@ -61,7 +62,25 @@ export default function CMSPage() {
             }
         };
 
+        const fetchChartData = async () => {
+            try {
+                const response = await fetch(`/api/dashboard/chart?year=${year}`);
+                const result = await response.json();
+                if (result.status === 200) {
+                    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+                    const formattedData = result.data.map((total: number, index: number) => ({
+                        name: monthNames[index],
+                        total
+                    }));
+                    setChartData(formattedData);
+                }
+            } catch (error) {
+                console.error('Error fetching chart data:', error);
+            }
+        };
+
         fetchDashboardData();
+        fetchChartData();
     }, [period, year, month]);
 
     const periodOptions = [
@@ -82,21 +101,6 @@ export default function CMSPage() {
         value: i + 1,
         label: `Tháng ${i + 1}`
     }));
-
-    const chartData = [
-        { name: "Jan", total: 1200 },
-        { name: "Feb", total: 2100 },
-        { name: "Mar", total: 1800 },
-        { name: "Apr", total: 2400 },
-        { name: "May", total: 1900 },
-        { name: "Jun", total: 2800 },
-        { name: "Jul", total: 2600 },
-        { name: "Aug", total: 2300 },
-        { name: "Sep", total: 2900 },
-        { name: "Oct", total: 3100 },
-        { name: "Nov", total: 2700 },
-        { name: "Dec", total: 3200 },
-    ];
 
     return (
         <div className="cms-content p-6">
