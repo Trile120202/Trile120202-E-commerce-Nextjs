@@ -26,12 +26,14 @@ interface DashboardData {
     revenue: {
         total: number;
     };
+    totalOrders: number;
     topSellingProducts: TopProduct[];
 }
 
 export default function CMSPage() {
     const [dashboardData, setDashboardData] = useState<DashboardData>({
         revenue: { total: 0 },
+        totalOrders: 0,
         topSellingProducts: []
     });
     const [period, setPeriod] = useState('year');
@@ -168,29 +170,46 @@ export default function CMSPage() {
                 </Card>
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">New Customers</CardTitle>
+                        <CardTitle className="text-sm font-medium">Tổng đơn hàng</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">+2350</div>
-                        <p className="text-xs text-muted-foreground">+180.1% from last month</p>
+                        <div className="text-2xl font-bold">{dashboardData.totalOrders}</div>
+                        <p className="text-xs text-muted-foreground">
+                            {period === 'year' ? `Năm ${year}` : 
+                             period.startsWith('quarter') ? `Quý ${period.slice(-1)} năm ${year}` :
+                             `Tháng ${month} năm ${year}`}
+                        </p>
                     </CardContent>
                 </Card>
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Total Orders</CardTitle>
+                        <CardTitle className="text-sm font-medium">Trung bình đơn hàng</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">+12,234</div>
-                        <p className="text-xs text-muted-foreground">+19% from last month</p>
+                        <div className="text-2xl font-bold">
+                            {dashboardData.totalOrders > 0 
+                                ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' })
+                                    .format(dashboardData.revenue.total / dashboardData.totalOrders)
+                                : '0 ₫'}
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                            {period === 'year' ? `Năm ${year}` : 
+                             period.startsWith('quarter') ? `Quý ${period.slice(-1)} năm ${year}` :
+                             `Tháng ${month} năm ${year}`}
+                        </p>
                     </CardContent>
                 </Card>
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Active Users</CardTitle>
+                        <CardTitle className="text-sm font-medium">Tỷ lệ hoàn thành</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">+573</div>
-                        <p className="text-xs text-muted-foreground">+201 since last hour</p>
+                        <div className="text-2xl font-bold">100%</div>
+                        <p className="text-xs text-muted-foreground">
+                            {period === 'year' ? `Năm ${year}` : 
+                             period.startsWith('quarter') ? `Quý ${period.slice(-1)} năm ${year}` :
+                             `Tháng ${month} năm ${year}`}
+                        </p>
                     </CardContent>
                 </Card>
             </div>
@@ -198,13 +217,23 @@ export default function CMSPage() {
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7 mb-6">
                 <Card className="col-span-4">
                     <CardHeader>
-                        <CardTitle>Overview</CardTitle>
+                        <CardTitle>Biểu đồ doanh thu</CardTitle>
                     </CardHeader>
                     <CardContent className="pl-2">
                         <ResponsiveContainer width="100%" height={350}>
                             <BarChart data={chartData}>
                                 <XAxis dataKey="name" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
-                                <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `$${value}`} />
+                                <YAxis 
+                                    stroke="#888888" 
+                                    fontSize={12} 
+                                    tickLine={false} 
+                                    axisLine={false} 
+                                    tickFormatter={(value) => new Intl.NumberFormat('vi-VN', { 
+                                        style: 'currency', 
+                                        currency: 'VND',
+                                        notation: 'compact'
+                                    }).format(value)} 
+                                />
                                 <Bar dataKey="total" fill="#adfa1d" radius={[4, 4, 0, 0]} />
                             </BarChart>
                         </ResponsiveContainer>

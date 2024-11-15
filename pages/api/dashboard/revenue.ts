@@ -27,8 +27,6 @@ function getPeriodClause(period: string, year: number, month?: number) {
     }
 }
 
-
-
 async function getTopSellingProducts(period: string, year: number, month?: number) {
     const periodClause = getPeriodClause(period, year, month);
 
@@ -66,6 +64,18 @@ async function getRevenue(period: string, year: number, month?: number) {
     return revenue ? { total: parseFloat(revenue.total) } : { total: 0 };
 }
 
+async function getTotalOrders(period: string, year: number, month?: number) {
+    const periodClause = getPeriodClause(period, year, month);
+
+    const result = await db('orders')
+        .count('* as total')
+        .where('status', 9)
+        .whereRaw(periodClause)
+        .first();
+
+    return result ? parseInt(result.total as string) : 0;
+}
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     const verified = await useAuth(req, res);
     if (!verified || verified.payload.roleName !== 'admin') {
@@ -91,15 +101,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 }));
             }
 
-            // Fetch revenue and top-selling products concurrently
-            const [revenue, topSellingProducts] = await Promise.all([
+            // Fetch revenue, total orders and top-selling products concurrently
+            const [revenue, totalOrders, topSellingProducts] = await Promise.all([
                 getRevenue(period, year, month),
+                getTotalOrders(period, year, month),
                 getTopSellingProducts(period, year, month)
             ]);
 
             res.status(StatusCode.OK).json(transformResponse({
-                data: { revenue, topSellingProducts },
-                message: `Retrieved revenue and top-selling products for ${period} of ${year} successfully.`,
+                data: { revenue, totalOrders, topSellingProducts },
+                message: `Retrieved revenue, total orders and top-selling products for ${period} of ${year} successfully.`,
                 statusCode: StatusCode.OK,
             }));
         } catch (error) {
