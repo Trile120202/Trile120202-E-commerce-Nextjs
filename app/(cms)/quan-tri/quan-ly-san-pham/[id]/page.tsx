@@ -61,7 +61,7 @@ const formSchema = z.object({
         .min(1, "Phải chọn ít nhất một CPU"),
     graphics_card_ids: z.array(z.string())
         .min(1, "Phải chọn ít nhất một card đồ họa"),
-    status: z.number().default(Status.ACTIVE),
+    status: z.number().default(1),
     thumbnail_id: z.string({
         required_error: "Vui lòng chọn ảnh đại diện"
     }),
@@ -96,7 +96,7 @@ const Page = ({ params }: { params: { id: string } }) => {
             display_ids: [],
             cpu_ids: [],
             graphics_card_ids: [],
-            status: Status.ACTIVE,
+            status: 1,
             thumbnail_id: "",
             images: []
         }
@@ -172,7 +172,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                     display_ids: displayIds,
                     cpu_ids: cpuIds,
                     graphics_card_ids: graphicsCardIds,
-                    status: productData.product_status || Status.ACTIVE,
+                    status: productData.product_status,
                     thumbnail_id: productData.thumbnail_id?.toString() || "",
                     images: productData.product_image_ids?.map(String) || []
                 });
@@ -469,11 +469,14 @@ const Page = ({ params }: { params: { id: string } }) => {
                                         <FormItem>
                                             <FormLabel className="text-base lg:text-lg">Trạng thái</FormLabel>
                                             <FormControl>
-                                                <SelectStatus
+                                                <select
                                                     value={field.value}
-                                                    onValueChange={field.onChange}
-                                                    options="basic"
-                                                />
+                                                    onChange={(e) => field.onChange(parseInt(e.target.value))}
+                                                    className="w-full h-10 lg:h-12 text-base lg:text-lg border rounded-md px-3"
+                                                >
+                                                    <option value={1}>Kinh doanh</option>
+                                                    <option value={0}>Ngưng kinh doanh</option>
+                                                </select>
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>

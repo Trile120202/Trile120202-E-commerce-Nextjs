@@ -42,7 +42,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 .leftJoin('cpus as cpu', 'pc2.cpu_id', 'cpu.id')
                 .leftJoin('product_graphics_cards as pgc', 'p.id', 'pgc.product_id')
                 .leftJoin('graphics_cards as gc', 'pgc.graphics_card_id', 'gc.id')
-                .where('p.status', 1)
+                .whereNot('p.status', -2)
                 .select(
                     'p.id AS product_id',
                     'p.name AS product_name',
@@ -84,7 +84,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 });
             }
         
-            let countQuery = db('products as p').where('p.status', 1);
+            let countQuery = db('products as p').whereNot('p.status', -2);
         
             if (search) {
                 countQuery = countQuery.where((builder) => {

@@ -65,9 +65,10 @@ const Page = () => {
     const [searchKeyword, setSearchKeyword] = useState('');
     const [limit, setLimit] = useState(10);
     const [selectedId, setSelectedId] = useState<number | null>(null);
+    const [statusFilter, setStatusFilter] = useState<string>('all');
 
     const { data, loading, error, fetchData } = useApi<ApiResponse>(
-        `/api/products?page=${currentPage}&limit=${limit}&search=${encodeURIComponent(searchKeyword)}`,
+        `/api/products?page=${currentPage}&limit=${limit}&search=${encodeURIComponent(searchKeyword)}&status=${statusFilter}`,
         { method: 'GET' }
     );
 
@@ -82,7 +83,7 @@ const Page = () => {
                 description: "Có lỗi xảy ra khi tải dữ liệu sản phẩm"
             });
         }
-    }, [currentPage, searchKeyword, limit]);
+    }, [currentPage, searchKeyword, limit, statusFilter]);
 
     const handleEdit = (id: number) => {
         router.push(`/quan-tri/quan-ly-san-pham/${id}`);
@@ -167,6 +168,20 @@ const Page = () => {
             render: (row: Product) => (
                 <span className="font-medium">
                     {row.stock_quantity.toLocaleString()}
+                </span>
+            )
+        },
+        {
+            accessor: 'status',
+            label: 'Trạng thái',
+            className: 'text-center',
+            render: (row: Product) => (
+                <span className={`px-2 py-1 rounded-full text-sm font-medium ${
+                    row.product_status === 1 
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-red-100 text-red-800'
+                }`}>
+                    {row.product_status === 1 ? 'Đang kinh doanh' : 'Ngưng kinh doanh'}
                 </span>
             )
         },
@@ -267,6 +282,15 @@ const Page = () => {
                                     value: searchKeyword,
                                     onChange: setSearchKeyword,
                                     placeholder: "Tìm kiếm sản phẩm"
+                                },
+                                status: {
+                                    value: statusFilter,
+                                    onChange: setStatusFilter,
+                                    options: [
+                                        { value: 'all', label: 'Tất cả' },
+                                        { value: '1', label: 'Đang kinh doanh' },
+                                        { value: '0', label: 'Ngưng kinh doanh' }
+                                    ]
                                 },
                                 limit: {
                                     value: limit,
