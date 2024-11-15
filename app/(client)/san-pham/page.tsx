@@ -203,8 +203,10 @@ const ProductCard: React.FC<{ product: Product }> = ({product}) => {
 const ProductsPage: React.FC = () => {
     const searchParams = useSearchParams();
     const search = searchParams.get('search') ?? '';
+    const minPrice = searchParams.get('minPrice') ?? '';
+    const maxPrice = searchParams.get('maxPrice') ?? '';
     const [currentPage, setCurrentPage] = React.useState(1);
-    const {data, loading, error} = useFetch<ApiResponse>(`/api/products?page=${currentPage}&limit=12&search=${search}`);
+    const {data, loading, error} = useFetch<ApiResponse>(`/api/products?page=${currentPage}&limit=12&search=${search}&minPrice=${minPrice}&maxPrice=${maxPrice}`);
 
     if (loading) return <Loading/>;
     if (error) return notFound();

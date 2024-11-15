@@ -10,18 +10,20 @@ const db = knex(knexConfig);
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method === 'GET') {
         try {
-            const verified = await useAuth(req, res);
-            if (!verified) {
-                return res.status(StatusCode.UNAUTHORIZED).json(transformResponse({
-                    data: null,
-                    message: 'Unauthorized',
-                    statusCode: StatusCode.UNAUTHORIZED
-                }));
-            }
+            // const verified = await useAuth(req, res);
+            // if (!verified) {
+            //     return res.status(StatusCode.UNAUTHORIZED).json(transformResponse({
+            //         data: null,
+            //         message: 'Unauthorized',
+            //         statusCode: StatusCode.UNAUTHORIZED
+            //     }));
+            // }
 
             const page = parseInt(req.query.page as string) || 1;
             const limit = parseInt(req.query.limit as string) || 10;
             const search = req.query.search as string;
+            const minPrice = parseInt(req.query.minPrice as string) || 0;
+            const maxPrice = parseInt(req.query.maxPrice as string) || Number.MAX_SAFE_INTEGER;
         
             let query = db('products as p')
                 .leftJoin('images as i', 'p.thumbnail_id', 'i.id')
@@ -42,6 +44,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 .leftJoin('product_graphics_cards as pgc', 'p.id', 'pgc.product_id')
                 .leftJoin('graphics_cards as gc', 'pgc.graphics_card_id', 'gc.id')
                 .whereNot('p.status', -2)
+                .whereBetween('p.price', [minPrice, maxPrice])
                 .select(
                     'p.id AS product_id',
                     'p.name AS product_name',
@@ -83,7 +86,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 });
             }
         
-            let countQuery = db('products as p').whereNot('p.status', -2);
+            let countQuery = db('products as p')
+                .whereNot('p.status', -2)
+                .whereBetween('p.price', [minPrice, maxPrice]);
         
             if (search) {
                 countQuery = countQuery.where((builder) => {

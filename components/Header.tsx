@@ -3,6 +3,8 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { FaShoppingCart, FaClipboardList, FaUser } from 'react-icons/fa';
+import { Button } from './ui/button';
+import { Input } from './ui/input';
 
 const URLS = {
   HOME: '/',
@@ -68,7 +70,7 @@ export default function Header() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      const encodedSearchQuery = encodeURIComponent(searchQuery).replace(/%20/g, '+');
+      const encodedSearchQuery = encodeURIComponent(searchQuery.normalize('NFC')).replace(/%20/g, '+');
       router.push(`${URLS.SEARCH}${encodedSearchQuery}`);
       setSearchQuery(''); 
     }
@@ -84,6 +86,8 @@ export default function Header() {
           placeholder="Tìm kiếm sản phẩm..."
           className="w-64 px-4 py-2 rounded-lg text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-400"
           autoFocus
+          lang="vi"
+          inputMode="search"
         />
         <button type="submit" className="absolute right-3 top-1/2 transform -translate-y-1/2">
           <svg className="w-5 h-5 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -135,12 +139,14 @@ export default function Header() {
     <div className={`lg:hidden w-full mt-4 ${isMenuOpen ? 'block' : 'hidden'}`}>
       <form onSubmit={handleSearch} className="relative mb-4">
         <input
-          type="text" 
+          type="search"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Tìm kiếm sản phẩm..."
           className="w-full px-4 py-2 rounded-lg text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-400"
           autoFocus
+          lang="vi"
+          inputMode="search"
         />
         <button type="submit" className="absolute right-3 top-1/2 transform -translate-y-1/2">
           <svg className="w-5 h-5 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
