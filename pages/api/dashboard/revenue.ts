@@ -7,6 +7,52 @@ import { useAuth } from '@/hooks/useAuth';
 
 const db = knex(knexConfig);
 
+async function getTopSellingProducts(period: string) {
+    const periodClause = {
+        quarter: `EXTRACT(QUARTER FROM orders.created_at) = EXTRACT(QUARTER FROM CURRENT_DATE)`,
+        month: `EXTRACT(MONTH FROM orders.created_at) = EXTRACT(MONTH FROM CURRENT_DATE)`,
+        year: `EXTRACT(YEAR FROM orders.created_at) = EXTRACT(YEAR FROM CURRENT_DATE)`
+    }[period];
+
+    return db('order_items')
+        .select(
+            'order_items.product_id',
+            db.raw('COUNT(*) as count'),
+            'products.name',
+            'images.url as thumbnail',
+            'categories.name as category_name',
+            'categories.slug as category_slug'
+        )
+        .join('orders', 'orders.id', 'order_items.order_id')
+        .join('products', 'products.id', 'order_items.product_id')
+        .join('product_images', 'product_images.product_id', 'products.id')
+        .join('images', 'images.id', 'product_images.image_id')
+        .leftJoin('product_categories', 'product_categories.product_id', 'products.id')
+        .leftJoin('categories', 'categories.id', 'product_categories.category_id')
+        .where('orders.status', 9)
+        .whereRaw(periodClause || '')
+        .groupBy('order_items.product_id', 'products.name', 'images.url', 'categories.name', 'categories.slug')
+        .orderBy('count', 'desc')
+        .limit(5);
+}
+
+
+async function getRevenue(period: string) {
+    const periodClause = {
+        quarter: `EXTRACT(QUARTER FROM created_at) = EXTRACT(QUARTER FROM CURRENT_DATE)`,
+        month: `EXTRACT(MONTH FROM created_at) = EXTRACT(MONTH FROM CURRENT_DATE)`,
+        year: `EXTRACT(YEAR FROM created_at) = EXTRACT(YEAR FROM CURRENT_DATE)`
+    }[period];
+
+    const revenue = await db('orders')
+        .sum({ total: db.raw('CAST(total_amount AS numeric)') })
+        .where('status', 9)
+        .whereRaw(periodClause || '')
+        .first();
+    
+    return revenue ? { total: parseFloat(revenue.total) } : { total: 0 };
+}
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     const verified = await useAuth(req, res);
     if (!verified || verified.payload.roleName !== 'admin') {
@@ -19,67 +65,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (req.method === 'GET') {
         try {
             const period = req.query.period as string || 'year';
-            let revenue;
-            let topSellingProducts;
-    
-            switch (period) {
-                case 'quarter':
-                    revenue = await db('orders')
-                        .sum({ total: db.raw('CAST(total_amount AS numeric)') })
-                        .where('status', 9)
-                        .whereRaw('EXTRACT(QUARTER FROM created_at) = EXTRACT(QUARTER FROM CURRENT_DATE)')
-                        .first();
-                    topSellingProducts = await db('order_items')
-                        .select('product_id', db.raw('COUNT(*) as count'))
-                        .join('orders', 'orders.id', 'order_items.order_id')
-                        .where('orders.status', 9)
-                        .whereRaw('EXTRACT(QUARTER FROM orders.created_at) = EXTRACT(QUARTER FROM CURRENT_DATE)')
-                        .groupBy('product_id')
-                        .orderBy('count', 'desc')
-                        .limit(5);
-                    break;
-                case 'month':
-                    revenue = await db('orders')
-                        .sum({ total: db.raw('CAST(total_amount AS numeric)') })
-                        .where('status', 9)
-                        .whereRaw('EXTRACT(MONTH FROM created_at) = EXTRACT(MONTH FROM CURRENT_DATE)')
-                        .first();
-                    topSellingProducts = await db('order_items')
-                        .select('product_id', db.raw('COUNT(*) as count'))
-                        .join('orders', 'orders.id', 'order_items.order_id')
-                        .where('orders.status', 9)
-                        .whereRaw('EXTRACT(MONTH FROM orders.created_at) = EXTRACT(MONTH FROM CURRENT_DATE)')
-                        .groupBy('product_id')
-                        .orderBy('count', 'desc')
-                        .limit(5);
-                    break;
-                case 'year':
-                    revenue = await db('orders')
-                        .sum({ total: db.raw('CAST(total_amount AS numeric)') })
-                        .where('status', 9)
-                        .whereRaw('EXTRACT(YEAR FROM created_at) = EXTRACT(YEAR FROM CURRENT_DATE)')
-                        .first();
-                    topSellingProducts = await db('order_items')
-                        .select('product_id', db.raw('COUNT(*) as count'))
-                        .join('orders', 'orders.id', 'order_items.order_id')
-                        .where('orders.status', 9)
-                        .whereRaw('EXTRACT(YEAR FROM orders.created_at) = EXTRACT(YEAR FROM CURRENT_DATE)')
-                        .groupBy('product_id')
-                        .orderBy('count', 'desc')
-                        .limit(5);
-                    break;
-                default:
-                    return res.status(StatusCode.BAD_REQUEST).json(transformResponse({
-                        data: null,
-                        message: 'Invalid period.',
-                        statusCode: StatusCode.BAD_REQUEST,
-                    }));
+            if (!['quarter', 'month', 'year'].includes(period)) {
+                return res.status(StatusCode.BAD_REQUEST).json(transformResponse({
+                    data: null,
+                    message: 'Invalid period.',
+                    statusCode: StatusCode.BAD_REQUEST,
+                }));
             }
-    
-            if (revenue && revenue.total) {
-                revenue.total = parseFloat(revenue.total);
-            }
-    
+
+            const [revenue, topSellingProducts] = await Promise.all([
+                getRevenue(period),
+                getTopSellingProducts(period)
+            ]);
+
             res.status(StatusCode.OK).json(transformResponse({
                 data: { revenue, topSellingProducts },
                 message: `Lấy doanh thu và top sản phẩm bán chạy nhất theo ${period} thành công.`,
@@ -94,5 +92,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             }));
         }
     }
+    
     
 }
