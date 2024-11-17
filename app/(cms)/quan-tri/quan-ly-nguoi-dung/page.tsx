@@ -106,7 +106,6 @@ const Page = () => {
     };
 
     const columns = [
-        { accessor: 'id', label: 'ID', className: 'font-medium' },
         { accessor: 'username', label: 'Tên người dùng', className: 'font-medium' },
         { accessor: 'email', label: 'Email', className: 'font-medium' },
         { accessor: 'role_name', label: 'Vai trò', className: 'text-center' },

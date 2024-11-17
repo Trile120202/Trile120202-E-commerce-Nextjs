@@ -125,7 +125,6 @@ const Page = () => {
     };
 
     const columns = [
-        { accessor: 'id', label: 'ID', className: 'font-medium' },
         { accessor: 'name', label: 'Tên màn hình', className: 'font-medium' },
         { accessor: 'size', label: 'Kích thước', className: 'font-medium' },
         { accessor: 'resolution', label: 'Độ phân giải', className: 'font-medium' },

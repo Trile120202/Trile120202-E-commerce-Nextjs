@@ -89,7 +89,6 @@ const Page = () => {
     };
 
     const columns = [
-        { accessor: 'id', label: 'ID', className: 'font-medium' },
         { accessor: 'name', label: 'Tên ổ cứng', className: 'font-medium' },
         { accessor: 'type', label: 'Loại', className: 'font-medium' },
         { accessor: 'capacity', label: 'Dung lượng', render: (row: Storage) => `${row.capacity}GB` },

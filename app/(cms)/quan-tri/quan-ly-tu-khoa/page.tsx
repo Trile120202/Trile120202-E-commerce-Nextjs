@@ -82,7 +82,6 @@ const Page = () => {
     };
 
     const columns = [
-        { accessor: 'id', label: 'ID', className: 'font-medium' },
         { accessor: 'name', label: 'Từ khóa', className: 'font-medium' },
         {
             accessor: 'status',

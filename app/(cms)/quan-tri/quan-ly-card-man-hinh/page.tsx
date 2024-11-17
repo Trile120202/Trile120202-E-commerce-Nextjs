@@ -87,7 +87,6 @@ const Page = () => {
     };
 
     const columns = [
-        { accessor: 'id', label: 'ID', className: 'font-medium' },
         { accessor: 'name', label: 'Tên Card', className: 'font-medium' },
         { accessor: 'brand', label: 'Hãng sản xuất', className: 'font-medium' },
         { accessor: 'memory_size', label: 'Dung lượng bộ nhớ', className: 'font-medium' },

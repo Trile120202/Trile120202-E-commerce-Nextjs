@@ -90,7 +90,6 @@ const Page = () => {
     };
 
     const columns = [
-        { accessor: 'id', label: 'ID', className: 'font-medium' },
         { accessor: 'code', label: 'Mã khuyến mãi', className: 'font-medium' },
         { accessor: 'discount_type', label: 'Loại giảm giá', render: (row: Coupon) => row.discount_type === 'percentage' ? 'Phần trăm' : 'Số tiền cố định' },
         { accessor: 'discount_value', label: 'Giá trị giảm', render: (row: Coupon) => row.discount_type === 'percentage' ? `${row.discount_value}%` : `${row.discount_value.toLocaleString()}đ` },

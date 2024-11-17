@@ -97,7 +97,6 @@ const Page = () => {
     }, [currentPage, selectedStatus, searchKeyword]);
 
     const columns = [
-        { accessor: 'id', label: 'ID', className: 'font-medium' },
         { accessor: 'full_name', label: 'Tên khách hàng', className: 'font-medium' },
         { accessor: 'created_at', label: 'Ngày đặt hàng', className: 'text-center' },
         { accessor: 'total_amount', label: 'Tổng tiền', className: 'text-right' },

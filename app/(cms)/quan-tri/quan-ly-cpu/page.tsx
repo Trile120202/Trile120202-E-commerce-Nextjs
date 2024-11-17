@@ -90,7 +90,6 @@ const Page = () => {
     };
 
     const columns = [
-        { accessor: 'id', label: 'ID', className: 'font-medium' },
         { accessor: 'name', label: 'Tên CPU', className: 'font-medium' },
         { accessor: 'brand', label: 'Hãng sản xuất', className: 'font-medium' },
         { accessor: 'model', label: 'Model', className: 'font-medium' },

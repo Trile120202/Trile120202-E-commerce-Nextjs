@@ -83,7 +83,6 @@ const Page = () => {
     };
 
     const columns = [
-        { accessor: 'id', label: 'ID', className: 'font-medium' },
         { accessor: 'name', label: 'Tên vai trò', className: 'font-medium' },
         { accessor: 'description', label: 'Mô tả', className: 'font-medium' },
         { 
