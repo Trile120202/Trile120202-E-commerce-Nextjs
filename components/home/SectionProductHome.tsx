@@ -208,9 +208,13 @@ const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
 
 interface SectionProductHomeProps {
     endpoint?: string;
+    viewAllEndpoint?: string;
 }
 
-const SectionProductHome: React.FC<SectionProductHomeProps> = ({ endpoint = '/api/products/get-data' }) => {
+const SectionProductHome: React.FC<SectionProductHomeProps> = ({ 
+    endpoint = '/api/products/get-data',
+    viewAllEndpoint = '/san-pham'
+}) => {
     const { data, loading, error } = useFetch<ApiResponse>(endpoint);
     if (loading) return <Loading/>;
     if (error) return <div className="text-black">Error: {error}</div>;
@@ -222,7 +226,7 @@ const SectionProductHome: React.FC<SectionProductHomeProps> = ({ endpoint = '/ap
                     Sản phẩm nổi bật
                     <span className="absolute -bottom-2 left-0 w-20 h-1 bg-blue-600"></span>
                 </h2>
-                <Link href="/san-pham" className="group flex items-center gap-2 text-blue-600 hover:text-blue-700 font-semibold transition-colors">
+                <Link href={viewAllEndpoint} className="group flex items-center gap-2 text-blue-600 hover:text-blue-700 font-semibold transition-colors">
                     Xem tất cả 
                     <span className="transform transition-transform group-hover:translate-x-1">→</span>
                 </Link>

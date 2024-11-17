@@ -206,8 +206,9 @@ const ProductsPage: React.FC = () => {
     const minPrice = searchParams?.get('minPrice') ?? '';
     const maxPrice = searchParams?.get('maxPrice') ?? '';
     const categoryId = searchParams?.get('categoryId') ?? '';
+    const type = searchParams?.get('type') ?? '';
     const [currentPage, setCurrentPage] = React.useState(1);
-    const {data, loading, error} = useFetch<ApiResponse>(`/api/products?page=${currentPage}&limit=12&search=${search}&categoryId=${categoryId}&minPrice=${minPrice}&maxPrice=${maxPrice}`);
+    const {data, loading, error} = useFetch<ApiResponse>(`/api/products?page=${currentPage}&limit=12&search=${search}&categoryId=${categoryId}&minPrice=${minPrice}&maxPrice=${maxPrice}&type=${type}`);
 
     if (loading) return <Loading/>;
     if (error) return notFound();
@@ -219,7 +220,7 @@ const ProductsPage: React.FC = () => {
     return (
         <div className="container mx-auto px-4 py-8">
             <h1 className="text-3xl font-bold mb-8 text-gray-800">
-                {search ? `Kết quả tìm kiếm cho "${search}"` : 'Tất cả sản phẩm'}
+                {search ? `Kết quả tìm kiếm cho "${search}"` : type === 'hot' ? 'Sản phẩm nổi bật' : 'Tất cả sản phẩm'}
             </h1>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 xl:gap-8">
                 {data?.data.map((product) => (

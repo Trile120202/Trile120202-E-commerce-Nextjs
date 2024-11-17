@@ -25,6 +25,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             const minPrice = parseInt(req.query.minPrice as string) || 0;
             let maxPrice = parseInt(req.query.maxPrice as string) || Number.MAX_SAFE_INTEGER;
             const categoryId = req.query.categoryId as string;
+            const type = req.query.type as string;
 
             if (maxPrice === 100000000) {
                 maxPrice = Number.MAX_SAFE_INTEGER;
@@ -48,6 +49,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 .leftJoin('cpus as cpu', 'pc2.cpu_id', 'cpu.id')
                 .leftJoin('product_graphics_cards as pgc', 'p.id', 'pgc.product_id')
                 .leftJoin('graphics_cards as gc', 'pgc.graphics_card_id', 'gc.id')
+                .leftJoin('order_items as oi', 'p.id', 'oi.product_id')
                 .whereNot('p.status', -2)
                 .whereBetween('p.price', [minPrice, maxPrice])
                 .select(
@@ -81,6 +83,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     db.raw('ARRAY_AGG(DISTINCT gc.id) FILTER (WHERE gc.id IS NOT NULL) AS graphics_card_ids')
                 )
                 .groupBy('p.id', 'i.id');
+
+            if (type) {
+                if (type === 'hot') {
+                    query = query
+                        .select(db.raw('COUNT(DISTINCT oi.id) as order_count'))
+                        .groupBy('p.id', 'i.id')
+                        .orderBy('order_count', 'desc');
+                } else if (type === 'gaming' || type === 'van-phong') {
+                    query = query.where('t.name', 'ilike', `%${type}%`);
+                }
+            }
         
             if (search) {
                 query = query.where((builder) => {
@@ -99,8 +112,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 .leftJoin('categories as c', 'pc.category_id', 'c.id')
                 .leftJoin('product_tags as pt', 'p.id', 'pt.product_id')
                 .leftJoin('tags as t', 'pt.tag_id', 't.id')
+                .leftJoin('order_items as oi', 'p.id', 'oi.product_id')
                 .whereNot('p.status', -2)
                 .whereBetween('p.price', [minPrice, maxPrice]);
+
+            if (type) {
+                if (type === 'hot') {
+                    countQuery = countQuery
+                        .select(db.raw('COUNT(DISTINCT oi.id) as order_count'))
+                        .groupBy('p.id');
+                } else if (type === 'gaming' || type === 'van-phong') {
+                    countQuery = countQuery.where('t.name', 'ilike', `%${type}%`);
+                }
+            }
         
             if (search) {
                 countQuery = countQuery.where((builder) => {
@@ -123,7 +147,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             const adjustedOffset = (adjustedPage - 1) * limit;
         
             const products = await query
-                .orderBy('p.created_at', 'desc')
+                .orderBy([
+                    { column: type === 'hot' ? 'order_count' : 'p.created_at', order: 'desc' }
+                ])
                 .limit(limit)
                 .offset(adjustedOffset);
         

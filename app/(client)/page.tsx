@@ -106,7 +106,52 @@ export default function Home() {
                         viewport={{ once: true }}
                     >
                         <h2 className="text-3xl font-bold text-center mb-12">Sản phẩm nổi bật</h2>
-                        <SectionProductHome endpoint="/api/products/product-hot" />
+                        <SectionProductHome endpoint="/api/products/product-hot" viewAllEndpoint="/san-pham?type=hot" />
+                    </motion.div>
+                </div>
+            </section>
+
+            {/* New Products */}
+            <section className="py-16 bg-gray-50">
+                <div className="container mx-auto px-4">
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6 }}
+                        viewport={{ once: true }}
+                    >
+                        <h2 className="text-3xl font-bold text-center mb-12">Sản phẩm mới</h2>
+                        <SectionProductHome endpoint="/api/products" viewAllEndpoint="/api/products" />
+                    </motion.div>
+                </div>
+            </section>
+
+            {/* Gaming Products */}
+            <section className="py-16">
+                <div className="container mx-auto px-4">
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6 }}
+                        viewport={{ once: true }}
+                    >
+                        <h2 className="text-3xl font-bold text-center mb-12">Gaming</h2>
+                        <SectionProductHome endpoint="/api/products?type=gaming" viewAllEndpoint="/api/products?type=gaming" />
+                    </motion.div>
+                </div>
+            </section>
+
+            {/* Office Products */}
+            <section className="py-16 bg-gray-50">
+                <div className="container mx-auto px-4">
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6 }}
+                        viewport={{ once: true }}
+                    >
+                        <h2 className="text-3xl font-bold text-center mb-12">Văn phòng</h2>
+                        <SectionProductHome endpoint="/api/products?type=van-phong" viewAllEndpoint="/api/products?type=van-phong" />
                     </motion.div>
                 </div>
             </section>
