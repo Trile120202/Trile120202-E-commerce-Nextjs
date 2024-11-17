@@ -20,23 +20,52 @@ interface TopProduct {
     thumbnail: string;
     category_name: string;
     category_slug: string;
-    total_quantity: number;
-    total_orders: number;
+    total_quantity: string;
+    total_orders: string;
+    stock_quantity: number;
+}
+
+interface Orders {
+    pendingOrders: number;
+    processingOrders: number;
+    confirmedOrders: number;
+    shippingOrders: number;
+    deliveredOrders: number;
+    cancelledOrders: number;
+    refundRequestedOrders: number;
+    refundingOrders: number;
+    refundedOrders: number;
+    completedOrders: number;
+    totalOrders: number;
 }
 
 interface DashboardData {
     revenue: {
         total: number;
     };
-    totalOrders: number;
+    orders: Orders;
     topSellingProducts: TopProduct[];
+    deliverySuccessRate: number;
 }
 
 export default function CMSPage() {
     const [dashboardData, setDashboardData] = useState<DashboardData>({
         revenue: { total: 0 },
-        totalOrders: 0,
-        topSellingProducts: []
+        orders: {
+            pendingOrders: 0,
+            processingOrders: 0,
+            confirmedOrders: 0,
+            shippingOrders: 0,
+            deliveredOrders: 0,
+            cancelledOrders: 0,
+            refundRequestedOrders: 0,
+            refundingOrders: 0,
+            refundedOrders: 0,
+            completedOrders: 0,
+            totalOrders: 0
+        },
+        topSellingProducts: [],
+        deliverySuccessRate: 0
     });
     const [chartData, setChartData] = useState<{ name: string; total: number; }[]>([]);
     const [period, setPeriod] = useState('year');
@@ -179,7 +208,7 @@ export default function CMSPage() {
                         <CardTitle className="text-sm font-medium">Tổng đơn hàng</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">{dashboardData.totalOrders}</div>
+                        <div className="text-2xl font-bold">{dashboardData.orders.totalOrders}</div>
                         <p className="text-xs text-muted-foreground">
                             {period === 'year' ? `Năm ${year}` : 
                              period.startsWith('quarter') ? `Quý ${period.slice(-1)} năm ${year}` :
@@ -193,9 +222,9 @@ export default function CMSPage() {
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">
-                            {dashboardData.totalOrders > 0 
+                            {dashboardData.orders.totalOrders > 0 
                                 ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' })
-                                    .format(dashboardData.revenue.total / dashboardData.totalOrders)
+                                    .format(dashboardData.revenue.total / dashboardData.orders.totalOrders)
                                 : '0 ₫'}
                         </div>
                         <p className="text-xs text-muted-foreground">
@@ -210,7 +239,7 @@ export default function CMSPage() {
                         <CardTitle className="text-sm font-medium">Tỷ lệ hoàn thành</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">100%</div>
+                        <div className="text-2xl font-bold">{dashboardData.deliverySuccessRate}%</div>
                         <p className="text-xs text-muted-foreground">
                             {period === 'year' ? `Năm ${year}` : 
                              period.startsWith('quarter') ? `Quý ${period.slice(-1)} năm ${year}` :
