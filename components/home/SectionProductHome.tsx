@@ -3,10 +3,15 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import useFetch from "@/lib/useFetch";
-import {FaCreditCard, FaShoppingCart} from "react-icons/fa";
+import {FaCreditCard, FaShoppingCart, FaChevronLeft, FaChevronRight} from "react-icons/fa";
 import Loading from "@/components/Loading";
 import { motion, AnimatePresence } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation, Pagination, Autoplay } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
 
 interface Specification {
     weight?: string;
@@ -92,75 +97,77 @@ const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
 
     return (
         <motion.div 
-            className="bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl flex flex-col h-full relative"
+            className="bg-white rounded-2xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-2xl flex flex-col h-full relative group"
             whileHover={{ scale: 1.02 }}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
         >
-            <Link href={`/san-pham/${product.slug}`} className="flex-grow">
-                <div className="relative w-full h-56 sm:h-48 md:h-52 lg:h-60">
+            <div className="flex-grow">
+                <div className="relative w-full h-64 overflow-hidden">
                     <Image
                         src={product.thumbnail_url}
                         alt={product.thumbnail_alt_text || product.product_name}
                         layout="fill"
                         objectFit="cover"
-                        className="transition-transform duration-300 hover:scale-105"
+                        className="transition-transform duration-500 group-hover:scale-110"
                     />
                     {product.stock_quantity <= 0 && (
-                        <div className="absolute top-2 right-2 bg-red-500 text-white px-3 py-1 rounded-full text-sm">
+                        <div className="absolute top-4 right-4 bg-red-500/90 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm font-semibold shadow-lg">
                             Hết hàng
                         </div>
                     )}
+                    {product.categories && (
+                        <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm text-gray-800 px-4 py-2 rounded-full text-sm font-medium">
+                            {product.categories}
+                        </div>
+                    )}
                 </div>
-                <div className="p-5">
-                    <h3 className="text-xl font-semibold mb-3 text-gray-800 line-clamp-2 min-h-[3.5rem]">
+                <div className="p-6">
+                    <h3 className="text-xl font-bold mb-3 text-gray-800 line-clamp-2 min-h-[3.5rem] hover:text-blue-600 transition-colors">
                         {product.product_name}
                     </h3>
-                    <div className="space-y-2">
+                    <div className="space-y-3">
                         {product.ram_names && (
-                            <p className="text-gray-600">
-                                <span className="font-medium">RAM:</span> {product.ram_names}
+                            <p className="text-gray-600 flex items-center gap-2">
+                                <span className="font-semibold text-gray-700">RAM:</span> 
+                                <span className="bg-blue-50 px-3 py-1 rounded-full text-blue-600">{product.ram_names}</span>
                             </p>
                         )}
                         {product.storage_names && (
-                            <p className="text-gray-600">
-                                <span className="font-medium">Bộ nhớ:</span> {product.storage_names}
+                            <p className="text-gray-600 flex items-center gap-2">
+                                <span className="font-semibold text-gray-700">Bộ nhớ:</span> 
+                                <span className="bg-green-50 px-3 py-1 rounded-full text-green-600">{product.storage_names}</span>
                             </p>
                         )}
-                        <p className="text-2xl font-bold text-blue-600">
+                        <p className="text-3xl font-bold text-blue-600 mt-4">
                             {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' })
                                 .format(parseFloat(product.price))}
                         </p>
-                        {product.categories && (
-                            <p className="text-sm text-gray-500 bg-gray-100 inline-block px-3 py-1 rounded-full">
-                                {product.categories}
-                            </p>
-                        )}
                     </div>
                 </div>
-            </Link>
-            <div className="flex justify-between p-5 mt-auto gap-3">
+            </div>
+            <div className="flex justify-between p-6 mt-auto gap-4 border-t border-gray-100">
                 <motion.button 
                     onClick={handleAddToCart}
                     disabled={product.stock_quantity <= 0}
-                    className={`flex-1 flex items-center justify-center px-4 py-3 rounded-lg transition-colors duration-300 text-sm font-medium ${
+                    className={`flex-1 flex items-center justify-center px-6 py-3 rounded-xl transition-all duration-300 text-sm font-semibold ${
                         product.stock_quantity <= 0 
-                        ? 'bg-gray-400 cursor-not-allowed' 
-                        : 'bg-blue-600 hover:bg-blue-700 text-white'
+                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
+                        : 'bg-blue-600 hover:bg-blue-700 text-white hover:shadow-lg hover:shadow-blue-200'
                     }`}
                     whileTap={product.stock_quantity > 0 ? { scale: 0.95 } : {}}
                 >
-                    <FaShoppingCart className="sm:mr-2" />
-                    <span className="hidden sm:inline">Thêm SP</span>
+                    <FaShoppingCart className="mr-2 text-lg" />
+                    <span>Thêm vào giỏ</span>
                 </motion.button>
-                <Link href={`/san-pham/${product.slug}`}>
+                <Link href={`/san-pham/${product.slug}`} className="flex-1">
                     <motion.button 
-                        className="flex-1 flex items-center justify-center px-4 py-3 rounded-lg transition-colors duration-300 text-sm font-medium bg-green-600 hover:bg-green-700 text-white"
+                        className="w-full flex items-center justify-center px-6 py-3 rounded-xl transition-all duration-300 text-sm font-semibold bg-green-600 hover:bg-green-700 text-white hover:shadow-lg hover:shadow-green-200"
                         whileTap={{ scale: 0.95 }}
                     >
-                        <FaCreditCard className="sm:mr-2" />
-                        <span className="hidden sm:inline">Xem SP</span>
+                        <FaCreditCard className="mr-2 text-lg" />
+                        <span>Xem chi tiết</span>
                     </motion.button>
                 </Link>
             </div>
@@ -190,7 +197,7 @@ const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
                             alt={product.thumbnail_alt_text || product.product_name}
                             width={100}
                             height={100}
-                            className="rounded-lg shadow-lg"
+                            className="rounded-xl shadow-2xl"
                         />
                     </motion.div>
                 )}
@@ -199,22 +206,71 @@ const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
     );
 };
 
-const SectionProductHome: React.FC = () => {
-    const { data, loading, error } = useFetch<ApiResponse>('/api/products/get-data');
+interface SectionProductHomeProps {
+    endpoint?: string;
+}
+
+const SectionProductHome: React.FC<SectionProductHomeProps> = ({ endpoint = '/api/products/get-data' }) => {
+    const { data, loading, error } = useFetch<ApiResponse>(endpoint);
     if (loading) return <Loading/>;
     if (error) return <div className="text-black">Error: {error}</div>;
+
     return (
-        <section className="container mx-auto px-4 py-12">
-            <div className="flex items-center justify-between mb-8">
-                <h2 className="text-3xl font-bold text-gray-800">Sản phẩm nổi bật</h2>
-                <Link href="/san-pham" className="text-blue-600 hover:text-blue-700 font-medium">
-                    Xem tất cả →
+        <section className="container mx-auto px-4 py-16">
+            <div className="flex items-center justify-between mb-12">
+                <h2 className="text-4xl font-bold text-gray-800 relative">
+                    Sản phẩm nổi bật
+                    <span className="absolute -bottom-2 left-0 w-20 h-1 bg-blue-600"></span>
+                </h2>
+                <Link href="/san-pham" className="group flex items-center gap-2 text-blue-600 hover:text-blue-700 font-semibold transition-colors">
+                    Xem tất cả 
+                    <span className="transform transition-transform group-hover:translate-x-1">→</span>
                 </Link>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 xl:gap-8">
-                {data?.data.map((product) => (
-                    <ProductCard key={product.product_id} product={product} />
-                ))}
+            
+            <div className="relative">
+                <button className="absolute -left-16 top-1/2 transform -translate-y-1/2 z-10 bg-white/90 backdrop-blur-sm p-4 rounded-full shadow-lg hover:shadow-xl transition-all swiper-button-prev">
+                    <FaChevronLeft className="text-gray-800 text-xl" />
+                </button>
+                <button className="absolute -right-16 top-1/2 transform -translate-y-1/2 z-10 bg-white/90 backdrop-blur-sm p-4 rounded-full shadow-lg hover:shadow-xl transition-all swiper-button-next">
+                    <FaChevronRight className="text-gray-800 text-xl" />
+                </button>
+
+                <Swiper
+                    modules={[Navigation, Pagination, Autoplay]}
+                    spaceBetween={30}
+                    slidesPerView={1}
+                    navigation={{
+                        prevEl: '.swiper-button-prev',
+                        nextEl: '.swiper-button-next',
+                    }}
+                    pagination={{ 
+                        clickable: true,
+                        bulletActiveClass: 'swiper-pagination-bullet-active bg-blue-600'
+                    }}
+                    autoplay={{
+                        delay: 3000,
+                        disableOnInteraction: false,
+                    }}
+                    breakpoints={{
+                        640: {
+                            slidesPerView: 2,
+                        },
+                        768: {
+                            slidesPerView: 3,
+                        },
+                        1024: {
+                            slidesPerView: 4,
+                        },
+                    }}
+                    className="py-8"
+                >
+                    {data?.data.map((product) => (
+                        <SwiperSlide key={product.product_id}>
+                            <ProductCard product={product} />
+                        </SwiperSlide>
+                    ))}
+                </Swiper>
             </div>
         </section>
     );

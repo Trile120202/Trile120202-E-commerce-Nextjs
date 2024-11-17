@@ -106,7 +106,7 @@ export default function Home() {
                         viewport={{ once: true }}
                     >
                         <h2 className="text-3xl font-bold text-center mb-12">Sản phẩm nổi bật</h2>
-                        <SectionProductHome />
+                        <SectionProductHome endpoint="/api/products/product-hot" />
                     </motion.div>
                 </div>
             </section>
