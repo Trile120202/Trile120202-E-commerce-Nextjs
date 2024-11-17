@@ -4,9 +4,11 @@ import CategoryHome from '@/components/home/CategoryHome';
 import SectionProductHome from "@/components/home/SectionProductHome";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import useFetch from "@/lib/useFetch";
+import { motion } from "framer-motion";
+import SearchForm from '@/components/home/SearchForm';
 
 interface Category {
     id: string;
@@ -28,138 +30,99 @@ interface ApiResponse {
 }
 
 export default function Home() {
-    const [searchParams, setSearchParams] = useState({
-        name: '',
-        category: '',
-        minPrice: '',
-        maxPrice: ''
-    });
-    const router = useRouter();
     const { data: categoryData } = useFetch<ApiResponse>('/api/categories/all-category');
-
-    const handleSearch = (e: React.FormEvent) => {
-        e.preventDefault();
-        const params = new URLSearchParams();
-        
-        if (searchParams.name) {
-            params.append('search', searchParams.name);
-        }
-        if (searchParams.category) {
-            params.append('categoryId', searchParams.category); 
-        }
-        if (searchParams.minPrice) {
-            params.append('minPrice', searchParams.minPrice);
-        }
-        if (searchParams.maxPrice) {
-            params.append('maxPrice', searchParams.maxPrice);
-        }
-
-        router.push(`/san-pham?${params.toString()}`);
-    };
-
+    
     return (
-        <div className="flex flex-col min-h-screen bg-gray-50">
-            <div className="flex-grow">
-                {/* Hero Section with Carousel */}
-                <section className="relative">
-                    <Carousel location="home" position="1" />
-                    <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-40 z-10">
-                        <div className="text-center text-white w-full max-w-4xl px-4">
-                            <h1 className="text-4xl md:text-6xl font-bold mb-4">Z-Shop</h1>
-                            <p className="text-xl mb-6">Khám phá bộ sưu tập mới nhất của chúng tôi</p>
-                            
-                            <form onSubmit={handleSearch} className="bg-white/10 backdrop-blur-md p-6 rounded-lg ">
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-                                    <input
-                                        type="text"
-                                        placeholder="Tên sản phẩm"
-                                        className="w-full px-4 py-2 rounded text-gray-800"
-                                        value={searchParams.name}
-                                        onChange={(e) => setSearchParams({...searchParams, name: e.target.value})}
-                                    />
-                                    <select 
-                                        className="w-full px-4 py-2 rounded text-gray-800"
-                                        value={searchParams.category}
-                                        onChange={(e) => setSearchParams({...searchParams, category: e.target.value})}
-                                    >
-                                        <option value="">Chọn danh mục</option>
-                                        {categoryData?.data.map((category) => (
-                                            <option key={category.id} value={category.id}>
-                                                {category.name}
-                                            </option>
-                                        ))}
-                                    </select>
-                                    <input
-                                        type="number"
-                                        placeholder="Giá tối thiểu"
-                                        className="w-full px-4 py-2 rounded text-gray-800"
-                                        value={searchParams.minPrice}
-                                        onChange={(e) => setSearchParams({...searchParams, minPrice: e.target.value})}
-                                    />
-                                    <input
-                                        type="number"
-                                        placeholder="Giá tối đa"
-                                        className="w-full px-4 py-2 rounded text-gray-800"
-                                        value={searchParams.maxPrice}
-                                        onChange={(e) => setSearchParams({...searchParams, maxPrice: e.target.value})}
-                                    />
-                                </div>
-                                <Button type="submit" className="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-full text-lg">
-                                    Tìm kiếm
-                                </Button>
-                            </form>
+        <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+            <section className="relative h-[600px]">
+                <Carousel location="home" position="1" />
+                <div className="absolute inset-0 bg-gradient-to-b from-black/60 to-black/30 flex items-center justify-center z-10">
+                    <motion.div 
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.8 }}
+                        className="container mx-auto px-4"
+                    >
+                        <div className="text-center text-white mb-8">
+                            <h1 className="text-5xl md:text-7xl font-bold mb-4">Z-Shop</h1>
+                            <p className="text-xl md:text-2xl font-light">Khám phá công nghệ đỉnh cao</p>
                         </div>
-                    </div>
-                </section>
+                        <SearchForm categoryData={categoryData} />
+                    </motion.div>
+                </div>
+            </section>
 
-                {/* Categories Section */}
-                <section className="container mx-auto px-4 py-12">
-                    <h2 className="text-3xl font-bold text-center mb-8">Danh mục sản phẩm</h2>
-                    <CategoryHome />
-                </section>
+            {/* Featured Products */}
+            <section className="py-16">
+                <div className="container mx-auto px-4">
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6 }}
+                        viewport={{ once: true }}
+                    >
+                        <h2 className="text-3xl font-bold text-center mb-12">Sản phẩm nổi bật</h2>
+                        <SectionProductHome />
+                    </motion.div>
+                </div>
+            </section>
 
-                {/* Featured Products Section */}
-                <section className="container mx-auto px-4 py-12 bg-white">
-                    <h2 className="text-3xl font-bold text-center mb-8">Sản phẩm nổi bật</h2>
-                    <SectionProductHome />
-                </section>
-
-                {/* Benefits Section */}
-                <section className="container mx-auto px-4 py-12">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div className="text-center p-6 bg-white rounded-lg shadow-md">
-                            <div className="text-4xl mb-4">⚡️</div>
-                            <h3 className="text-xl font-semibold mb-2">Thanh toán an toàn</h3>
-                            <p className="text-gray-600">Bảo mật thông tin</p>
-                        </div>
-                        <div className="text-center p-6 bg-white rounded-lg shadow-md">
-                            <div className="text-4xl mb-4">💎</div>
+            {/* Benefits */}
+            <section className="py-16 bg-gray-50">
+                <div className="container mx-auto px-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <motion.div 
+                            className="text-center p-8 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow"
+                            whileHover={{ y: -5 }}
+                        >
+                            <div className="text-5xl mb-4">⚡️</div>
+                            <h3 className="text-xl font-semibold mb-2">Giao hàng nhanh chóng</h3>
+                            <p className="text-gray-600">Nhận hàng trong 24h</p>
+                        </motion.div>
+                        <motion.div 
+                            className="text-center p-8 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow"
+                            whileHover={{ y: -5 }}
+                        >
+                            <div className="text-5xl mb-4">💎</div>
                             <h3 className="text-xl font-semibold mb-2">Chất lượng đảm bảo</h3>
-                            <p className="text-gray-600">Sản phẩm chính hãng</p>
-                        </div>
+                            <p className="text-gray-600">Sản phẩm chính hãng 100%</p>
+                        </motion.div>
+                        <motion.div 
+                            className="text-center p-8 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow"
+                            whileHover={{ y: -5 }}
+                        >
+                            <div className="text-5xl mb-4">🛡️</div>
+                            <h3 className="text-xl font-semibold mb-2">Bảo hành tận tâm</h3>
+                            <p className="text-gray-600">Hỗ trợ 24/7</p>
+                        </motion.div>
                     </div>
-                </section>
+                </div>
+            </section>
 
-                {/* Newsletter Section */}
-                <section className="bg-blue-600 py-12">
-                    <div className="container mx-auto px-4">
-                        <div className="text-center text-white">
-                            <h2 className="text-3xl font-bold mb-4">Đăng ký nhận tin</h2>
-                            <p className="mb-6">Nhận thông tin về sản phẩm mới và khuyến mãi</p>
-                            <div className="max-w-md mx-auto flex gap-4">
-                                <input
-                                    type="email"
-                                    placeholder="Email của bạn"
-                                    className="flex-1 px-4 py-2 rounded-lg focus:outline-none text-gray-800"
-                                />
-                                <Button className="bg-yellow-400 hover:bg-yellow-500 text-blue-900 px-6 py-2 rounded-lg">
-                                    Đăng ký
-                                </Button>
-                            </div>
+            {/* Newsletter */}
+            <section className="py-16 bg-blue-600">
+                <div className="container mx-auto px-4">
+                    <motion.div 
+                        className="max-w-2xl mx-auto text-center text-white"
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                    >
+                        <h2 className="text-3xl font-bold mb-4">Đăng ký nhận tin</h2>
+                        <p className="mb-8 text-blue-100">Nhận thông tin về sản phẩm mới và ưu đãi đặc biệt</p>
+                        <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
+                            <input
+                                type="email"
+                                placeholder="Email của bạn"
+                                className="flex-1 px-6 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 text-gray-800"
+                            />
+                            <Button className="bg-yellow-400 hover:bg-yellow-500 text-blue-900 px-8 py-3 rounded-lg font-medium transition-colors duration-300">
+                                Đăng ký ngay
+                            </Button>
                         </div>
-                    </div>
-                </section>
-            </div>
+                    </motion.div>
+                </div>
+            </section>
         </div>
     );
 }
