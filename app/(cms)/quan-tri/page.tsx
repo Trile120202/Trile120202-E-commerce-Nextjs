@@ -205,11 +205,53 @@ export default function CMSPage() {
                 </Card>
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Tổng đơn hàng</CardTitle>
+                        <CardTitle className="text-sm font-medium">Chi tiết đơn hàng</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">{dashboardData.orders.totalOrders}</div>
-                        <p className="text-xs text-muted-foreground">
+                        <div className="text-xs space-y-1">
+                            <div className="flex justify-between">
+                                <span>Chờ xác nhận:</span>
+                                <span>{dashboardData.orders.pendingOrders}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span>Đang xử lý:</span>
+                                <span>{dashboardData.orders.processingOrders}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span>Đã xác nhận:</span>
+                                <span>{dashboardData.orders.confirmedOrders}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span>Đang giao:</span>
+                                <span>{dashboardData.orders.shippingOrders}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span>Đã giao:</span>
+                                <span>{dashboardData.orders.deliveredOrders}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span>Đã hủy:</span>
+                                <span>{dashboardData.orders.cancelledOrders}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span>Yêu cầu hoàn tiền:</span>
+                                <span>{dashboardData.orders.refundRequestedOrders}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span>Đang hoàn tiền:</span>
+                                <span>{dashboardData.orders.refundingOrders}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span>Đã hoàn tiền:</span>
+                                <span>{dashboardData.orders.refundedOrders}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span>Hoàn thành:</span>
+                                <span>{dashboardData.orders.completedOrders}</span>
+                            </div>
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-2">
                             {period === 'year' ? `Năm ${year}` : 
                              period.startsWith('quarter') ? `Quý ${period.slice(-1)} năm ${year}` :
                              `Tháng ${month} năm ${year}`}
