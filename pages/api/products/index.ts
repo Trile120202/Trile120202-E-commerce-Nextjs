@@ -23,8 +23,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             const limit = parseInt(req.query.limit as string) || 10;
             const search = req.query.search as string;
             const minPrice = parseInt(req.query.minPrice as string) || 0;
-            const maxPrice = parseInt(req.query.maxPrice as string) || Number.MAX_SAFE_INTEGER;
+            let maxPrice = parseInt(req.query.maxPrice as string) || Number.MAX_SAFE_INTEGER;
             const categoryId = req.query.categoryId as string;
+
+            if (maxPrice === 100000000) {
+                maxPrice = Number.MAX_SAFE_INTEGER;
+            }
         
             let query = db('products as p')
                 .leftJoin('images as i', 'p.thumbnail_id', 'i.id')
@@ -81,9 +85,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             if (search) {
                 query = query.where((builder) => {
                     builder.where('p.name', 'ilike', `%${search}%`)
-                        .orWhere('p.description', 'ilike', `%${search}%`)
-                        .orWhere('r.name', 'ilike', `%${search}%`)
-                        .orWhere('p.description', 'ilike', `%${search}%`);
+                        .orWhere('t.name', 'ilike', `%${search}%`)
+                        .orWhere('c.name', 'ilike', `%${search}%`);
                 });
             }
 
@@ -93,13 +96,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         
             let countQuery = db('products as p')
                 .leftJoin('product_categories as pc', 'p.id', 'pc.product_id')
+                .leftJoin('categories as c', 'pc.category_id', 'c.id')
+                .leftJoin('product_tags as pt', 'p.id', 'pt.product_id')
+                .leftJoin('tags as t', 'pt.tag_id', 't.id')
                 .whereNot('p.status', -2)
                 .whereBetween('p.price', [minPrice, maxPrice]);
         
             if (search) {
                 countQuery = countQuery.where((builder) => {
                     builder.where('p.name', 'ilike', `%${search}%`)
-                        .orWhere('p.description', 'ilike', `%${search}%`);
+                        .orWhere('t.name', 'ilike', `%${search}%`)
+                        .orWhere('c.name', 'ilike', `%${search}%`);
                 });
             }
 
