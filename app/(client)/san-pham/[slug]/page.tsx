@@ -156,55 +156,40 @@ export default function ProductPage({ params }: ProductPageProps) {
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.2 }}
           >
-            <h2 className="text-2xl font-semibold mb-3">Thông số kỹ thuật:</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <h3 className="text-xl font-semibold mb-3 text-blue-700">Thông số cơ bản</h3>
-                <ul className="space-y-3">
-                  {product.specifications && Object.entries(product.specifications).map(([key, value]) => (
-                    <li key={key} className="flex items-start">
-                      <span className="font-medium min-w-[120px] text-gray-700">{key}:</span>
-                      <span className="ml-2 text-gray-600">{value}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <h3 className="text-xl font-semibold mb-3 text-blue-700">Cấu hình chi tiết</h3>
-                <ul className="space-y-3">
-                  {product.ram_names && (
-                    <li className="flex items-start">
-                      <span className="font-medium min-w-[120px] text-gray-700">Bộ nhớ RAM:</span>
-                      <span className="ml-2 text-gray-600">{product.ram_names}</span>
-                    </li>
-                  )}
-                  {product.storage_names && (
-                    <li className="flex items-start">
-                      <span className="font-medium min-w-[120px] text-gray-700">Ổ cứng:</span>
-                      <span className="ml-2 text-gray-600">{product.storage_names}</span>
-                    </li>
-                  )}
-                  {product.cpu_names && (
-                    <li className="flex items-start">
-                      <span className="font-medium min-w-[120px] text-gray-700">Vi xử lý:</span>
-                      <span className="ml-2 text-gray-600">{product.cpu_names}</span>
-                    </li>
-                  )}
-                  {product.graphics_card_names && (
-                    <li className="flex items-start">
-                      <span className="font-medium min-w-[120px] text-gray-700">Card đồ họa:</span>
-                      <span className="ml-2 text-gray-600">{product.graphics_card_names}</span>
-                    </li>
-                  )}
-                  {product.display_names && (
-                    <li className="flex items-start">
-                      <span className="font-medium min-w-[120px] text-gray-700">Màn hình:</span>
-                      <span className="ml-2 text-gray-600">{product.display_names}</span>
-                    </li>
-                  )}
-                </ul>
-              </div>
+            <h2 className="text-2xl font-semibold mb-3">Cấu hình chi tiết:</h2>
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <ul className="space-y-3">
+                {product.ram_names && (
+                  <li className="flex items-start">
+                    <span className="font-medium min-w-[120px] text-gray-700">Bộ nhớ RAM:</span>
+                    <span className="ml-2 text-gray-600">{product.ram_names}</span>
+                  </li>
+                )}
+                {product.storage_names && (
+                  <li className="flex items-start">
+                    <span className="font-medium min-w-[120px] text-gray-700">Ổ cứng:</span>
+                    <span className="ml-2 text-gray-600">{product.storage_names}</span>
+                  </li>
+                )}
+                {product.cpu_names && (
+                  <li className="flex items-start">
+                    <span className="font-medium min-w-[120px] text-gray-700">Vi xử lý:</span>
+                    <span className="ml-2 text-gray-600">{product.cpu_names}</span>
+                  </li>
+                )}
+                {product.graphics_card_names && (
+                  <li className="flex items-start">
+                    <span className="font-medium min-w-[120px] text-gray-700">Card đồ họa:</span>
+                    <span className="ml-2 text-gray-600">{product.graphics_card_names}</span>
+                  </li>
+                )}
+                {product.display_names && (
+                  <li className="flex items-start">
+                    <span className="font-medium min-w-[120px] text-gray-700">Màn hình:</span>
+                    <span className="ml-2 text-gray-600">{product.display_names}</span>
+                  </li>
+                )}
+              </ul>
             </div>
           </motion.div>
           <div 
