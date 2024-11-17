@@ -69,12 +69,55 @@ async function getTotalOrders(period: string, year: number, month?: number) {
     const periodClause = getPeriodClause(period, year, month);
 
     const result = await db('orders')
-        .count('* as total')
-        .where('status', 9)
+        .select(
+            db.raw('COUNT(CASE WHEN status = 0 THEN 1 END) as pending_orders'),
+            db.raw('COUNT(CASE WHEN status = 1 THEN 1 END) as processing_orders'),
+            db.raw('COUNT(CASE WHEN status = 2 THEN 1 END) as confirmed_orders'),
+            db.raw('COUNT(CASE WHEN status = 3 THEN 1 END) as shipping_orders'),
+            db.raw('COUNT(CASE WHEN status = 4 THEN 1 END) as delivered_orders'),
+            db.raw('COUNT(CASE WHEN status = 5 THEN 1 END) as cancelled_orders'),
+            db.raw('COUNT(CASE WHEN status = 6 THEN 1 END) as refund_requested_orders'),
+            db.raw('COUNT(CASE WHEN status = 7 THEN 1 END) as refunding_orders'),
+            db.raw('COUNT(CASE WHEN status = 8 THEN 1 END) as refunded_orders'),
+            db.raw('COUNT(CASE WHEN status = 9 THEN 1 END) as completed_orders'),
+            db.raw('COUNT(*) as total_orders')
+        )
         .whereRaw(periodClause)
         .first();
 
-    return result ? parseInt(result.total as string) : 0;
+    return {
+        pendingOrders: parseInt(result.pending_orders as string) || 0,
+        processingOrders: parseInt(result.processing_orders as string) || 0,
+        confirmedOrders: parseInt(result.confirmed_orders as string) || 0,
+        shippingOrders: parseInt(result.shipping_orders as string) || 0,
+        deliveredOrders: parseInt(result.delivered_orders as string) || 0,
+        cancelledOrders: parseInt(result.cancelled_orders as string) || 0,
+        refundRequestedOrders: parseInt(result.refund_requested_orders as string) || 0,
+        refundingOrders: parseInt(result.refunding_orders as string) || 0,
+        refundedOrders: parseInt(result.refunded_orders as string) || 0,
+        completedOrders: parseInt(result.completed_orders as string) || 0,
+        totalOrders: parseInt(result.total_orders as string) || 0
+    };
+}
+
+async function getDeliverySuccessRate(period: string, year: number, month?: number) {
+    const periodClause = getPeriodClause(period, year, month);
+
+    const results = await db('orders')
+        .select(
+            db.raw('COUNT(CASE WHEN status = 9 THEN 1 END) as success_count'),
+            db.raw('COUNT(CASE WHEN status = 5 THEN 1 END) as failed_count'),
+            db.raw('COUNT(*) as total_count')
+        )
+        .whereIn('status', [5, 9])
+        .whereRaw(periodClause)
+        .first();
+
+    const successRate = results.total_count > 0 
+        ? (results.success_count / results.total_count) * 100 
+        : 0;
+
+    return Math.round(successRate * 100) / 100; 
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -101,14 +144,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 }));
             }
 
-            const [revenue, totalOrders, topSellingProducts] = await Promise.all([
+            const [revenue, orders, topSellingProducts, deliverySuccessRate] = await Promise.all([
                 getRevenue(period, year, month),
                 getTotalOrders(period, year, month),
-                getTopSellingProducts(period, year, month)
+                getTopSellingProducts(period, year, month),
+                getDeliverySuccessRate(period, year, month)
             ]);
 
             res.status(StatusCode.OK).json(transformResponse({
-                data: { revenue, totalOrders, topSellingProducts },
+                data: { 
+                    revenue,
+                    orders,
+                    topSellingProducts,
+                    deliverySuccessRate 
+                },
                 message: `Retrieved revenue, total orders and top-selling products for ${period} of ${year} successfully.`,
                 statusCode: StatusCode.OK,
             }));
