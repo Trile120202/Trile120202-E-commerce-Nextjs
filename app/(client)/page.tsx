@@ -45,7 +45,7 @@ export default function Home() {
             params.append('search', searchParams.name);
         }
         if (searchParams.category) {
-            params.append('category', searchParams.category); 
+            params.append('categoryId', searchParams.category); 
         }
         if (searchParams.minPrice) {
             params.append('minPrice', searchParams.minPrice);
@@ -84,7 +84,7 @@ export default function Home() {
                                     >
                                         <option value="">Chọn danh mục</option>
                                         {categoryData?.data.map((category) => (
-                                            <option key={category.id} value={category.slug}>
+                                            <option key={category.id} value={category.id}>
                                                 {category.name}
                                             </option>
                                         ))}

@@ -24,6 +24,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             const search = req.query.search as string;
             const minPrice = parseInt(req.query.minPrice as string) || 0;
             const maxPrice = parseInt(req.query.maxPrice as string) || Number.MAX_SAFE_INTEGER;
+            const categoryId = req.query.categoryId as string;
         
             let query = db('products as p')
                 .leftJoin('images as i', 'p.thumbnail_id', 'i.id')
@@ -85,8 +86,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                         .orWhere('p.description', 'ilike', `%${search}%`);
                 });
             }
+
+            if (categoryId) {
+                query = query.where('pc.category_id', categoryId);
+            }
         
             let countQuery = db('products as p')
+                .leftJoin('product_categories as pc', 'p.id', 'pc.product_id')
                 .whereNot('p.status', -2)
                 .whereBetween('p.price', [minPrice, maxPrice]);
         
@@ -95,6 +101,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     builder.where('p.name', 'ilike', `%${search}%`)
                         .orWhere('p.description', 'ilike', `%${search}%`);
                 });
+            }
+
+            if (categoryId) {
+                countQuery = countQuery.where('pc.category_id', categoryId);
             }
         
             const [countResult] = await countQuery.clone().count('* as total');
