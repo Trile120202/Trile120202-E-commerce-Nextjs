@@ -20,6 +20,8 @@ interface TopProduct {
     thumbnail: string;
     category_name: string;
     category_slug: string;
+    total_quantity: number;
+    total_orders: number;
 }
 
 interface DashboardData {
@@ -270,7 +272,7 @@ export default function CMSPage() {
                                             <span className="line-clamp-2">{product.name}</span>
                                         </TableCell>
                                         <TableCell>{product.category_name}</TableCell>
-                                        <TableCell className="text-right">{product.count}</TableCell>
+                                        <TableCell className="text-right">{product.total_quantity}</TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>

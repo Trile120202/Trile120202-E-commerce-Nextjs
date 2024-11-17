@@ -34,7 +34,9 @@ async function getTopSellingProducts(period: string, year: number, month?: numbe
         .select(
             'order_items.product_id',
             db.raw('SUM(order_items.quantity) as total_quantity'),
+            db.raw('COUNT(DISTINCT orders.id) as total_orders'),
             'products.name',
+            'products.stock_quantity',
             'images.url as thumbnail',
             'categories.name as category_name',
             'categories.slug as category_slug'
@@ -46,7 +48,7 @@ async function getTopSellingProducts(period: string, year: number, month?: numbe
         .leftJoin('categories', 'categories.id', 'product_categories.category_id')
         .where('orders.status', 9)
         .whereRaw(periodClause)
-        .groupBy('order_items.product_id', 'products.name', 'images.url', 'categories.name', 'categories.slug')
+        .groupBy('order_items.product_id', 'products.name', 'products.stock_quantity', 'images.url', 'categories.name', 'categories.slug')
         .orderBy('total_quantity', 'desc')
         .limit(5);
 }
