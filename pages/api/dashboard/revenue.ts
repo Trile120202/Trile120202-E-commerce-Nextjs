@@ -33,7 +33,7 @@ async function getTopSellingProducts(period: string, year: number, month?: numbe
     return db('order_items')
         .select(
             'order_items.product_id',
-            db.raw('COUNT(*) as count'),
+            db.raw('SUM(order_items.quantity) as total_quantity'),
             'products.name',
             'images.url as thumbnail',
             'categories.name as category_name',
@@ -41,14 +41,13 @@ async function getTopSellingProducts(period: string, year: number, month?: numbe
         )
         .join('orders', 'orders.id', 'order_items.order_id')
         .join('products', 'products.id', 'order_items.product_id')
-        .join('product_images', 'product_images.product_id', 'products.id')
-        .join('images', 'images.id', 'product_images.image_id')
+        .join('images', 'products.thumbnail_id', 'images.id')
         .leftJoin('product_categories', 'product_categories.product_id', 'products.id')
         .leftJoin('categories', 'categories.id', 'product_categories.category_id')
         .where('orders.status', 9)
         .whereRaw(periodClause)
         .groupBy('order_items.product_id', 'products.name', 'images.url', 'categories.name', 'categories.slug')
-        .orderBy('count', 'desc')
+        .orderBy('total_quantity', 'desc')
         .limit(5);
 }
 
