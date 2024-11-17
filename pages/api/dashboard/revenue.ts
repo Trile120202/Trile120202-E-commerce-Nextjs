@@ -10,18 +10,20 @@ const db = knex(knexConfig);
 function getPeriodClause(period: string, year: number, month?: number) {
     switch (period) {
         case 'quarter1':
-            return `EXTRACT(QUARTER FROM orders.created_at) = 1 AND EXTRACT(YEAR FROM orders.created_at) = ${year}`;
+            return `orders.created_at >= '${year}-01-01' AND orders.created_at < '${year}-04-01'`;
         case 'quarter2':
-            return `EXTRACT(QUARTER FROM orders.created_at) = 2 AND EXTRACT(YEAR FROM orders.created_at) = ${year}`;
+            return `orders.created_at >= '${year}-04-01' AND orders.created_at < '${year}-07-01'`;
         case 'quarter3':
-            return `EXTRACT(QUARTER FROM orders.created_at) = 3 AND EXTRACT(YEAR FROM orders.created_at) = ${year}`;
+            return `orders.created_at >= '${year}-07-01' AND orders.created_at < '${year}-10-01'`;
         case 'quarter4':
-            return `EXTRACT(QUARTER FROM orders.created_at) = 4 AND EXTRACT(YEAR FROM orders.created_at) = ${year}`;
+            return `orders.created_at >= '${year}-10-01' AND orders.created_at < '${year + 1}-01-01'`;
         case 'month':
-            const selectedMonth = month ?? new Date().getMonth() + 1; 
-            return `EXTRACT(MONTH FROM orders.created_at) = ${selectedMonth} AND EXTRACT(YEAR FROM orders.created_at) = ${year}`;
+            const selectedMonth = month ?? new Date().getMonth() + 1;
+            const nextMonth = selectedMonth === 12 ? 1 : selectedMonth + 1;
+            const nextYear = selectedMonth === 12 ? year + 1 : year;
+            return `orders.created_at >= '${year}-${selectedMonth.toString().padStart(2, '0')}-01' AND orders.created_at < '${nextYear}-${nextMonth.toString().padStart(2, '0')}-01'`;
         case 'year':
-            return `EXTRACT(YEAR FROM orders.created_at) = ${year}`;
+            return `orders.created_at >= '${year}-01-01' AND orders.created_at < '${year + 1}-01-01'`;
         default:
             throw new Error('Invalid period');
     }
