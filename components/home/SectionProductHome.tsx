@@ -97,7 +97,7 @@ const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
 
     return (
         <motion.div 
-            className="bg-white rounded-2xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-2xl flex flex-col h-full relative group"
+            className="bg-white rounded-2xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-2xl flex flex-col h-full my-3 relative group "
             whileHover={{ scale: 1.02 }}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
