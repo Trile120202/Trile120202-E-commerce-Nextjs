@@ -48,7 +48,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             .where('p.status', 1)
             .whereRaw("o.created_at >= NOW() - INTERVAL '30 days'")
             .select(
-                'p.id',
+                'p.id as product_id',
                 'p.name as product_name',
                 'p.price',
                 'p.slug',
