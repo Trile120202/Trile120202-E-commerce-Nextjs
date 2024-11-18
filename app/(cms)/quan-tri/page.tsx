@@ -219,10 +219,6 @@ export default function CMSPage() {
                                 <span>{dashboardData.orders.processingOrders}</span>
                             </div>
                             <div className="flex justify-between">
-                                <span>Đã xác nhận:</span>
-                                <span>{dashboardData.orders.confirmedOrders}</span>
-                            </div>
-                            <div className="flex justify-between">
                                 <span>Đang giao:</span>
                                 <span>{dashboardData.orders.shippingOrders}</span>
                             </div>
