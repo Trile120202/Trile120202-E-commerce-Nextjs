@@ -150,8 +150,8 @@ export default function Home() {
                         transition={{ duration: 0.6 }}
                         viewport={{ once: true }}
                     >
-                        <h2 className="text-3xl font-bold text-center mb-12">Văn phòng</h2>
-                        <SectionProductHome endpoint="/api/products?type=van-phong" viewAllEndpoint="/api/products?type=van-phong" />
+                        <h2 className="text-3xl font-bold text-center mb-12">Sinh viên</h2>
+                        <SectionProductHome endpoint="/api/products?type=sinh-vien" viewAllEndpoint="/api/products?type=sinh-vien" />
                     </motion.div>
                 </div>
             </section>

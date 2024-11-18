@@ -25,7 +25,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             const minPrice = parseInt(req.query.minPrice as string) || 0;
             let maxPrice = parseInt(req.query.maxPrice as string) || Number.MAX_SAFE_INTEGER;
             const categoryId = req.query.categoryId as string;
-            const type = req.query.type as string;
+            let type = req.query.type as string;
 
             if (maxPrice === 100000000) {
                 maxPrice = Number.MAX_SAFE_INTEGER;
@@ -90,7 +90,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                         .select(db.raw('COUNT(DISTINCT oi.id) as order_count'))
                         .groupBy('p.id', 'i.id')
                         .orderBy('order_count', 'desc');
-                } else if (type === 'gaming' || type === 'van-phong') {
+                } else if (type === 'gaming' || type === 'sinh-vien') {
+                    if(type==='sinh-vien'){
+                        type = 'sinh viên'
+                    }
                     query = query.where('t.name', 'ilike', `%${type}%`);
                 }
             }

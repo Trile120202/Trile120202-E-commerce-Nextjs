@@ -166,8 +166,7 @@ const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
                         className="w-full flex items-center justify-center px-6 py-3 rounded-xl transition-all duration-300 text-sm font-semibold bg-green-600 hover:bg-green-700 text-white hover:shadow-lg hover:shadow-green-200"
                         whileTap={{ scale: 0.95 }}
                     >
-                        <FaCreditCard className="mr-2 text-lg" />
-                        <span>Xem chi tiết</span>
+                        <span>Chi tiết</span>
                     </motion.button>
                 </Link>
             </div>
