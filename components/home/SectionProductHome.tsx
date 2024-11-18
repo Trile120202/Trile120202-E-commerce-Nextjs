@@ -247,12 +247,9 @@ const SectionProductHome: React.FC<SectionProductHomeProps> = ({
                         prevEl: '.swiper-button-prev',
                         nextEl: '.swiper-button-next',
                     }}
-                    pagination={{ 
-                        clickable: true,
-                        bulletActiveClass: 'swiper-pagination-bullet-active bg-blue-600'
-                    }}
+                   
                     autoplay={{
-                        delay: 3000,
+                        delay: 4500,
                         disableOnInteraction: false,
                     }}
                     breakpoints={{

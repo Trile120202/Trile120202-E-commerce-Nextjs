@@ -78,7 +78,7 @@ export default function Header() {
 
   const DesktopMenu = () => (
     <nav className="hidden lg:flex lg:items-center lg:w-auto">
-      <form onSubmit={handleSearch} className="relative mr-4">
+      {/* <form onSubmit={handleSearch} className="relative mr-4">
         <input
           type="text"
           value={searchQuery}
@@ -94,7 +94,7 @@ export default function Header() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
         </button>
-      </form>
+      </form> */}
       <ul className="flex flex-row space-x-4 items-center">
         <li>
           <Link href={URLS.HOME} className="text-white hover:text-yellow-300 transition duration-300">Trang chủ</Link>
@@ -137,7 +137,7 @@ export default function Header() {
 
   const MobileMenu = () => (
     <div className={`lg:hidden w-full mt-4 ${isMenuOpen ? 'block' : 'hidden'}`}>
-      <form onSubmit={handleSearch} className="relative mb-4">
+      {/* <form onSubmit={handleSearch} className="relative mb-4">
         <input
           type="search"
           value={searchQuery}
@@ -153,7 +153,7 @@ export default function Header() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
         </button>
-      </form>
+      </form> */}
       <ul className="flex flex-col space-y-2 items-center">
         <li>
           <Link href={URLS.HOME} onClick={() => setIsMenuOpen(false)} className="text-white hover:text-yellow-300 transition duration-300 block">Trang chủ</Link>

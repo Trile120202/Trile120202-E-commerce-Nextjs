@@ -10,6 +10,7 @@ import Loading from "@/components/Loading";
 import {notFound, useSearchParams} from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
+import SearchForm from "@/components/home/SearchForm";
 
 interface Specification {
     weight: string;
@@ -222,6 +223,9 @@ const ProductsPage: React.FC = () => {
             <h1 className="text-3xl font-bold mb-8 text-gray-800">
                 {search ? `Kết quả tìm kiếm cho "${search}"` : type === 'hot' ? 'Sản phẩm nổi bật' : 'Tất cả sản phẩm'}
             </h1>
+            <div className="mb-8">
+                <SearchForm />
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 xl:gap-8">
                 {data?.data.map((product) => (
                     <ProductCard key={product.product_id} product={product}/>
