@@ -41,33 +41,6 @@ export default function Home() {
     const router = useRouter();
     const { data: categoryData } = useFetch<ApiResponse>('/api/categories/all-category');
 
-    const handleSearch = (e: React.FormEvent) => {
-        e.preventDefault();
-        const params = new URLSearchParams();
-        
-        if (searchParams.name) {
-            params.append('search', searchParams.name);
-        }
-        if (searchParams.category) {
-            params.append('categoryId', searchParams.category); 
-        }
-        if (searchParams.minPrice) {
-            params.append('minPrice', searchParams.minPrice);
-        }
-        if (searchParams.maxPrice) {
-            params.append('maxPrice', searchParams.maxPrice);
-        }
-
-        router.push(`/san-pham?${params.toString()}`);
-    };
-
-    const handlePriceChange = (values: number[]) => {
-        setSearchParams({
-            ...searchParams,
-            minPrice: (values[0] * 1000000).toString(),
-            maxPrice: (values[1] * 1000000).toString()
-        });
-    };
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
