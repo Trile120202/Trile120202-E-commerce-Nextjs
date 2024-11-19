@@ -1,17 +1,20 @@
 import { useState, useEffect } from 'react';
-import { transformResponse } from '@/lib/interceptors/transformInterceptor';
 
 interface SettingResponse {
-    id: number;
-    name: string;
-    value: string;
     status: number;
-    created_at: string;
-    updated_at: string;
+    message: string;
+    data: {
+        id: string;
+        name: string;
+        value: string;
+        status: number;
+        created_at: string;
+        updated_at: string;
+    }
 }
 
 export const useGetDataSetting = (name: string) => {
-    const [data, setData] = useState<SettingResponse | null>(null);
+    const [data, setData] = useState<string | null>(null);
     const [error, setError] = useState<Error | null>(null);
     const [isLoading, setIsLoading] = useState(false);
 
@@ -22,8 +25,8 @@ export const useGetDataSetting = (name: string) => {
             setIsLoading(true);
             try {
                 const response = await fetch(`/api/settings/${name}`);
-                const result = await response.json();
-                setData(result.data);
+                const result: SettingResponse = await response.json();
+                setData(result.data.value);
             } catch (err) {
                 setError(err instanceof Error ? err : new Error('An error occurred'));
             } finally {

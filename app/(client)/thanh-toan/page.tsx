@@ -8,6 +8,7 @@ import useSWR from 'swr';
 import { usePaymentMethods } from '@/hooks/useMethod';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
+import { useGetDataSetting } from '@/hooks/useGetDataSetting';
 
 interface Location {
     id: string;
@@ -75,6 +76,8 @@ const Page = () => {
     const [paymentMethod, setPaymentMethod] = useState('');
     const { items, total, updateQuantity, removeItem } = useCart();
     const { paymentMethods, isLoading: isLoadingPayments } = usePaymentMethods();
+    const { data: shippingCharge } = useGetDataSetting('shipping_charge');
+    const shippingFee = shippingCharge ? parseInt(shippingCharge) : 30000;
     
     const { data: locationData, error: locationError, mutate: mutateLocations } = useSWR<LocationResponse>('/api/locations', fetcher);
     const { data: provinceData } = useSWR<{data: Province[]}>('/api/locations/p', fetcher);
@@ -227,7 +230,7 @@ const Page = () => {
                                     })),
                                     shipping_address: `${selectedLocation.address}, ${selectedLocation.ward_name}, ${selectedLocation.district_name}, ${selectedLocation.province_name}`,
                                     payment_method_id: paymentMethod,
-                                    total_amount: total + 30000, 
+                                    total_amount: total + shippingFee, 
                                     delivery_address_id: selectedLocation.id,
                                     note: ''
                                 };
@@ -581,11 +584,11 @@ const Page = () => {
                 </div>
                 <div className="flex justify-between mb-4">
                     <span className="font-semibold">Phí vận chuyển:</span>
-                    <span>30,000 ₫</span>
+                    <span>{shippingFee.toLocaleString()} ₫</span>
                 </div>
                 <div className="flex justify-between mb-6">
                     <span className="font-semibold">Tổng thanh toán:</span>
-                    <span className="text-xl text-red-500 font-bold">{(total + 30000).toLocaleString()} ₫</span>
+                    <span className="text-xl text-red-500 font-bold">{(total + shippingFee).toLocaleString()} ₫</span>
                 </div>
                 <button 
                     onClick={handleCreateOrder}

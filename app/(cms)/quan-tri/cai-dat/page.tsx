@@ -59,7 +59,7 @@ const Page = () => {
         security_ssl_required: 'false',
         security_jwt_expiry: '',
         config: '{}',
-        shipping_charge: '30000'
+        shipping_charge: ''
     });
 
     useEffect(() => {
