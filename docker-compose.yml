@@ -11,7 +11,7 @@ services:
       POSTGRES_PASSWORD: dev_lor
       POSTGRES_MAX_CONNECTIONS: 200
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - ./db_data:/var/lib/postgresql/data
       - ./init_schema:/docker-entrypoint-initdb.d
@@ -19,7 +19,7 @@ services:
       image: adminer
       restart: always
       ports:
-          - '8080:8080'
+          - '83:8080'
       environment:
           POSTGRES_PASSWORD: dev_lor
           POSTGRES_USER: admin

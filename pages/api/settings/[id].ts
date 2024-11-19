@@ -13,7 +13,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             const { id } = req.query;
 
             const setting = await db('settings')
-                .where({ id, status: 1 })
+                .where({ name:id, status: 1 })
                 .first();
 
             if (!setting) {
