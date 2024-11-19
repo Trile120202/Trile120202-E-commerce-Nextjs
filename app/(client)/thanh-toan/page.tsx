@@ -9,6 +9,7 @@ import { usePaymentMethods } from '@/hooks/useMethod';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import { useGetDataSetting } from '@/hooks/useGetDataSetting';
+import { useGetCouponWithCode } from '@/hooks/useGetCouponWithCode';
 
 interface Location {
     id: string;
@@ -73,11 +74,15 @@ const Page = () => {
         is_default: false
     });
     const [promoCode, setPromoCode] = useState('');
+    const [appliedCoupon, setAppliedCoupon] = useState<any>(null);
     const [paymentMethod, setPaymentMethod] = useState('');
     const { items, total, updateQuantity, removeItem } = useCart();
     const { paymentMethods, isLoading: isLoadingPayments } = usePaymentMethods();
     const { data: shippingCharge } = useGetDataSetting('shipping_charge');
     const shippingFee = shippingCharge ? parseInt(shippingCharge) : 30000;
+    const [couponData, setCouponData] = useState<any>(null);
+    const [isLoadingCoupon, setIsLoadingCoupon] = useState(false);
+    const [finalTotal, setFinalTotal] = useState(total + shippingFee);
     
     const { data: locationData, error: locationError, mutate: mutateLocations } = useSWR<LocationResponse>('/api/locations', fetcher);
     const { data: provinceData } = useSWR<{data: Province[]}>('/api/locations/p', fetcher);
@@ -194,6 +199,91 @@ const Page = () => {
         }
     };
 
+    const handleApplyCoupon = async () => {
+        if (!promoCode) {
+            toast({
+                title: "Lỗi",
+                description: "Vui lòng nhập mã giảm giá",
+                variant: "destructive"
+            });
+            return;
+        }
+
+        setIsLoadingCoupon(true);
+        try {
+            const response = await fetch(`/api/coupons/${promoCode}`);
+            const data = await response.json();
+            
+            if (data && data.status === 200) {
+                const coupon = data.data;
+                const currentDate = new Date();
+                const startDate = new Date(coupon.start_date);
+                const endDate = new Date(coupon.end_date);
+                
+                // Kiểm tra thời gian hiệu lực
+                if (currentDate < startDate || currentDate > endDate) {
+                    toast({
+                        title: "Lỗi",
+                        description: "Mã giảm giá đã hết hạn hoặc chưa đến thời gian sử dụng",
+                        variant: "destructive"
+                    });
+                    return;
+                }
+
+                // Kiểm tra giá trị đơn hàng tối thiểu
+                if (total < parseFloat(coupon.min_purchase_amount)) {
+                    toast({
+                        title: "Lỗi",
+                        description: `Giá trị đơn hàng tối thiểu phải từ ${parseFloat(coupon.min_purchase_amount).toLocaleString()} ₫`,
+                        variant: "destructive"
+                    });
+                    return;
+                }
+
+                // Tính toán số tiền giảm giá
+                let discountAmount = 0;
+                if (coupon.discount_type === 'percentage') {
+                    discountAmount = (total * parseFloat(coupon.discount_value)) / 100;
+                    // Kiểm tra giới hạn giảm giá tối đa
+                    if (parseFloat(coupon.max_discount_value) > 0) {
+                        discountAmount = Math.min(discountAmount, parseFloat(coupon.max_discount_value));
+                    }
+                } else {
+                    discountAmount = parseFloat(coupon.discount_value);
+                }
+
+                // Cập nhật state
+                const couponWithDiscount = {
+                    ...coupon,
+                    discount_amount: discountAmount
+                };
+                setCouponData(couponWithDiscount);
+                setAppliedCoupon(couponWithDiscount);
+                setFinalTotal(total + shippingFee - discountAmount);
+                
+                toast({
+                    title: "Thành công",
+                    description: "Áp dụng mã giảm giá thành công",
+                    variant: "default"
+                });
+            } else {
+                toast({
+                    title: "Lỗi",
+                    description: "Mã giảm giá không hợp lệ hoặc đã hết hạn",
+                    variant: "destructive"
+                });
+            }
+        } catch (error) {
+            toast({
+                title: "Lỗi",
+                description: "Có lỗi xảy ra khi áp dụng mã giảm giá",
+                variant: "destructive"
+            });
+        } finally {
+            setIsLoadingCoupon(false);
+        }
+    };
+
     const handleCreateOrder = async () => {
         if (!selectedLocation) {
             toast({
@@ -230,8 +320,9 @@ const Page = () => {
                                     })),
                                     shipping_address: `${selectedLocation.address}, ${selectedLocation.ward_name}, ${selectedLocation.district_name}, ${selectedLocation.province_name}`,
                                     payment_method_id: paymentMethod,
-                                    total_amount: total + shippingFee, 
+                                    total_amount: finalTotal,
                                     delivery_address_id: selectedLocation.id,
+                                    coupon_id: appliedCoupon ? appliedCoupon.id : null,
                                     note: ''
                                 };
 
@@ -294,6 +385,11 @@ const Page = () => {
             setPaymentMethod(paymentMethods[0].id.toString());
         }
     }, [paymentMethods]);
+
+    // Update final total when total or shipping fee changes
+    useEffect(() => {
+        setFinalTotal(total + shippingFee - (appliedCoupon?.discount_amount || 0));
+    }, [total, shippingFee, appliedCoupon]);
 
     return (
         <div className="max-w-4xl mx-auto p-6">
@@ -536,11 +632,34 @@ const Page = () => {
                         onChange={(e) => setPromoCode(e.target.value)}
                         className="flex-1 p-3 border rounded-md"
                         placeholder="Nhập mã giảm giá..."
+                        disabled={appliedCoupon !== null}
                     />
-                    <button className="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600">
-                        Áp dụng
-                    </button>
+                    {appliedCoupon ? (
+                        <button 
+                            onClick={() => {
+                                setAppliedCoupon(null);
+                                setPromoCode('');
+                                setFinalTotal(total + shippingFee);
+                            }}
+                            className="bg-red-500 text-white px-6 py-2 rounded-md hover:bg-red-600"
+                        >
+                            Hủy mã
+                        </button>
+                    ) : (
+                        <button 
+                            onClick={handleApplyCoupon}
+                            className="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600"
+                            disabled={isLoadingCoupon}
+                        >
+                            Áp dụng
+                        </button>
+                    )}
                 </div>
+                {appliedCoupon && appliedCoupon.discount_amount && (
+                    <div className="mt-2 text-green-600">
+                        Đã áp dụng mã giảm giá: {appliedCoupon.discount_amount.toLocaleString()} ₫
+                    </div>
+                )}
             </div>
 
             {/* Phương thức thanh toán */}
@@ -578,18 +697,32 @@ const Page = () => {
 
             {/* Tổng tiền và nút thanh toán */}
             <div className="bg-white p-6 rounded-lg shadow-md">
-                <div className="flex justify-between mb-4">
-                    <span className="font-semibold">Tổng tiền hàng:</span>
-                    <span>{total.toLocaleString()} ₫</span>
+                <div className="space-y-4 mb-6">
+                    <div className="flex justify-between">
+                        <span className="text-gray-600">Tổng tiền sản phẩm:</span>
+                        <span className="font-medium">{total.toLocaleString()} ₫</span>
+                    </div>
+                    
+                    <div className="flex justify-between">
+                        <span className="text-gray-600">Phí vận chuyển:</span>
+                        <span className="font-medium">{shippingFee.toLocaleString()} ₫</span>
+                    </div>
+                    
+                    {appliedCoupon && appliedCoupon.discount_amount && (
+                        <div className="flex justify-between text-green-600">
+                            <span>Giảm giá:</span>
+                            <span>-{appliedCoupon.discount_amount.toLocaleString()} ₫</span>
+                        </div>
+                    )}
+                    
+                    <div className="flex justify-between pt-4 border-t">
+                        <span className="font-semibold">Tổng thanh toán:</span>
+                        <span className="text-xl text-red-500 font-bold">
+                            {finalTotal.toLocaleString()} ₫
+                        </span>
+                    </div>
                 </div>
-                <div className="flex justify-between mb-4">
-                    <span className="font-semibold">Phí vận chuyển:</span>
-                    <span>{shippingFee.toLocaleString()} ₫</span>
-                </div>
-                <div className="flex justify-between mb-6">
-                    <span className="font-semibold">Tổng thanh toán:</span>
-                    <span className="text-xl text-red-500 font-bold">{(total + shippingFee).toLocaleString()} ₫</span>
-                </div>
+                
                 <button 
                     onClick={handleCreateOrder}
                     className="w-full bg-red-500 text-white py-3 rounded-md hover:bg-red-600 font-semibold"

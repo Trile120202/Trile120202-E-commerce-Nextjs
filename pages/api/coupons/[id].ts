@@ -9,14 +9,7 @@ import { useAuth } from '@/hooks/useAuth';
 const db = knex(knexConfig);
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-    const verified = await useAuth(req, res);
-    if (!verified || verified.payload.roleName !== 'admin') {
-        return res.status(StatusCode.UNAUTHORIZED).json(transformResponse({
-            data: null,
-            message: 'Unauthorized',
-            statusCode: StatusCode.UNAUTHORIZED
-        }));
-}
+
     const { id } = req.query;
 
     if (req.method === 'GET') {
@@ -48,6 +41,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             }));
         }
     } else if (req.method === 'PUT') {
+        const verified = await useAuth(req, res);
+        if (!verified || verified.payload.roleName !== 'admin') {
+            return res.status(StatusCode.UNAUTHORIZED).json(transformResponse({
+                data: null,
+                message: 'Unauthorized',
+                statusCode: StatusCode.UNAUTHORIZED
+            }));
+    }
         try {
             const {
                 code,
