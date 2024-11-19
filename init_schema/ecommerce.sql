@@ -42,11 +42,8 @@ DROP TABLE IF EXISTS payment_methods CASCADE;
 DROP TABLE IF EXISTS user_delivery_addresses CASCADE;
 DROP TABLE IF EXISTS delivery_addresses CASCADE;
 
-
-
-
-
 DROP FUNCTION IF EXISTS update_modified_column() CASCADE;
+
 DROP TABLE IF EXISTS "banner_images";
 CREATE TABLE "public"."banner_images" (
     "id" uuid DEFAULT gen_random_uuid() NOT NULL,
@@ -131,6 +128,7 @@ INSERT INTO "cart_items" ("id", "cart_id", "product_id", "quantity", "created_at
 ('e014f9f8-b398-439d-8767-dbf4230c15c4',	'28bfdec5-27d3-432e-9d75-bb6e45c2c16b',	'8bede882-3d39-430d-ad0a-75658fb3c7ce',	1,	'2024-11-18 06:38:23.556044',	'2024-11-18 06:38:23.556044',	1),
 ('3f009ec9-b12a-472b-b133-5dd3f3d89af8',	'28bfdec5-27d3-432e-9d75-bb6e45c2c16b',	'9ce63f97-dc12-4510-9eec-d44d7ee3d547',	1,	'2024-11-18 06:38:25.427656',	'2024-11-18 06:38:25.427656',	1),
 ('581ae7de-1fb2-4ae9-915f-9ef8b73b56fb',	'28bfdec5-27d3-432e-9d75-bb6e45c2c16b',	'72b983b9-8267-44e5-8269-862561258c31',	2,	'2024-11-18 06:38:16.30949',	'2024-11-18 06:38:26.179446',	1),
+('29aa84c8-2d94-4bf1-9b29-89e3a532f218',	'949c82a0-8c81-4876-aa8e-1145d11c83e9',	'72b983b9-8267-44e5-8269-862561258c31',	1,	'2024-11-19 08:45:26.176953',	'2024-11-19 08:45:26.176953',	1),
 ('8a587dfb-2eb8-4994-a35d-f083f2044a65',	'28bfdec5-27d3-432e-9d75-bb6e45c2c16b',	'27f381af-0752-40e6-9825-5cfaa92d5e77',	28,	'2024-11-14 16:56:27.052956',	'2024-11-14 17:00:46.722165',	0),
 ('02bd0130-c005-4303-9898-5a0f58987773',	'28bfdec5-27d3-432e-9d75-bb6e45c2c16b',	'27f381af-0752-40e6-9825-5cfaa92d5e77',	1,	'2024-11-14 17:02:29.122718',	'2024-11-14 17:09:17.027214',	0),
 ('d85494ae-c7b8-4345-b195-533ba67f8b4e',	'949c82a0-8c81-4876-aa8e-1145d11c83e9',	'27f381af-0752-40e6-9825-5cfaa92d5e77',	1,	'2024-11-15 00:24:09.975555',	'2024-11-15 00:24:19.735165',	0),
@@ -1887,26 +1885,459 @@ CREATE INDEX "idx_settings_name" ON "public"."settings" USING btree ("name");
 CREATE INDEX "idx_settings_status" ON "public"."settings" USING btree ("status");
 
 INSERT INTO "settings" ("id", "name", "value", "status", "created_at", "updated_at") VALUES
-('bf00f01c-45a1-4f1a-ad89-a7def2ee62a5',	'site_name',	'Laptop Store',	1,	'2024-11-13 07:57:59.793165',	'2024-11-13 07:57:59.793165'),
-('aa1353a9-0972-4cfb-b51f-28522a9d4193',	'site_description',	'Cửa hàng laptop chính hãng',	1,	'2024-11-13 07:57:59.793165',	'2024-11-13 07:57:59.793165'),
-('8a64ada0-bb1a-4c96-a5b3-5e94e72693ea',	'contact_email',	'contact@laptopstore.com',	1,	'2024-11-13 07:57:59.793165',	'2024-11-13 07:57:59.793165'),
-('cad2ee46-134c-40c8-8b9b-7d3a90fb265e',	'contact_phone',	'0123456789',	1,	'2024-11-13 07:57:59.793165',	'2024-11-13 07:57:59.793165'),
-('0180ae34-1132-48ee-8df3-3f54b5a3ab35',	'contact_address',	'Hà Nội, Việt Nam',	1,	'2024-11-13 07:57:59.793165',	'2024-11-13 07:57:59.793165'),
-('d7daeb48-45c0-4096-9c90-4f98f0f6339f',	'social_facebook',	'https://facebook.com/laptopstore',	1,	'2024-11-13 07:57:59.793165',	'2024-11-13 07:57:59.793165'),
-('14c12cbb-44c0-41ad-8ef2-73dc381ec58b',	'social_instagram',	'https://instagram.com/laptopstore',	1,	'2024-11-13 07:57:59.793165',	'2024-11-13 07:57:59.793165'),
-('b520962a-7b05-492c-84a7-470834ac63a8',	'social_twitter',	'https://twitter.com/laptopstore',	1,	'2024-11-13 07:57:59.793165',	'2024-11-13 07:57:59.793165'),
-('4e8055fa-85f7-474e-8688-82952ea3b717',	'maintenance_mode',	'false',	1,	'2024-11-13 07:57:59.793165',	'2024-11-13 07:57:59.793165'),
-('b385ab64-2671-4bfd-adef-49fd6bf749e1',	'currency',	'VND',	1,	'2024-11-13 07:57:59.793165',	'2024-11-13 07:57:59.793165'),
-('9fc96872-f1d7-4db8-8ebb-133108519334',	'security_login_attempts',	'5',	1,	'2024-11-13 07:57:59.806087',	'2024-11-13 07:57:59.806087'),
-('b6b2c6f5-f9e8-4583-814b-07fbfc09b4de',	'security_lockout_duration',	'30',	1,	'2024-11-13 07:57:59.806087',	'2024-11-13 07:57:59.806087'),
-('e84762fc-c7b8-4038-9abe-74a7f0b1cef5',	'security_password_expiry',	'90',	1,	'2024-11-13 07:57:59.806087',	'2024-11-13 07:57:59.806087'),
-('ebae4299-1486-4881-8db8-48e4e01c3edb',	'security_password_length',	'8',	1,	'2024-11-13 07:57:59.806087',	'2024-11-13 07:57:59.806087'),
-('528162ee-fc86-46fc-a680-db9ec552cf7e',	'security_password_complexity',	'true',	1,	'2024-11-13 07:57:59.806087',	'2024-11-13 07:57:59.806087'),
-('d45d9a91-e483-48d1-8870-c8b389d882e8',	'security_session_timeout',	'60',	1,	'2024-11-13 07:57:59.806087',	'2024-11-13 07:57:59.806087'),
-('9567ca4d-058e-472d-a3df-648a967b1850',	'security_2fa_enabled',	'false',	1,	'2024-11-13 07:57:59.806087',	'2024-11-13 07:57:59.806087'),
-('18ade65d-d04c-4481-8f09-ebb6d3044210',	'security_ip_whitelist',	'',	1,	'2024-11-13 07:57:59.806087',	'2024-11-13 07:57:59.806087'),
-('f00ad54f-9fa5-42f9-825b-cebed4d222be',	'security_ssl_required',	'true',	1,	'2024-11-13 07:57:59.806087',	'2024-11-13 07:57:59.806087'),
-('9bb6f738-c68f-4fc2-b506-555856c4fbb1',	'security_jwt_expiry',	'24',	1,	'2024-11-13 07:57:59.806087',	'2024-11-13 07:57:59.806087');
+('b385ab64-2671-4bfd-adef-49fd6bf749e1',	'currency',	'VND',	1,	'2024-11-13 07:57:59.793165',	'2024-11-19 09:40:43.745657'),
+('cad2ee46-134c-40c8-8b9b-7d3a90fb265e',	'contact_phone',	'0123456789',	1,	'2024-11-13 07:57:59.793165',	'2024-11-19 09:40:43.746116'),
+('0180ae34-1132-48ee-8df3-3f54b5a3ab35',	'contact_address',	'Hồ Chí Minh, Việt Nam',	1,	'2024-11-13 07:57:59.793165',	'2024-11-19 09:40:43.746502'),
+('ebae4299-1486-4881-8db8-48e4e01c3edb',	'security_password_length',	'8',	1,	'2024-11-13 07:57:59.806087',	'2024-11-19 09:40:43.747044'),
+('528162ee-fc86-46fc-a680-db9ec552cf7e',	'security_password_complexity',	'true',	1,	'2024-11-13 07:57:59.806087',	'2024-11-19 09:40:43.747348'),
+('d45d9a91-e483-48d1-8870-c8b389d882e8',	'security_session_timeout',	'60',	1,	'2024-11-13 07:57:59.806087',	'2024-11-19 09:40:43.7478'),
+('9567ca4d-058e-472d-a3df-648a967b1850',	'security_2fa_enabled',	'false',	1,	'2024-11-13 07:57:59.806087',	'2024-11-19 09:40:43.748292'),
+('18ade65d-d04c-4481-8f09-ebb6d3044210',	'security_ip_whitelist',	'',	1,	'2024-11-13 07:57:59.806087',	'2024-11-19 09:40:43.74888'),
+('f00ad54f-9fa5-42f9-825b-cebed4d222be',	'security_ssl_required',	'true',	1,	'2024-11-13 07:57:59.806087',	'2024-11-19 09:40:43.749197'),
+('9fc96872-f1d7-4db8-8ebb-133108519334',	'security_login_attempts',	'5',	1,	'2024-11-13 07:57:59.806087',	'2024-11-19 09:40:43.749763'),
+('b6b2c6f5-f9e8-4583-814b-07fbfc09b4de',	'security_lockout_duration',	'30',	1,	'2024-11-13 07:57:59.806087',	'2024-11-19 09:40:43.75011'),
+('e84762fc-c7b8-4038-9abe-74a7f0b1cef5',	'security_password_expiry',	'90',	1,	'2024-11-13 07:57:59.806087',	'2024-11-19 09:40:43.750482'),
+('ac069372-9f57-4669-a8a3-a79bc9a5bc32',	'shipping_charge',	'40000',	1,	'2024-11-19 04:40:00.206476',	'2024-11-19 09:40:43.751441'),
+('1df55dbd-ea57-4a74-9f71-4ebe67cd167f',	'config',	'{
+  "ram": {
+    "capacities": [
+      "4GB",
+      "8GB", 
+      "16GB",
+      "32GB",
+      "64GB"
+    ],
+    "types": [
+      "DDR3",
+      "DDR4",
+      "DDR5"
+    ],
+    "speeds": [
+      "2133MHz",
+      "2400MHz", 
+      "2666MHz",
+      "3000MHz",
+      "3200MHz",
+      "3600MHz",
+      "4000MHz",
+      "4400MHz",
+      "4600MHz",
+      "4800MHz",
+      "5200MHz",
+      "5600MHz",
+      "6000MHz",
+      "6400MHz",
+      "7200MHz",
+      "7800MHz"
+    ],
+    "brands": [
+      "Kingston",
+      "Corsair", 
+      "G.Skill",
+      "Crucial", 
+      "Samsung",
+      "Team Group",
+      "Adata",
+      "Gigabyte",
+      "Thermaltake",
+      "Patriot",
+      "Silicon Power",
+      "Apacer",
+      "Transcend",
+      "PNY",
+      "Mushkin",
+      "Geil",
+      "Klevv",
+      "Lexar",
+      "Zadak"
+    ]
+  },
+  "hard_drives": {
+    "types": [
+      "HDD",
+      "SSD",
+      "NVMe SSD"
+    ],
+    "capacities": [
+      "128GB",
+      "256GB",
+      "512GB",
+      "1TB",
+      "2TB",
+      "4TB",
+      "8TB"
+    ],
+    "interfaces": [
+      "SATA III",
+      "PCIe 3.0",
+      "PCIe 4.0"
+    ],
+    "form_factors": [
+      "2.5\"",
+      "3.5\"",
+      "M.2"
+    ],
+    "brands": [
+      "Samsung",
+      "Western Digital",
+      "Seagate",
+      "Crucial",
+      "Kingston",
+      "SanDisk",
+      "Intel",
+      "Corsair",
+      "Adata",
+      "Team Group",
+      "Gigabyte",
+      "MSI",
+      "Transcend",
+      "PNY",
+      "Lexar"
+    ]
+  },
+  "banners": {
+    "locations": [
+      "/",
+      "/san-pham"
+    ],
+    "positions": [
+      "Đầu trang",
+      "Giữa trang", 
+      "Cuối trang",
+      "Bên trái",
+      "Bên phải"
+    ]
+  },
+  "orders": {
+    "statuses": [
+      "Chờ xác nhận",
+      "Đã xác nhận",
+      "Đang giao hàng",
+      "Đã giao hàng",
+      "Đã hủy",
+      "Hoàn trả"
+    ]
+  },
+  "brands": {
+    "names": [
+      "Apple",
+      "Samsung",
+      "Xiaomi",
+      "Oppo",
+      "Vivo",
+      "Realme",
+      "Nokia",
+      "Asus",
+      "Lenovo",
+      "HP",
+      "Dell",
+      "Acer",
+      "MSI",
+      "LG",
+      "Sony",
+      "Huawei",
+      "OnePlus",
+      "Google",
+      "Microsoft"
+    ]
+  },
+  "models": {
+    "phones": [
+      "iPhone 15 Pro Max",
+      "iPhone 15 Pro",
+      "iPhone 15 Plus",
+      "iPhone 15",
+      "iPhone 14 Pro Max",
+      "iPhone 14 Pro",
+      "Galaxy S23 Ultra",
+      "Galaxy S23+",
+      "Galaxy S23",
+      "Galaxy Z Fold5",
+      "Galaxy Z Flip5",
+      "Xiaomi 13T Pro",
+      "Redmi Note 12",
+      "OPPO Find N3 Flip",
+      "OPPO Reno10",
+      "Vivo V29e"
+    ],
+    "laptops": [
+      "MacBook Air M2",
+      "MacBook Pro 14",
+      "MacBook Pro 16",
+      "Dell XPS 13",
+      "Dell XPS 15",
+      "ThinkPad X1 Carbon",
+      "ROG Zephyrus G14",
+      "ROG Zephyrus G15",
+      "Legion Pro 7i",
+      "Legion Slim 7i",
+      "Razer Blade 14",
+      "Razer Blade 15",
+      "HP Spectre x360",
+      "HP Envy x360"
+    ]
+  },
+  "cpu": {
+    "brands": [
+      "Intel",
+      "AMD"
+    ],
+    "models": {
+      "Intel": [
+        "Celeron G5905",
+        "Celeron G5925",
+        "Celeron G6900",
+        "Celeron N4020",
+        "Celeron N4120",
+        "Celeron N5100",
+        "Core 7 Ultra 155H",
+        "Core i3-10100",
+        "Core i3-10100F",
+        "Core i3-1115G4",
+        "Core i3-1125G4", 
+        "Core i3-12100",
+        "Core i3-12100F",
+        "Core i3-N305",
+        "Core i5-13600K",
+        "Core i5-13600KF",
+        "Core i5-155H",
+        "Core i5-1135G7",
+        "Core i5-1155G7",
+        "Core i5-11400H",
+        "Core i5-12450H",
+        "Core i5-12500H",
+        "Core i5-13500H",
+        "Core i5-3320M",
+        "Core i5-4300HQ",
+        "Core i5-5300HQ",
+        "Core i5-6300HQ",
+        "Core i5-7300HQ",
+        "Core i5-12600K",
+        "Core i5-12600KF",
+        "Core i7-13700K",
+        "Core i7-13700KF",
+        "Core i7-11800H",
+        "Core i7-12700H",
+        "Core i7-12800H",
+        "Core i7-13700H",
+        "Core i7-13800H",
+        "Core i7-14700H",
+        "Core i7-3720QM",
+        "Core i7-4700HQ",
+        "Core i7-5700HQ",
+        "Core i7-6700HQ",
+        "Core i7-7700HQ",
+        "Core i7-12700K",
+        "Core i7-12700KF",
+        "Core i9-12900H",
+        "Core i9-12900HK",
+        "Core i9-12900K",
+        "Core i9-12900KF",
+        "Core i9-13900H",
+        "Core i9-13900HX",
+        "Core i9-13900K",
+        "Core i9-13900KF",
+        "Core i9-14900HX",
+        "Core Ultra 5 125H",
+        "Core Ultra 7 155H",
+        "Core Ultra 7 165H", 
+        "Core Ultra 9 185H",
+        "Pentium Gold G6400",
+        "Pentium Gold G6405",
+        "Pentium Gold G7400",
+        "Pentium Silver N6000",
+        "Pentium Silver N6005",
+        "Xeon W3-3435",
+        "Xeon W5-3435X",
+        "Xeon W7-3465X",
+        "Xeon W9-3495X"
+      ],
+      "AMD": [
+        "Ryzen 9 7950X3D",
+        "Ryzen 9 7945HX",
+        "Ryzen 9 7940HS",
+        "Ryzen 9 7900X3D",
+        "Ryzen 9 7950X",
+        "Ryzen 9 7900X",
+        "Ryzen 9 6900HX",
+        "Ryzen 9 6900HS",
+        "Ryzen 9 5900HX",
+        "Ryzen 7 7840HS",
+        "Ryzen 7 7800X3D",
+        "Ryzen 7 7735HS",
+        "Ryzen 7 7700X",
+        "Ryzen 7 6800H",
+        "Ryzen 7 6800HS",
+        "Ryzen 7 5800H",
+        "Ryzen 5 7640HS",
+        "Ryzen 5 7600X",
+        "Ryzen 5 6600H",
+        "Ryzen 5 5600H",
+        "Ryzen 9 5950X",
+        "Ryzen 9 5900X",
+        "Ryzen 7 5800X3D",
+        "Ryzen 7 5800X",
+        "Ryzen 5 5600X",
+        "Ryzen 5 5600",
+        "Ryzen 5 5500",
+        "Ryzen 3 5300G",
+        "Ryzen 3 4100",
+        "Ryzen 3 3300X",
+        "Ryzen 3 3100",
+        "Athlon 3000G",
+        "Athlon 240GE",
+        "Athlon 220GE",
+        "Athlon 200GE",
+        "Threadripper PRO 7995WX",
+        "Threadripper PRO 7985WX",
+        "Threadripper PRO 7975WX",
+        "Threadripper PRO 7965WX",
+        "Threadripper PRO 7955WX"
+      ]
+    },
+    "cache": [
+      "128MB",
+      "96MB",
+      "64MB",
+      "48MB",
+      "36MB",
+      "32MB",
+      "30MB",
+      "25MB", 
+      "24MB",
+      "20MB",
+      "16MB",
+      "12MB",
+      "8MB",
+      "6MB",
+      "4MB",
+      "3MB",
+      "2MB",
+      "1MB",
+      "512KB"
+    ],
+    "base_clock": [
+      "1.8 GHz",
+      "2.0 GHz",
+      "2.2 GHz",
+      "2.5 GHz",
+      "2.8 GHz",
+      "3.0 GHz",
+      "3.2 GHz",
+      "3.4 GHz", 
+      "3.6 GHz",
+      "3.8 GHz",
+      "4.0 GHz",
+      "4.2 GHz",
+      "4.4 GHz",
+      "4.5 GHz",
+      "4.7 GHz",
+      "4.8 GHz",
+      "5.0 GHz"
+    ],
+    "boost_clock": [
+      "3.2 GHz",
+      "3.5 GHz",
+      "3.8 GHz",
+      "4.0 GHz",
+      "4.2 GHz",
+      "4.5 GHz",
+      "4.7 GHz",
+      "4.9 GHz",
+      "5.0 GHz",
+      "5.2 GHz", 
+      "5.4 GHz",
+      "5.6 GHz",
+      "5.7 GHz",
+      "5.8 GHz",
+      "6.0 GHz"
+    ]
+  },
+  "graphics_cards": {
+    "brand": [
+      "NVIDIA",
+      "AMD",
+      "Intel",
+      "ASUS",
+      "MSI",
+      "Gigabyte",
+      "EVGA",
+      "Sapphire",
+      "PowerColor",
+      "Zotac"
+    ],
+    "memory_size": [
+      "2GB",
+      "4GB", 
+      "6GB",
+      "8GB",
+      "10GB",
+      "12GB",
+      "16GB",
+      "24GB"
+    ],
+    "memory_type": [
+      "GDDR5",
+      "GDDR5X",
+      "GDDR6",
+      "GDDR6X",
+      "HBM2",
+      "HBM2e"
+    ],
+    "clock_speed": [
+      "1.0 GHz",
+      "1.2 GHz",
+      "1.4 GHz", 
+      "1.6 GHz",
+      "1.8 GHz",
+      "2.0 GHz",
+      "2.2 GHz",
+      "2.4 GHz",
+      "2.6 GHz",
+      "2.8 GHz"
+    ]
+  },
+  "displays": {
+    "size": [
+      "11.6",
+      "13.3", 
+      "14",
+      "15.6",
+      "16",
+      "17.3"
+    ],
+    "resolution": [
+      "1366x768",
+      "1920x1080",
+      "2560x1440", 
+      "2880x1800",
+      "3840x2160"
+    ],
+    "panel_type": [
+      "IPS",
+      "TN",
+      "OLED",
+      "Mini LED"
+    ],
+    "refresh_rate": [
+      "60Hz",
+      "90Hz",
+      "120Hz",
+      "144Hz",
+      "165Hz",
+      "240Hz"
+    ]
+  }
+}
+',	1,	'2024-11-19 04:00:59.869804',	'2024-11-19 09:40:43.750833'),
+('9bb6f738-c68f-4fc2-b506-555856c4fbb1',	'security_jwt_expiry',	'24',	1,	'2024-11-13 07:57:59.806087',	'2024-11-19 09:40:43.752088'),
+('bf00f01c-45a1-4f1a-ad89-a7def2ee62a5',	'site_name',	'Z-Shop',	1,	'2024-11-13 07:57:59.793165',	'2024-11-19 09:40:43.741471'),
+('aa1353a9-0972-4cfb-b51f-28522a9d4193',	'site_description',	'Cửa hàng laptop chính hãng',	1,	'2024-11-13 07:57:59.793165',	'2024-11-19 09:40:43.74218'),
+('8a64ada0-bb1a-4c96-a5b3-5e94e72693ea',	'contact_email',	'contact@laptopstore.com',	1,	'2024-11-13 07:57:59.793165',	'2024-11-19 09:40:43.74288'),
+('d7daeb48-45c0-4096-9c90-4f98f0f6339f',	'social_facebook',	'https://facebook.com/laptopstore',	1,	'2024-11-13 07:57:59.793165',	'2024-11-19 09:40:43.743613'),
+('14c12cbb-44c0-41ad-8ef2-73dc381ec58b',	'social_instagram',	'https://instagram.com/laptopstore',	1,	'2024-11-13 07:57:59.793165',	'2024-11-19 09:40:43.74413'),
+('b520962a-7b05-492c-84a7-470834ac63a8',	'social_twitter',	'https://twitter.com/laptopstore',	1,	'2024-11-13 07:57:59.793165',	'2024-11-19 09:40:43.744694'),
+('4e8055fa-85f7-474e-8688-82952ea3b717',	'maintenance_mode',	'false',	1,	'2024-11-13 07:57:59.793165',	'2024-11-19 09:40:43.745104');
 
 DROP TABLE IF EXISTS "tags";
 CREATE TABLE "public"."tags" (
@@ -12674,4 +13105,4 @@ ALTER TABLE ONLY "public"."users" ADD CONSTRAINT "users_role_id_fkey" FOREIGN KE
 
 ALTER TABLE ONLY "public"."wishlist" ADD CONSTRAINT "wishlist_product_id_fkey" FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE NOT DEFERRABLE;
 
--- 2024-11-18 09:14:55.653288+00
+-- 2024-11-19 09:55:05.123169+00

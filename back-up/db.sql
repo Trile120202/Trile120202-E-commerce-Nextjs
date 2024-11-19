@@ -41,10 +41,6 @@ DROP TABLE IF EXISTS payment_methods CASCADE;
 DROP TABLE IF EXISTS user_delivery_addresses CASCADE;
 DROP TABLE IF EXISTS delivery_addresses CASCADE;
 
-
-
-
-
 DROP FUNCTION IF EXISTS update_modified_column() CASCADE;
 
 CREATE TABLE images
