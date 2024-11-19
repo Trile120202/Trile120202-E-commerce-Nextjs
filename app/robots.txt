@@ -1,0 +1,12 @@
+User-agent: Googlebot
+Allow: /
+Disallow: /private/
+Disallow: /quan-tri
+
+User-agent: Applebot
+Disallow: /
+
+User-agent: Bingbot
+Disallow: /
+
+Sitemap: https://acme.com/sitemap.xml
