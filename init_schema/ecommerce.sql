@@ -41,6 +41,7 @@ DROP TABLE IF EXISTS provinces CASCADE;
 DROP TABLE IF EXISTS payment_methods CASCADE;
 DROP TABLE IF EXISTS user_delivery_addresses CASCADE;
 DROP TABLE IF EXISTS delivery_addresses CASCADE;
+DROP TABLE IF EXISTS user_coupons CASCADE;
 
 DROP FUNCTION IF EXISTS update_modified_column() CASCADE;
 DROP TABLE IF EXISTS "banner_images";
@@ -128,6 +129,7 @@ INSERT INTO "cart_items" ("id", "cart_id", "product_id", "quantity", "created_at
 ('3f009ec9-b12a-472b-b133-5dd3f3d89af8',	'28bfdec5-27d3-432e-9d75-bb6e45c2c16b',	'9ce63f97-dc12-4510-9eec-d44d7ee3d547',	1,	'2024-11-18 06:38:25.427656',	'2024-11-18 06:38:25.427656',	1),
 ('581ae7de-1fb2-4ae9-915f-9ef8b73b56fb',	'28bfdec5-27d3-432e-9d75-bb6e45c2c16b',	'72b983b9-8267-44e5-8269-862561258c31',	2,	'2024-11-18 06:38:16.30949',	'2024-11-18 06:38:26.179446',	1),
 ('8a587dfb-2eb8-4994-a35d-f083f2044a65',	'28bfdec5-27d3-432e-9d75-bb6e45c2c16b',	'27f381af-0752-40e6-9825-5cfaa92d5e77',	28,	'2024-11-14 16:56:27.052956',	'2024-11-14 17:00:46.722165',	0),
+('32dc4c3f-2b71-4377-97fc-84d04289666c',	'949c82a0-8c81-4876-aa8e-1145d11c83e9',	'27f381af-0752-40e6-9825-5cfaa92d5e77',	1,	'2024-11-20 03:36:25.927952',	'2024-11-20 03:36:25.927952',	1),
 ('02bd0130-c005-4303-9898-5a0f58987773',	'28bfdec5-27d3-432e-9d75-bb6e45c2c16b',	'27f381af-0752-40e6-9825-5cfaa92d5e77',	1,	'2024-11-14 17:02:29.122718',	'2024-11-14 17:09:17.027214',	0),
 ('d85494ae-c7b8-4345-b195-533ba67f8b4e',	'949c82a0-8c81-4876-aa8e-1145d11c83e9',	'27f381af-0752-40e6-9825-5cfaa92d5e77',	1,	'2024-11-15 00:24:09.975555',	'2024-11-15 00:24:19.735165',	0),
 ('bd1b8abc-51e3-4987-b754-367e53605634',	'949c82a0-8c81-4876-aa8e-1145d11c83e9',	'8bede882-3d39-430d-ad0a-75658fb3c7ce',	1,	'2024-11-14 23:53:52.845821',	'2024-11-15 00:01:34.327105',	0),
@@ -196,12 +198,12 @@ CREATE TABLE "public"."coupons" (
     "id" uuid DEFAULT gen_random_uuid() NOT NULL,
     "code" character varying(50) NOT NULL,
     "discount_type" character varying(20) NOT NULL,
-    "discount_value" numeric(10,2) NOT NULL,
+    "discount_value" character varying(20) NOT NULL,
     "start_date" date,
     "end_date" date,
-    "min_purchase_amount" numeric(10,2),
+    "min_purchase_amount" character varying(20),
     "max_usage" integer,
-    "max_discount_value" numeric(10,2),
+    "max_discount_value" character varying(20),
     "is_active" boolean DEFAULT true,
     "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
     "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
@@ -227,8 +229,9 @@ CREATE INDEX "idx_coupons_status" ON "public"."coupons" USING btree ("status");
 CREATE INDEX "idx_coupons_updated_at" ON "public"."coupons" USING btree ("updated_at");
 
 INSERT INTO "coupons" ("id", "code", "discount_type", "discount_value", "start_date", "end_date", "min_purchase_amount", "max_usage", "max_discount_value", "is_active", "created_at", "updated_at", "status") VALUES
-('11273d02-d22e-4882-9065-0514a86cc721',	'NEWBIE',	'percentage',	20.00,	'2024-11-12',	'2024-11-30',	2000000.00,	2,	200000.00,	't',	'2024-11-13 11:47:52.120655',	'2024-11-13 11:47:52.120655',	1),
-('f5ae55b6-310a-4795-a364-e1e266cb2fd3',	'Giam10K',	'fixed_amount',	1000.00,	'2024-11-19',	'2024-11-30',	100000.00,	10000,	10000.00,	't',	'2024-11-19 14:49:27.461398',	'2024-11-19 14:49:27.461398',	1);
+('f5ae55b6-310a-4795-a364-e1e266cb2fd3',	'Giam10K',	'fixed_amount',	'1000',	'2024-11-19',	'2024-11-30',	'100000',	10000,	'10000',	't',	'2024-11-19 14:49:27.461398',	'2024-11-19 14:49:27.461398',	1),
+('11273d02-d22e-4882-9065-0514a86cc721',	'NEWBIE',	'percentage',	'20',	'2024-11-12',	'2024-11-30',	'2000000',	2,	'200000',	't',	'2024-11-13 11:47:52.120655',	'2024-11-13 11:47:52.120655',	1),
+('78a03520-2b22-428f-b794-8094e197cf60',	'Giam20K',	'fixed_amount',	'20000',	'2024-11-20',	'2024-11-30',	'200000',	20000,	'20000',	't',	'2024-11-20 03:48:15.454298',	'2024-11-20 03:48:15.454298',	1);
 
 DROP TABLE IF EXISTS "cpus";
 CREATE TABLE "public"."cpus" (
@@ -1176,7 +1179,6 @@ INSERT INTO "images" ("id", "url", "alt_text", "created_at", "updated_at", "stat
 ('a59bf196-f665-496b-a67d-c74c50dd63e5',	'https://utfs.io/f/htZOn3gdgqGN6O3yYKhiGmgLUXFDC6Iw9ZThno8RNHv7ka0W',	'ictus_16_80w_micasilver_nt_hdcam_nonfpr_nonodd_victusamd_coreset_front_98a4a444dccf4c959645368c89bddf69_grande.png',	'2024-11-11 16:49:46.666686',	'2024-11-11 16:49:46.666686',	1),
 ('e0fe2019-c705-4970-a9e1-7ea5806d3d55',	'https://utfs.io/f/htZOn3gdgqGNFVslBwNOfwWRvdVqkLXHP2eznSi6KgMZbI81',	'4.png',	'2024-11-13 08:24:17.665924',	'2024-11-13 08:24:47.071612',	-2);
 
-
 DROP TABLE IF EXISTS "order_items";
 CREATE TABLE "public"."order_items" (
     "id" uuid DEFAULT gen_random_uuid() NOT NULL,
@@ -1677,7 +1679,6 @@ INSERT INTO "products" ("id", "name", "slug", "price", "description", "specifica
 ('e8ccf343-ebbe-4a16-a135-913ea7f6e039',	'Sản phẩm ',	'san-pham',	'14990000',	'<p>sfsd</p>',	NULL,	11111109,	'8bf0ed30-56b9-4932-82b4-d981c5014b0d',	'2024-11-15 08:43:23.345811',	'2024-11-18 09:08:24.691244',	1),
 ('72b983b9-8267-44e5-8269-862561258c31',	'HP VICTUS 16-r0129TX 8C5N4PA',	'hp-victus-16-r0129tx-8c5n4pa',	'29900000',	'<h2 class="ql-align-justify"><strong>Đánh giá chi tiết laptop gaming&nbsp;HP VICTUS 16-r0129TX 8C5N4PA</strong></h2><p class="ql-align-justify"><strong>Laptop gaming HP VICTUS 16-r0129TX 8C5N4PA</strong>&nbsp;là một sự lựa chọn tốt cho những game thủ đang tìm kiếm một chiếc&nbsp;<a href="https://gearvn.com/collections/laptop" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">laptop</a>&nbsp;xách tay mạnh mẽ với hiệu suất ổn định và giá cả hợp lý và&nbsp;ưu điểm về màn hình lớn 16 inch.&nbsp;Dưới đây&nbsp;<a href="https://gearvn.com/" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">GEARVN</a>&nbsp;giới thiệu đến bạn&nbsp;một số thông tin chi tiết về sản phẩm này.</p><p class="ql-align-center"><img src="https://product.hstatic.net/200000722513/product/khung-laptop-23_339c9e6bca2e43d095a928ff49b26b6d_grande.png"></p><h3 class="ql-align-justify"><strong>Thiết kế sang trọng, tinh tế</strong></h3><p>HP VICTUS 16-r0129TX 8C5N4PA là 1 chiếc&nbsp;<a href="https://gearvn.com/pages/laptop-gaming" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">laptop gaming</a>&nbsp;được thiết kế với trọng lượng vô cùng lý tưởng&nbsp;<strong>2.3kg</strong>&nbsp;và độ dày chỉ có&nbsp;<strong>23.9mm</strong>, chiếc laptop này thực sự là một người bạn đồng hành lý tưởng cho những ai thích di dộng. Với trọng lượng vừa phải, tạo nên cảm giác thoải mái cho người dùng khi mang theo, tạo điều kiện linh hoạt cho người sử dụng ở nhiều địa điểm khác nhau.</p><p>&nbsp;</p><p class="ql-align-center"><img src="https://file.hstatic.net/200000722513/file/52399_laptop_hp_gaming_victus_16_s0078ax_2_b09dccaa11db4756b67e86f1cb6a7cbf_grande.jpg"></p><h3><strong>Hiệu năng mạnh mẽ từ chip Intel</strong></h3><p>HP VICTUS 16-r0129TX 8C5N4PA được trang bị&nbsp;<a href="https://gearvn.com/collections/cpu-bo-vi-xu-ly?hang=intel" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">CPU&nbsp;Intel</a>&nbsp;Core&nbsp;<strong>i7-13700H</strong>, hỗ trợ tốc độ tối đa lên đến&nbsp;<strong>5.0GHz</strong>,&nbsp;<a href="https://gearvn.com/collections/vga-card-man-hinh" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">card đồ họa</a>&nbsp;<strong>NVIDIA® GeForce RTX™ 3050 6GB GDDR6</strong>&nbsp;kết hợp&nbsp;<strong>16GB</strong>&nbsp;<a href="https://gearvn.com/collections/ram-laptop" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">RAM</a>&nbsp;có thể đáp ứng chơi mượt các tựa game esport và AAA nặng&nbsp;ở mức cài đặt khá, không quá cao.&nbsp;Ổ cứng&nbsp;<a href="https://gearvn.com/collections/day-cap-hdmi" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">SSD</a>&nbsp;<strong>512GB NVMe PCIe</strong>&nbsp;tốc độ cao giúp khởi động máy, load game và ứng dụng nhanh chóng.</p><p class="ql-align-center"><img src="https://product.hstatic.net/200000722513/product/victus-16-s0078ax-8c5n7pa-r5-7640hs_1_bbf8ff87056f48bf9310a4a2609e1ffe_bb9c35f3801843a8866f910106d6d3f8_grande.png"></p><h3><strong>Màn hình kích thước lớn</strong></h3><p>HP VICTUS 16-r0129TX 8C5N4PA được trang bị&nbsp;<a href="https://gearvn.com/pages/man-hinh" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">màn hình</a>&nbsp;<strong>16 inch</strong>&nbsp;<a href="https://gearvn.com/collections/do-phan-giai-full-hd-1080p" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">Full HD</a>&nbsp;<strong>(1920 x 1080) IPS</strong>&nbsp;cung cấp không gian lớn cho trải nghiệm game sắc nét, chân thực. Công nghệ chống&nbsp;chói kết hợp tần số quét&nbsp;<a href="https://gearvn.com/collections/man-hinh-144hz" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">144Hz</a>&nbsp;cho ra độ phân giải cao và khả năng tái tạo màu sắc tuyệt vời. Độ sáng&nbsp;<strong>250 nits</strong>&nbsp;giúp bạn dễ dàng sử dụng máy ở nhiều điều kiện môi trường ánh sáng khác nhau.</p><p class="ql-align-center"><img src="https://product.hstatic.net/200000722513/product/victus-16-s0078ax-8c5n7pa-r5-7640hs_2_a2117f21f3124c3297286e75f974eb4e_7980ad39136b43f187b169439e580140_grande.png"></p><p><br></p>',	NULL,	9988,	'7adede1b-ba6b-4097-ba35-0e6edca6122b',	'2024-11-13 11:06:42.228792',	'2024-11-19 14:44:37.100313',	1),
 ('f08b023b-adc3-4604-8742-acdf30ce585e',	'ASUS Vivobook 15 OLED A1505VA MA468W',	'asus-vivobook-15-oled-a1505va-ma468w',	'17990000',	'<h2 class="ql-align-justify"><strong>Đánh giá chi tiết laptop Asus Vivobook 15&nbsp;OLED A1505VA L1114W</strong></h2><p class="ql-align-justify"><a href="https://gearvn.com/collections/laptop-asus-vivobook-series" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">Asus Vivobook</a>&nbsp;15&nbsp;OLED A1505VA L1114W mang lại trải nghiệm hình ảnh tốt hơn với trang bị màn hình OLED. Thiết kế mỏng nhẹ cùng cấu hình mạnh mẽ cho phép người dùng nâng cao hiệu suất khi làm việc.</p><p class="ql-align-center"><img src="https://product.hstatic.net/200000722513/product/ava_cc377fa319f54e5884151ee493e0f2c1_large.png"></p><h3 class="ql-align-justify"><strong>Thiết kế sang trọng, độc đáo</strong></h3><p class="ql-align-justify">Laptop Asus Vivobook 15&nbsp;OLED sở hữu một màu đen sang trọng với thiết kế vuông vắn đầy tinh tế. Bản lề được thiết kế tự tạo một góc nghiêng vừa phải khi mở nắp máy tính lên. Trọng lượng nhẹ khoảng 1.7kg với bề dày máy tính là 1.99cm tạo điều kiện hơn cho người dùng bỏ vào balo và mang vác đi bất cứ đâu.</p><p class="ql-align-center"><img src="https://file.hstatic.net/1000026716/file/gearvn-laptop-asus-vivobook-15x-oled-a1505va-l1114w-5_8300cc128b0d43889a184733364a7ae7.png"></p><h3 class="ql-align-justify"><strong>Cấu hình vượt trội</strong></h3><p class="ql-align-justify">Sử dụng CPU Intel core i5-13500H thế hệ 13 mạnh mẽ cho phép Asus OLED Vivobook 15&nbsp;OLED giải quyết mọi tác vụ văn phòng cơ bản đến nâng cao. Việc làm đồ họa cơ bản trên máy cũng được hỗ trợ với VGA tích hợp&nbsp;<a href="https://gearvn.com/blogs/thu-thuat-giai-dap/intel-iris-xe-graphics-la-gi" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">Intel® Iris Xe Graphics</a>. 16GB RAM DDR4 xử lý đa nhiệm nhanh chóng cho những thao tác mượt mà. Bộ lưu trữ 512GB thỏa sức lưu trữ các dữ liệu quan trọng mà người dùng cần.</p><p class="ql-align-center"><img src="https://file.hstatic.net/1000026716/file/gearvn-laptop-asus-vivobook-15x-oled-a1505va-l1114w-3_1a7d5544b1ea49b1ad35fbc7060fb05f.png"></p><p class="ql-align-justify">&nbsp;</p><h3 class="ql-align-justify"><strong>Hệ thống tản nhiệt hiệu quả trên Asus Vivobook 15&nbsp;OLED A1505VA L1114W</strong></h3><p class="ql-align-justify">Để duy trì mọi hoạt động và công suất làm việc từ các linh kiện một cách tốt nhất nhà Asus đã trang bị thêm hệ thống tản nhiệt trên laptop Asus Vivobook 15&nbsp;OLED. Công nghệ tản nhiệt Asus IceCool hiệu quả khi sử dụng 6 ống dẫn nhiệt và bộ quạt IceBlade 87 cánh được làm bằng Polyme tinh thể lỏng cao cấp. Tất cả góp phần trong việc dẫn các khí nóng được sản sinh trong quá trình vận hành máy từ các linh kiện bên trong thân máy. Từ đó tối ưu hóa công việc một cách trơn tru và mượt mà nhất cho người dùng.</p><p class="ql-align-center"><img src="https://file.hstatic.net/1000026716/file/gearvn-laptop-asus-vivobook-15x-oled-a1505va-l1114w-7_043a2b1ae151414d81408f0ac4bb0af4.png"></p><h3 class="ql-align-justify"><strong>Chất lượng hình ảnh chân thực</strong></h3><p class="ql-align-justify">Asus Vivobook 15&nbsp;sở hữu màn hình OLED&nbsp;<a href="https://gearvn.com/collections/do-phan-giai-full-hd-1080p" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">Full HD</a>&nbsp;với độ phân giải 1920 x 1080. Tỷ lệ màn hình 16:9 cùng thiết kế viền mỏng mở ra tầm nhìn thoải mái hơn trên một sản phẩm laptop mỏng nhẹ. Độ sáng 600 nits hỗ trợ hình ảnh hiển thị luôn tốt trong nhiều điều kiện ánh sáng. Vivobook 15&nbsp;OLED đạt chuẩn PANTONE Validated và dải màu&nbsp;<a href="https://gearvn.com/blogs/thu-thuat-giai-dap/dci-p3-la-gi" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">DCI-P3</a>&nbsp;100% mang lại độ chính xác về màu sắc cao. Trải nghiệm xem phim hay chiến những tựa game chân thực đến từng chi tiết.&nbsp;</p><p class="ql-align-center"><img src="https://file.hstatic.net/1000026716/file/gearvn-laptop-asus-vivobook-15x-oled-a1505va-l1114w-2_7d5124bd14c74402b494fb96094e9970.png"></p><h3 class="ql-align-justify"><strong>Bàn phím và bảo mật</strong></h3><p class="ql-align-justify">Đây có lẽ là sản phẩm&nbsp;<a href="https://gearvn.com/collections/laptop-hoc-sinh-sinh-vien" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">laptop cho sinh viên</a>&nbsp;hoàn hảo với thiết kế bàn phím thoải mái. Hành trình phím sâu với đầy đủ các phím để việc gõ máy trên Asus Vivobook 15 OLED thuận lợi không khác gì những dòng&nbsp;<a href="https://gearvn.com/pages/ban-phim-may-tinh" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(66, 139, 202);">bàn phím cơ</a>&nbsp;rời có trên thị trường. Cảm biến vân tay được tích hợp với bàn di chuột trải nghiệm mở máy nhanh hơn chỉ với 1 chạm.</p><p class="ql-align-center"><img src="https://file.hstatic.net/1000026716/file/gearvn-laptop-asus-vivobook-15x-oled-a1505va-l1114w-4_f688a5fafed04e4c8bd53f7315b0de2d.png"></p>',	NULL,	96,	'c0fef1c4-19cd-4967-bf81-9fd93ebc98b9',	'2024-11-14 17:13:27.971249',	'2024-11-19 15:58:02.164942',	1);
-
 
 DROP TABLE IF EXISTS "provinces";
 DROP SEQUENCE IF EXISTS provinces_id_seq1;
@@ -2367,6 +2368,26 @@ INSERT INTO "tags" ("id", "name", "created_at", "updated_at", "status") VALUES
 ('bfdc34f3-0c17-4bd8-bb77-95434f81d036',	'mỏng nhẹ',	'2024-11-13 10:51:09.828254',	'2024-11-13 10:51:09.828254',	1),
 ('75194ec7-334c-4b78-9c15-b9e9cafc1551',	'sinh viên',	'2024-11-13 10:51:16.681635',	'2024-11-13 10:51:16.681635',	1),
 ('1bf4e55d-e390-4eab-ae51-38de5e5464a5',	'đồ họa',	'2024-11-13 10:51:22.825171',	'2024-11-13 10:51:22.825171',	1);
+
+DROP TABLE IF EXISTS "user_coupons";
+CREATE TABLE "public"."user_coupons" (
+    "id" uuid DEFAULT gen_random_uuid() NOT NULL,
+    "user_id" uuid NOT NULL,
+    "coupon_id" uuid NOT NULL,
+    "is_used" boolean DEFAULT false,
+    "used_at" timestamp,
+    "status" integer DEFAULT '1' NOT NULL,
+    "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "user_coupons_pkey" PRIMARY KEY ("id")
+) WITH (oids = false);
+
+CREATE INDEX "idx_user_coupons_coupon_id" ON "public"."user_coupons" USING btree ("coupon_id");
+
+CREATE INDEX "idx_user_coupons_status" ON "public"."user_coupons" USING btree ("status");
+
+CREATE INDEX "idx_user_coupons_user_id" ON "public"."user_coupons" USING btree ("user_id");
+
 
 DROP TABLE IF EXISTS "user_delivery_addresses";
 CREATE TABLE "public"."user_delivery_addresses" (
@@ -13108,4 +13129,4 @@ ALTER TABLE ONLY "public"."users" ADD CONSTRAINT "users_role_id_fkey" FOREIGN KE
 
 ALTER TABLE ONLY "public"."wishlist" ADD CONSTRAINT "wishlist_product_id_fkey" FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE NOT DEFERRABLE;
 
--- 2024-11-19 16:03:27.211398+00
+-- 2024-11-20 03:58:19.801692+00

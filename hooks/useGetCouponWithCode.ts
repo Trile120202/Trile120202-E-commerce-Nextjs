@@ -33,7 +33,7 @@ export const useGetCouponWithCode = (code: string) => {
 
       setIsLoading(true);
       try {
-        const response = await fetch(`/api/coupons/${code}`);
+        const response = await fetch(`/api/coupons/code/${code}`);
         const result: CouponResponse = await response.json();
         setData(result.data);
       } catch (err) {

@@ -15,7 +15,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (req.method === 'GET') {
         try {
             const coupon = await db('coupons')
-                .where('code', id)
+                .where('id', id)
                 .whereNot('status', -2)
                 .first();
 

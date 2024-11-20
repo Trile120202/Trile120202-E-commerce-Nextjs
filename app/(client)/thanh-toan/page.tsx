@@ -211,7 +211,7 @@ const Page = () => {
 
         setIsLoadingCoupon(true);
         try {
-            const response = await fetch(`/api/coupons/${promoCode}`);
+            const response = await fetch(`/api/coupons/code/${promoCode}`);
             const data = await response.json();
             
             if (data && data.status === 200) {

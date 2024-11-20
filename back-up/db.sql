@@ -40,6 +40,7 @@ DROP TABLE IF EXISTS provinces CASCADE;
 DROP TABLE IF EXISTS payment_methods CASCADE;
 DROP TABLE IF EXISTS user_delivery_addresses CASCADE;
 DROP TABLE IF EXISTS delivery_addresses CASCADE;
+DROP TABLE IF EXISTS user_coupons CASCADE;
 
 DROP FUNCTION IF EXISTS update_modified_column() CASCADE;
 
@@ -315,17 +316,18 @@ CREATE TABLE coupons
     id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     code                VARCHAR(50) UNIQUE                                                  NOT NULL,
     discount_type       VARCHAR(20) CHECK (discount_type IN ('percentage', 'fixed_amount')) NOT NULL,
-    discount_value      DECIMAL(10, 2)                                                      NOT NULL,
+    discount_value      VARCHAR(20)                                                      NOT NULL,
     start_date          DATE,
     end_date            DATE,
-    min_purchase_amount DECIMAL(10, 2),
+    min_purchase_amount VARCHAR(20),
     max_usage           INT,
-    max_discount_value  DECIMAL(10, 2),
+    max_discount_value  VARCHAR(20),
     is_active           BOOLEAN DEFAULT TRUE,
     created_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     status              INT     DEFAULT 1
 );
+
 
 CREATE INDEX idx_coupons_code ON coupons (code);
 CREATE INDEX idx_coupons_discount_type ON coupons (discount_type);
@@ -744,6 +746,28 @@ CREATE TABLE delivery_addresses
     created_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE user_coupons (
+    id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id          UUID NOT NULL,
+    coupon_id       UUID NOT NULL,
+    is_used          BOOLEAN DEFAULT FALSE,
+    used_at          TIMESTAMP,
+    status           INT NOT NULL DEFAULT 1,
+    created_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TRIGGER update_user_coupons_modtime
+    BEFORE UPDATE
+    ON user_coupons
+    FOR EACH ROW
+EXECUTE FUNCTION update_modified_column();
+
+CREATE INDEX idx_user_coupons_user_id ON user_coupons(user_id);
+CREATE INDEX idx_user_coupons_coupon_id ON user_coupons(coupon_id);
+CREATE INDEX idx_user_coupons_status ON user_coupons(status);
+
 
 
 CREATE OR REPLACE FUNCTION update_modified_column()
