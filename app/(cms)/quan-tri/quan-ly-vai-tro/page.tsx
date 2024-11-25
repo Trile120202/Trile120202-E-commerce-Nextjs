@@ -24,9 +24,10 @@ import {
 import { Card, CardHeader, CardTitle } from "@/components/ui/card"
 import useApi from '@/lib/useApi';
 import DataTable from "@/components/custom/datatable";
+import { useToast } from '@/hooks/use-toast';
 
 interface Role {
-    id: number;
+    id: string;
     name: string;
     description: string;
     created_at: string;
@@ -49,12 +50,17 @@ interface ApiResponse {
 }
 
 const Page = () => {
+    const PROTECTED_ROLE_IDS = [
+        '550e8400-e29b-41d4-a716-446655440000',
+        '550e8400-e29b-41d4-a716-446655440001'
+    ];
+    
     const router = useRouter();
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedStatus, setSelectedStatus] = useState<string>('all');
     const [searchKeyword, setSearchKeyword] = useState<string>('');
     const [limit, setLimit] = useState<number>(10);
-
+    const { toast } = useToast();
     const { data, loading, error, fetchData } = useApi<ApiResponse>(
         `/api/role?page=${currentPage}&limit=${limit}&search=${searchKeyword}${selectedStatus !== 'all' ? `&status=${selectedStatus}` : ''}`,
         {
@@ -70,11 +76,27 @@ const Page = () => {
         setCurrentPage(page);
     };
 
-    const handleEdit = (id: number) => {
+    const handleEdit = (id: string) => {
+        if (PROTECTED_ROLE_IDS.includes(id)) {
+            toast({
+                title: 'Không thể sửa vai trò bảo mật',
+                description: 'Vai trò bảo mật không thể sửa được',
+                variant: 'destructive',
+            });
+            return;
+        }
         router.push(`/quan-tri/quan-ly-vai-tro/${id}`);
     };
 
-    const handleDelete = (id: number) => {
+    const handleDelete = (id: string) => {
+        if (PROTECTED_ROLE_IDS.includes(id)) {
+            toast({
+                title: 'Không thể xóa vai trò bảo mật',
+                description: 'Vai trò bảo mật không thể xóa được',
+                variant: 'destructive',
+            });
+            return;
+        }
         console.log(`Delete role with id: ${id}`);
     };
 
