@@ -10,6 +10,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import Image from 'next/image';
 import { OrderStatus } from '@/lib/orderStatus';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 
 interface OrderItem {
     id: number;
@@ -43,6 +53,10 @@ const Page = ({ params }: { params: { id: string } }) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [orderData, setOrderData] = useState<OrderData | null>(null);
+    const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+    const [pendingStatus, setPendingStatus] = useState<string | null>(null);
+    const [selectedStatus, setSelectedStatus] = useState<string>('');
+    const [hasChanges, setHasChanges] = useState(false);
 
     useEffect(() => {
         const fetchOrderData = async () => {
@@ -51,6 +65,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                 const result = await response.json();
                 if (response.ok) {
                     setOrderData(result.data);
+                    setSelectedStatus(result.data.status.toString());
                 } else {
                     setError(result.message);
                 }
@@ -62,7 +77,19 @@ const Page = ({ params }: { params: { id: string } }) => {
         fetchOrderData();
     }, [params.id]);
 
-    const handleStatusChange = async (status: string) => {
+    const handleStatusChange = (status: string) => {
+        setSelectedStatus(status);
+        setHasChanges(true);
+    };
+
+    const handleSave = () => {
+        setPendingStatus(selectedStatus);
+        setShowConfirmDialog(true);
+    };
+
+    const confirmStatusChange = async () => {
+        if (!pendingStatus) return;
+        
         setLoading(true);
         try {
             const response = await fetch('/api/orders/change-status', {
@@ -72,7 +99,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                 },
                 body: JSON.stringify({
                     orderId: params.id,
-                    status: parseInt(status)
+                    status: parseInt(pendingStatus)
                 }),
             });
 
@@ -81,11 +108,14 @@ const Page = ({ params }: { params: { id: string } }) => {
                 throw new Error(data.message);
             }
 
-            setOrderData(prev => prev ? {...prev, status: parseInt(status)} : null);
+            setOrderData(prev => prev ? {...prev, status: parseInt(pendingStatus)} : null);
+            setHasChanges(false);
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Có lỗi xảy ra khi cập nhật trạng thái');
         } finally {
             setLoading(false);
+            setShowConfirmDialog(false);
+            setPendingStatus(null);
         }
     };
 
@@ -103,6 +133,21 @@ const Page = ({ params }: { params: { id: string } }) => {
 
     return (
         <div className="container mx-auto p-6">
+            <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Xác nhận thay đổi trạng thái</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Bạn có chắc chắn muốn thay đổi trạng thái đơn hàng này?
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Hủy</AlertDialogCancel>
+                        <AlertDialogAction onClick={confirmStatusChange}>Xác nhận</AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+
             <Card>
                 <CardHeader>
                     <CardTitle>Chi tiết đơn hàng #{params.id}</CardTitle>
@@ -118,9 +163,9 @@ const Page = ({ params }: { params: { id: string } }) => {
                         <div className="flex items-center space-x-4">
                             <Label className="min-w-[150px]">Trạng thái:</Label>
                             <Select
-                                defaultValue={orderData.status.toString()}
+                                value={selectedStatus}
                                 onValueChange={handleStatusChange}
-                                disabled={loading}
+                                disabled={loading || orderData.status === 9}
                             >
                                 <SelectTrigger className="w-[200px]">
                                     <SelectValue />
@@ -129,14 +174,19 @@ const Page = ({ params }: { params: { id: string } }) => {
                                     <SelectItem value="1">Đang chờ</SelectItem>
                                     <SelectItem value="2">Đang xử lý</SelectItem>
                                     <SelectItem value="3">Đang giao hàng</SelectItem>
-                                    <SelectItem value="4">Đã giao hàng</SelectItem>
                                     <SelectItem value="5">Đã hủy</SelectItem>
                                     <SelectItem value="6">Đang trả hàng</SelectItem>
-                                    <SelectItem value="7">Trả hàng thành công</SelectItem>
-                                    <SelectItem value="8">Trả hàng thất bại</SelectItem>
                                     <SelectItem value="9">Thành công</SelectItem>
                                 </SelectContent>
                             </Select>
+                            {hasChanges && (
+                                <Button 
+                                    onClick={handleSave}
+                                    disabled={loading}
+                                >
+                                    Lưu thay đổi
+                                </Button>
+                            )}
                         </div>
 
                         <div className="space-y-4">

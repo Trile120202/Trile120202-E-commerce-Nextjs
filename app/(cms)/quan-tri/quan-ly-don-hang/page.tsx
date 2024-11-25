@@ -202,13 +202,13 @@ const Page = () => {
     return (
         <Card className="w-full shadow-lg">
             <CardHeader className="bg-gradient-to-r from-blue-500 to-purple-600 text-white">
-                <div className="flex justify-between items-center">
+                {/* <div className="flex justify-between items-center">
                     <CardTitle className="text-2xl font-bold">Quản lý đơn hàng</CardTitle>
                     <Button onClick={handleCreate} className="bg-green-500 hover:bg-green-600 transition duration-300">
                         <FaPlus className="mr-2 h-4 w-4" />
                         Tạo mới
                     </Button>
-                </div>
+                </div> */}
             </CardHeader>
             <CardContent className="pt-6">
                 <div className="flex space-x-4 mb-6">
@@ -222,11 +222,7 @@ const Page = () => {
                                 <SelectItem value="1">Chờ xác nhận</SelectItem>
                                 <SelectItem value="2">Đang xử lý</SelectItem>
                                 <SelectItem value="3">Đang giao hàng</SelectItem>
-                                <SelectItem value="4">Đã giao hàng</SelectItem>
                                 <SelectItem value="5">Đã hủy</SelectItem>
-                                <SelectItem value="6">Đang hoàn trả</SelectItem>
-                                <SelectItem value="7">Hoàn trả thành công</SelectItem>
-                                <SelectItem value="8">Hoàn trả thất bại</SelectItem>
                                 <SelectItem value="9">Thành công</SelectItem>
                             </SelectContent>
                         </Select>

@@ -26,6 +26,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             let maxPrice = parseInt(req.query.maxPrice as string) || Number.MAX_SAFE_INTEGER;
             const categoryId = req.query.categoryId as string;
             let type = req.query.type as string;
+            const status = parseInt(req.query.status as string);
 
             if (maxPrice === 100000000) {
                 maxPrice = Number.MAX_SAFE_INTEGER;
@@ -51,6 +52,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 .leftJoin('graphics_cards as gc', 'pgc.graphics_card_id', 'gc.id')
                 .leftJoin('order_items as oi', 'p.id', 'oi.product_id')
                 .whereNot('p.status', -2)
+                .modify(function(queryBuilder) {
+                    if (typeof status !== 'undefined' && !isNaN(status)) {
+                        queryBuilder.where('p.status', status);
+                    }
+                })
                 .whereBetween('p.price', [minPrice, maxPrice])
                 .select(
                     'p.id AS product_id',

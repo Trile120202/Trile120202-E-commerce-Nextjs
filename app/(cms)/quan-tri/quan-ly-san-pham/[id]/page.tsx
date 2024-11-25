@@ -48,7 +48,7 @@ const formSchema = z.object({
     stock_quantity: z.string()
         .trim()
         .min(1, "Số lượng tồn kho không được để trống")
-        .refine((val) => parseInt(val) >= 1, "Số lượng tồn kho phải từ 1 trở lên"),
+        .refine((val) => parseInt(val) >= 0, "Số lượng tồn kho phải từ 0 trở lên"),
     description: z.string()
         .trim()
         .min(1, "Mô tả không được để trống"),

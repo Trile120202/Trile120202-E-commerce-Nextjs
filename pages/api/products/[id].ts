@@ -123,7 +123,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
             const { name, price, stock_quantity, description, specifications, categories, status, thumbnail_id, images, ram_ids, storage_ids, tag_ids, display_ids, cpu_ids, graphics_card_ids } = req.body;
 
-            if (!name || !price || !stock_quantity || !description || !categories || !thumbnail_id || !images) {
+            if (!name || !price || stock_quantity<0 || !description || !categories || !thumbnail_id || !images) {
                 return res.status(StatusCode.BAD_REQUEST).json(transformResponse({
                     data: null,
                     message: 'Required fields are missing.',

@@ -223,24 +223,8 @@ export default function CMSPage() {
                                 <span>{dashboardData.orders.shippingOrders}</span>
                             </div>
                             <div className="flex justify-between">
-                                <span>Đã giao:</span>
-                                <span>{dashboardData.orders.deliveredOrders}</span>
-                            </div>
-                            <div className="flex justify-between">
                                 <span>Đã hủy:</span>
                                 <span>{dashboardData.orders.cancelledOrders}</span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span>Yêu cầu hoàn tiền:</span>
-                                <span>{dashboardData.orders.refundRequestedOrders}</span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span>Đang hoàn tiền:</span>
-                                <span>{dashboardData.orders.refundingOrders}</span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span>Đã hoàn tiền:</span>
-                                <span>{dashboardData.orders.refundedOrders}</span>
                             </div>
                             <div className="flex justify-between">
                                 <span>Hoàn thành:</span>
