@@ -3,12 +3,13 @@ import React, { useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { motion, useInView, useAnimation } from 'framer-motion';
 import { FaShieldAlt, FaHandshake, FaHeadset, FaMapMarkerAlt } from 'react-icons/fa';
+import {useGetDataSetting} from "@/hooks/useGetDataSetting";
 
 const AnimatedSection: React.FC<{ children: React.ReactNode; delay?: number }> = ({ children, delay = 0 }) => {
     const ref = useRef(null);
     const isInView = useInView(ref, { once: false, margin: "-100px" });
     const controls = useAnimation();
-
+    const { data: contact_address } = useGetDataSetting('contact_address');
     useEffect(() => {
         if (isInView) {
             controls.start({ opacity: 1, y: 0 });
@@ -33,6 +34,8 @@ const Page: React.FC = () => {
     const titleControls = useAnimation();
     const titleRef = useRef(null);
     const isTitleInView = useInView(titleRef, { once: false });
+    const { data: contact_address } = useGetDataSetting('contact_address');
+    const { data: contact_phone } = useGetDataSetting('contact_phone');
 
     useEffect(() => {
         if (isTitleInView) {
@@ -84,7 +87,7 @@ const Page: React.FC = () => {
                             Cam kết của chúng tôi
                         </h2>
                         <ul className="list-disc list-inside text-gray-700">
-                            <li>Sản phẩm chính hãng, chất lượng đảm bảo</li>
+                            <li>Sản phẩm chính hãng, chất lượng đảm b���o</li>
                             <li>Dịch vụ hậu mãi chu đáo</li>
                             <li>Tư vấn chuyên nghiệp, tận tâm</li>
                             <li>Giá cả cạnh tranh</li>
@@ -144,11 +147,11 @@ const Page: React.FC = () => {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <h3 className="font-semibold mb-2">Địa chỉ:</h3>
-                                    <p>123 Đường ABC, Quận XYZ, TP. Hồ Chí Minh</p>
+                                    <p>{contact_address}</p>
                                 </div>
                                 <div>
                                     <h3 className="font-semibold mb-2">Điện thoại:</h3>
-                                    <p>0123 456 789</p>
+                                    <p>{contact_phone}</p>
                                 </div>
                             </div>
                         </div>

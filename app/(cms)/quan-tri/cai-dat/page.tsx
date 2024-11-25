@@ -43,6 +43,8 @@ const Page = () => {
         contact_email: '',
         contact_phone: '',
         contact_address: '',
+        contact_time: '',
+        contact_map_url: '',
         social_facebook: '',
         social_instagram: '',
         social_twitter: '',
@@ -260,6 +262,26 @@ const Page = () => {
                                         value={settings.contact_address}
                                         onChange={(e) => handleInputChange('contact_address', e.target.value)}
                                         placeholder="Nhập địa chỉ" 
+                                        className="mt-2 p-3" 
+                                    />
+                                </div>
+                                <div>
+                                    <Label htmlFor="contact_time" className="text-lg text-gray-700">Thời gian làm việc</Label>
+                                    <Input 
+                                        id="contact_time"
+                                        value={settings.contact_time}
+                                        onChange={(e) => handleInputChange('contact_time', e.target.value)}
+                                        placeholder="Nhập thời gian làm việc" 
+                                        className="mt-2 p-3" 
+                                    />
+                                </div>
+                                <div>
+                                    <Label htmlFor="contact_map_url" className="text-lg text-gray-700">URL bản đồ</Label>
+                                    <Input 
+                                        id="contact_map_url"
+                                        value={settings.contact_map_url}
+                                        onChange={(e) => handleInputChange('contact_map_url', e.target.value)}
+                                        placeholder="Nhập URL bản đồ" 
                                         className="mt-2 p-3" 
                                     />
                                 </div>

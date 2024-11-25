@@ -2,12 +2,19 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { FaEnvelope, FaPhone, FaMapMarkerAlt, FaClock } from 'react-icons/fa';
+import { useGetDataSetting } from '@/hooks/useGetDataSetting';
 
 const ContactPage: React.FC = () => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [subject, setSubject] = useState('');
     const [message, setMessage] = useState('');
+
+    const { data: contact_address } = useGetDataSetting('contact_address');
+    const { data: contact_phone } = useGetDataSetting('contact_phone'); 
+    const { data: contact_email } = useGetDataSetting('contact_email'); 
+    const { data: contact_time } = useGetDataSetting('contact_time');
+    const { data: contact_map_url } = useGetDataSetting('contact_map_url');
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -38,24 +45,24 @@ const ContactPage: React.FC = () => {
                             <div className="space-y-6 mb-8">
                                 <p className="flex items-center">
                                     <FaEnvelope className="mr-4 text-2xl text-yellow-300" />
-                                    <span className="break-all">contact@zshop.com</span>
+                                    {contact_email}
                                 </p>
-                                <p className="flex items-center">
-                                    <FaPhone className="mr-4 text-2xl text-yellow-300" />
-                                    (028) 3456-7890
-                                </p>
+                                    <p className="flex items-center">
+                                        <FaPhone className="mr-4 text-2xl text-yellow-300" />
+                                        {contact_phone}
+                                    </p>
                                 <p className="flex items-start">
                                     <FaMapMarkerAlt className="mr-4 mt-1 text-2xl text-yellow-300 flex-shrink-0" />
-                                    <span>1227 Huỳnh Tấn Phát, Phú Mỹ, Quận 7, TP. Hồ Chí Minh</span>
+                                    {contact_address}
                                 </p>
                                 <p className="flex items-center">
                                     <FaClock className="mr-4 text-2xl text-yellow-300" />
-                                    8:00 - 22:00 (Thứ 2 - Chủ Nhật)
+                                    {contact_time}
                                 </p>
                             </div>
                             <div className="w-full h-64 md:h-80 rounded-lg overflow-hidden mb-8">
                                 <iframe 
-                                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3920.1824747869655!2d106.73416937601239!3d10.720404860222542!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752542eaa64631%3A0x18c3217255a019e5!2zMTIyNyBIdeG7s25oIFThuqVuIFBow6F0LCBQaMO6IE3hu7ksIFF14bqtbiA3LCBI4buTIENow60gTWluaCwgVmnhu4d0IE5hbQ!5e0!3m2!1svi!2s!4v1729412101091!5m2!1svi!2s" 
+                                    src={contact_map_url} 
                                     width="100%" 
                                     height="100%" 
                                     style={{border:0}} 
