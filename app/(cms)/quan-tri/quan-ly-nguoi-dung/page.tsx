@@ -24,9 +24,10 @@ import {
 import { Card, CardHeader, CardTitle } from "@/components/ui/card"
 import useApi from '@/lib/useApi';
 import DataTable from "@/components/custom/datatable";
+import { useToast } from "@/hooks/use-toast";
 
 interface User {
-    id: number;
+    id: string;
     username: string;
     email: string;
     first_name: string;
@@ -53,11 +54,14 @@ interface ApiResponse {
 }
 
 const Page = () => {
+    const PROTECTED_USER_IDS = ['bfece6d4-82d8-46b9-8326-c36b4bbc813d'];
+    
     const router = useRouter();
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedStatus, setSelectedStatus] = useState<string>('all');
     const [searchKeyword, setSearchKeyword] = useState<string>('');
     const [limit, setLimit] = useState<number>(10);
+    const { toast } = useToast();
 
     const { data, loading, error, fetchData } = useApi<ApiResponse>(
         `/api/users?page=${currentPage}&limit=${limit}&search=${searchKeyword}${selectedStatus !== 'all' ? `&status=${selectedStatus}` : ''}`,
@@ -74,11 +78,27 @@ const Page = () => {
         setCurrentPage(page);
     };
 
-    const handleEdit = (id: number) => {
+    const handleEdit = (id: string) => {
+        if (PROTECTED_USER_IDS.includes(id)) {
+            toast({
+                title: "Không thể sửa người dùng này",
+                description: "Người dùng này không thể chỉnh sửa",
+                variant: "destructive",
+            });
+            return;
+        }
         router.push(`/quan-tri/quan-ly-nguoi-dung/${id}`);
     };
 
-    const handleDelete = async (id: number) => {
+    const handleDelete = async (id: string) => {
+        if (PROTECTED_USER_IDS.includes(id)) {
+            toast({
+                title: "Không thể xóa người dùng này",
+                description: "Người dùng này không thể xóa",
+                variant: "destructive",
+            });
+            return;
+        }
         try {
             const response = await fetch('/api/users/update-status', {
                 method: 'PATCH',

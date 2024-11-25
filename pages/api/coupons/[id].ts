@@ -102,7 +102,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     start_date,
                     end_date,
                     min_purchase_amount,
-                    max_usage,
+                    max_usage:1,
                     max_discount_value,
                     is_active,
                     updated_at: db.fn.now(),

@@ -115,7 +115,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 start_date: start_date || null,
                 end_date: end_date || null,
                 min_purchase_amount: min_purchase_amount || null,
-                max_usage: max_usage || null,
+                max_usage: 1,
                 max_discount_value: max_discount_value || null,
                 is_active: is_active ?? true,
                 status: 1,

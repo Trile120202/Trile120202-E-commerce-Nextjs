@@ -44,9 +44,7 @@ const formSchema = z.object({
     min_purchase_amount: z.string()
         .min(1, 'Giá trị đơn hàng tối thiểu không được để trống')
         .refine((val) => !isNaN(Number(val)) && Number(val) > 0, 'Giá trị đơn hàng tối thiểu phải là số dương'),
-    max_usage: z.string()
-        .min(1, 'Số lần sử dụng tối đa không được để trống')
-        .refine((val) => !isNaN(Number(val)) && Number(val) > 0, 'Số lần sử dụng tối đa phải là số dương'),
+    max_usage: z.string().default('1'),
     max_discount_value: z.string()
         .min(1, 'Giá trị giảm tối đa không được để trống')
         .refine((val) => !isNaN(Number(val)) && Number(val) > 0, 'Giá trị giảm tối đa phải là số dương'),
@@ -69,7 +67,7 @@ const Page = ({ params }: { params: { id: string } }) => {
             start_date: '',
             end_date: '',
             min_purchase_amount: '',
-            max_usage: '',
+            max_usage: '1',
             max_discount_value: '',
             is_active: true
         },
@@ -316,7 +314,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                                         )}
                                     />
 
-                                    <FormField
+                                    {/* <FormField
                                         control={form.control}
                                         name="max_usage"
                                         render={({ field }) => (
@@ -333,7 +331,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                                                 <FormMessage />
                                             </FormItem>
                                         )}
-                                    />
+                                    /> */}
 
                                     <FormField
                                         control={form.control}

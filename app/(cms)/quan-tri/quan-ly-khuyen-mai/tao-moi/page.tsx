@@ -47,9 +47,7 @@ const formSchema = z.object({
     min_purchase_amount: z.string()
         .min(1, "Giá trị đơn hàng tối thiểu không được để trống")
         .refine((val) => !isNaN(Number(val)) && Number(val) > 0, "Giá trị đơn hàng tối thiểu phải là số dương"),
-    max_usage: z.string()
-        .min(1, "Số lần sử dụng tối đa không được để trống")
-        .refine((val) => !isNaN(Number(val)) && Number(val) > 0, "Số lần sử dụng tối đa phải là số dương"),
+    max_usage: z.string().default('1')  ,
     max_discount_value: z.string()
         .min(1, "Giá trị giảm tối đa không được để trống")
         .refine((val) => !isNaN(Number(val)) && Number(val) > 0, "Giá trị giảm tối đa phải là số dương"),
@@ -82,7 +80,7 @@ const Page = () => {
                 ...values,
                 discount_value: Number(values.discount_value),
                 min_purchase_amount: Number(values.min_purchase_amount),
-                max_usage: Number(values.max_usage),
+                max_usage: Number(values.max_usage??1),
                 max_discount_value: Number(values.max_discount_value)
             };
 
@@ -251,7 +249,7 @@ const Page = () => {
                                     )}
                                 />
 
-                                <FormField
+                                {/* <FormField
                                     control={form.control}
                                     name="max_usage"
                                     render={({ field }) => (
@@ -268,9 +266,9 @@ const Page = () => {
                                             <FormMessage />
                                         </FormItem>
                                     )}
-                                />
+                                /> */}
 
-                                <FormField
+                                {/* <FormField
                                     control={form.control}
                                     name="is_active"
                                     render={({ field }) => (
@@ -289,7 +287,7 @@ const Page = () => {
                                             </FormControl>
                                         </FormItem>
                                     )}
-                                />
+                                /> */}
                             </div>
 
                             <div className="flex justify-end gap-4 lg:gap-6 pt-6">

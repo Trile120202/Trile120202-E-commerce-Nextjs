@@ -51,6 +51,8 @@ const formSchema = z.object({
     status: z.boolean().default(true)
 });
 
+const PROTECTED_USER_IDS = ['bfece6d4-82d8-46b9-8326-c36b4bbc813d'];
+
 const Page = ({ params }: { params: { id: string } }) => {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
@@ -74,6 +76,16 @@ const Page = ({ params }: { params: { id: string } }) => {
     });
 
     useEffect(() => {
+        if (PROTECTED_USER_IDS.includes(params.id)) {
+            toast({
+                variant: "destructive",
+                title: "Không thể truy cập",
+                description: "Bạn không có quyền truy cập người dùng này",
+            });
+            router.push('/quan-tri/quan-ly-nguoi-dung');
+            return;
+        }
+
         const fetchUser = async () => {
             try {
                 setIsLoading(true);
