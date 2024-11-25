@@ -94,7 +94,7 @@ export default function Home() {
                         viewport={{ once: true }}
                     >
                         <h2 className="text-3xl font-bold text-center mb-12">Sản phẩm mới</h2>
-                        <SectionProductHome endpoint="/api/products" viewAllEndpoint="/api/products" />
+                        <SectionProductHome endpoint="/api/products" viewAllEndpoint="/san-pham" />
                     </motion.div>
                 </div>
             </section>
@@ -109,7 +109,7 @@ export default function Home() {
                         viewport={{ once: true }}
                     >
                         <h2 className="text-3xl font-bold text-center mb-12">Gaming</h2>
-                        <SectionProductHome endpoint="/api/products?type=gaming" viewAllEndpoint="/api/products?type=gaming" />
+                        <SectionProductHome endpoint="/api/products?type=gaming" viewAllEndpoint="/san-pham?type=gaming" />
                     </motion.div>
                 </div>
             </section>
@@ -124,7 +124,7 @@ export default function Home() {
                         viewport={{ once: true }}
                     >
                         <h2 className="text-3xl font-bold text-center mb-12">Sinh viên</h2>
-                        <SectionProductHome endpoint="/api/products?type=sinh-vien" viewAllEndpoint="/api/products?type=sinh-vien" />
+                        <SectionProductHome endpoint="/api/products?type=sinh-vien" viewAllEndpoint="/san-pham?type=sinh-vien" />
                     </motion.div>
                 </div>
             </section>
