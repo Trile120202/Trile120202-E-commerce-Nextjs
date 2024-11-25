@@ -32,6 +32,11 @@ const formSchema = z.object({
     status: z.boolean().default(true)
 });
 
+const PROTECTED_ROLE_IDS = [
+    '550e8400-e29b-41d4-a716-446655440000',
+    '550e8400-e29b-41d4-a716-446655440001'
+];
+
 const Page = ({ params }: { params: { id: string } }) => {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
@@ -59,6 +64,16 @@ const Page = ({ params }: { params: { id: string } }) => {
                     throw new Error(data.message || 'Không thể tải thông tin vai trò');
                 }
 
+                if (PROTECTED_ROLE_IDS.includes(params.id)) {
+                    toast({
+                        variant: "destructive",
+                        title: "Không thể sửa vai trò bảo mật",
+                        description: "Vai trò bảo mật không thể sửa được",
+                    });
+                    router.back();
+                    return;
+                }
+
                 setRole(data.data);
                 form.reset({
                     name: data.data.name,
@@ -80,9 +95,18 @@ const Page = ({ params }: { params: { id: string } }) => {
         if (params.id) {
             fetchRole();
         }
-    }, [params.id, form, toast]);
+    }, [params.id, form, toast, router]);
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
+        if (PROTECTED_ROLE_IDS.includes(params.id)) {
+            toast({
+                variant: "destructive", 
+                title: "Không thể sửa vai trò bảo mật",
+                description: "Vai trò bảo mật không thể sửa được",
+            });
+            return;
+        }
+
         try {
             setLoading(true);
             const response = await fetch(`/api/role/${params.id}`, {
