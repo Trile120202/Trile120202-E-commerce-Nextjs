@@ -40,7 +40,12 @@ const formSchema = z.object({
     start_date: z.string()
         .min(1, 'Ngày bắt đầu không được để trống'),
     end_date: z.string()
-        .min(1, 'Ngày kết thúc không được để trống'),
+        .min(1, 'Ngày kết thúc không được để trống')
+        .refine((end_date, ctx) => {
+            const start = new Date(ctx.parent.start_date);
+            const end = new Date(end_date);
+            return end > start;
+        }, "Ngày kết thúc phải sau ngày bắt đầu"),
     min_purchase_amount: z.string()
         .min(1, 'Giá trị đơn hàng tối thiểu không được để trống')
         .refine((val) => !isNaN(Number(val)) && Number(val) > 0, 'Giá trị đơn hàng tối thiểu phải là số dương'),
@@ -88,8 +93,8 @@ const Page = ({ params }: { params: { id: string } }) => {
                     code: data.data.code,
                     discount_type: data.data.discount_type,
                     discount_value: data.data.discount_value.toString(),
-                    start_date: data.data.start_date?.split('T')[0] || '',
-                    end_date: data.data.end_date?.split('T')[0] || '',
+                    start_date: data.data.start_date?.split(' ')[0] || '',
+                    end_date: data.data.end_date?.split(' ')[0] || '',
                     min_purchase_amount: data.data.min_purchase_amount.toString(),
                     max_usage: data.data.max_usage.toString(),
                     max_discount_value: data.data.max_discount_value.toString(),
@@ -115,18 +120,22 @@ const Page = ({ params }: { params: { id: string } }) => {
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         try {
             setLoading(true);
+            const processedData = {
+                ...values,
+                discount_value: Number(values.discount_value),
+                min_purchase_amount: Number(values.min_purchase_amount),
+                max_usage: Number(values.max_usage??1),
+                max_discount_value: Number(values.max_discount_value),
+                start_date: values.start_date + " 00:00:00",
+                end_date: values.end_date + " 00:00:00"
+            };
+
             const response = await fetch(`/api/coupons/${params.id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    ...values,
-                    discount_value: parseInt(values.discount_value),
-                    min_purchase_amount: parseInt(values.min_purchase_amount),
-                    max_usage: parseInt(values.max_usage),
-                    max_discount_value: parseInt(values.max_discount_value)
-                }),
+                body: JSON.stringify(processedData),
             });
 
             const data = await response.json();
@@ -230,7 +239,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                                                 <FormControl>
                                                     <Input 
                                                         type="number"
-                                                        placeholder="Nhập giá trị giảm"
+                                                        placeholder={form.watch('discount_type') === 'percentage' ? 'Nhập phần trăm giảm' : 'Nhập số tiền giảm'}
                                                         {...field}
                                                         className="focus:ring-2 h-10 lg:h-12 text-base lg:text-lg"
                                                     />
@@ -286,6 +295,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                                                 <FormControl>
                                                     <Input 
                                                         type="date"
+                                                        min={form.watch('start_date')}
                                                         {...field}
                                                         className="focus:ring-2 h-10 lg:h-12 text-base lg:text-lg"
                                                     />
@@ -313,25 +323,6 @@ const Page = ({ params }: { params: { id: string } }) => {
                                             </FormItem>
                                         )}
                                     />
-
-                                    {/* <FormField
-                                        control={form.control}
-                                        name="max_usage"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel className="text-base lg:text-lg">Số lần sử dụng tối đa</FormLabel>
-                                                <FormControl>
-                                                    <Input 
-                                                        type="number"
-                                                        placeholder="Nhập số lần sử dụng tối đa"
-                                                        {...field}
-                                                        className="focus:ring-2 h-10 lg:h-12 text-base lg:text-lg"
-                                                    />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    /> */}
 
                                     <FormField
                                         control={form.control}

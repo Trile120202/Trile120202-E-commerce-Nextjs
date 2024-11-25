@@ -43,7 +43,12 @@ const formSchema = z.object({
     start_date: z.string()
         .min(1, "Ngày bắt đầu không được để trống"),
     end_date: z.string()
-        .min(1, "Ngày kết thúc không được để trống"),
+        .min(1, "Ngày kết thúc không được để trống")
+        .refine((end_date, ctx) => {
+            const start = new Date(ctx.parent.start_date);
+            const end = new Date(end_date);
+            return end > start;
+        }, "Ngày kết thúc phải sau ngày bắt đầu"),
     min_purchase_amount: z.string()
         .min(1, "Giá trị đơn hàng tối thiểu không được để trống")
         .refine((val) => !isNaN(Number(val)) && Number(val) > 0, "Giá trị đơn hàng tối thiểu phải là số dương"),
@@ -81,7 +86,9 @@ const Page = () => {
                 discount_value: Number(values.discount_value),
                 min_purchase_amount: Number(values.min_purchase_amount),
                 max_usage: Number(values.max_usage??1),
-                max_discount_value: Number(values.max_discount_value)
+                max_discount_value: Number(values.max_discount_value),
+                start_date: values.start_date + " 00:00:00",
+                end_date: values.end_date + " 00:00:00"
             };
 
             const response = await fetch('/api/coupons', {
@@ -202,7 +209,7 @@ const Page = () => {
                                             <FormLabel className="text-base lg:text-lg">Ngày bắt đầu</FormLabel>
                                             <FormControl>
                                                 <Input 
-                                                    type="datetime-local"
+                                                    type="date"
                                                     {...field}
                                                     className="focus:ring-2 h-10 lg:h-12 text-base lg:text-lg"
                                                 />
@@ -220,7 +227,8 @@ const Page = () => {
                                             <FormLabel className="text-base lg:text-lg">Ngày kết thúc</FormLabel>
                                             <FormControl>
                                                 <Input 
-                                                    type="datetime-local"
+                                                    type="date"
+                                                    min={form.watch('start_date')}
                                                     {...field}
                                                     className="focus:ring-2 h-10 lg:h-12 text-base lg:text-lg"
                                                 />
