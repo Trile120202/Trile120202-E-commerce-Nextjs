@@ -4,17 +4,19 @@ import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import useFetch from "@/lib/useFetch";
 
-interface SearchFormProps {
-    categoryData?: {
-        data: {
-            id: string;
-            name: string;
-        }[];
-    };
+interface ApiResponse {
+    status: number;
+    message: string;
+    data: {
+        id: string;
+        name: string;
+    }[];
 }
 
-export default function SearchForm({ categoryData }: SearchFormProps) {
+export default function SearchForm() {
+    const { data: categoryData } = useFetch<ApiResponse>('/api/categories/all-category');
     const [searchParams, setSearchParams] = useState({
         name: '',
         category: '',

@@ -12,25 +12,6 @@ import { cn } from "@/lib/utils";
 import { Slider } from "@/components/ui/slider";
 import SearchForm from "@/components/home/SearchForm";
 
-interface Category {
-    id: string;
-    name: string;
-    slug: string;
-    content: string;
-    image_id: string | null;
-    created_at: string;
-    updated_at: string;
-    status: number;
-    image_url: string | null;
-    image_alt_text: string | null;
-}
-
-interface ApiResponse {
-    status: number;
-    message: string;
-    data: Category[];
-}
-
 export default function Home() {
     const [searchParams, setSearchParams] = useState({
         name: '',
@@ -39,7 +20,6 @@ export default function Home() {
         maxPrice: '100000000'
     });
     const router = useRouter();
-    const { data: categoryData } = useFetch<ApiResponse>('/api/categories/all-category');
 
 
     return (
@@ -65,7 +45,7 @@ export default function Home() {
             {/* Filter Section */}
             <section className="py-8 bg-white shadow-lg relative -mt-16 z-20">
                 <div className="container mx-auto px-4">
-                    <SearchForm categoryData={categoryData} />
+                    <SearchForm/>
                 </div>
             </section>
 
