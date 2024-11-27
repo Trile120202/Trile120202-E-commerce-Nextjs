@@ -117,6 +117,11 @@ const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
                             Hết hàng
                         </div>
                     )}
+                    {product.product_status === 0 && (
+                        <div className="absolute top-4 left-4 bg-yellow-500/90 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm font-semibold shadow-lg">
+                            Ngưng kinh doanh
+                        </div>
+                    )}
                     {product.categories && (
                         <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm text-gray-800 px-4 py-2 rounded-full text-sm font-medium">
                             {product.categories}
@@ -150,13 +155,13 @@ const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
             <div className="flex justify-between p-6 mt-auto gap-4 border-t border-gray-100">
                 <motion.button 
                     onClick={handleAddToCart}
-                    disabled={product.stock_quantity <= 0}
+                    disabled={product.stock_quantity <= 0 || product.product_status === 0}
                     className={`flex-1 flex items-center justify-center px-6 py-3 rounded-xl transition-all duration-300 text-sm font-semibold ${
-                        product.stock_quantity <= 0 
+                        product.stock_quantity <= 0 || product.product_status === 0
                         ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
                         : 'bg-blue-600 hover:bg-blue-700 text-white hover:shadow-lg hover:shadow-blue-200'
                     }`}
-                    whileTap={product.stock_quantity > 0 ? { scale: 0.95 } : {}}
+                    whileTap={(product.stock_quantity > 0 && product.product_status !== 0) ? { scale: 0.95 } : {}}
                 >
                     <FaShoppingCart className="mr-2 text-lg" />
                     <span>Thêm vào giỏ</span>
