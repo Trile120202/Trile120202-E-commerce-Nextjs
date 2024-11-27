@@ -62,7 +62,7 @@ const Page: React.FC = () => {
                     <div className="flex flex-col md:flex-row items-center">
                         <div className="md:w-1/2 mb-6 md:mb-0 md:mr-6">
                             <Image
-                                src="https://picsum.photos/2000/2000?random"
+                                src="/images/anh1a.avif"
                                 alt="About Us"
                                 width={500}
                                 height={500}
@@ -87,7 +87,7 @@ const Page: React.FC = () => {
                             Cam kết của chúng tôi
                         </h2>
                         <ul className="list-disc list-inside text-gray-700">
-                            <li>Sản phẩm chính hãng, chất lượng đảm b���o</li>
+                            <li>Sản phẩm chính hãng, chất lượng đảm bảo chất lượng</li>
                             <li>Dịch vụ hậu mãi chu đáo</li>
                             <li>Tư vấn chuyên nghiệp, tận tâm</li>
                             <li>Giá cả cạnh tranh</li>
@@ -113,7 +113,7 @@ const Page: React.FC = () => {
                     <div className="flex flex-col md:flex-row items-center">
                         <div className="md:w-1/2 mb-6 md:mb-0 md:mr-6">
                             <Image
-                                src="https://picsum.photos/2000/2000?random"
+                                src="/images/flat-design-realistic-landing-page-template_23-2150102697.avif"
                                 alt="Customer Service"
                                 width={500}
                                 height={500}
@@ -157,7 +157,7 @@ const Page: React.FC = () => {
                         </div>
                         <div className="md:w-1/2">
                             <Image
-                                src="https://picsum.photos/2000/2000?random"
+                                src="/images/landing-page-with-laptop-template-design_23-2148340933.avif"
                                 alt="Contact Us"
                                 width={500}
                                 height={500}
