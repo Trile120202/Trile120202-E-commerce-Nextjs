@@ -40,13 +40,7 @@ const formSchema = z.object({
     start_date: z.string()
         .min(1, 'Ngày bắt đầu không được để trống'),
     end_date: z.string()
-        .min(1, 'Ngày kết thúc không được để trống')
-        // .refine((end_date, ctx) => {
-        //     const start = new Date(ctx.parent.start_date);
-        //     const end = new Date(end_date);
-        //     return end > start;
-        // }, "Ngày kết thúc phải sau ngày bắt đầu"),
-    ,
+        .min(1, 'Ngày kết thúc không được để trống')    ,
     min_purchase_amount: z.string()
         .min(1, 'Giá trị đơn hàng tối thiểu không được để trống')
         .refine((val) => !isNaN(Number(val)) && Number(val) > 0, 'Giá trị đơn hàng tối thiểu phải là số dương'),
