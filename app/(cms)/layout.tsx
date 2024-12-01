@@ -18,7 +18,6 @@ const menuItems = [
     { href: '/quan-tri/quan-ly-khuyen-mai', icon: FaPercent, label: 'Quản lý khuyến mãi' },
     { href: '/quan-tri/quan-ly-nguoi-dung', icon: FaUsers, label: 'Quản lý người dùng' },
     { href: '/quan-tri/quan-ly-vai-tro', icon: FaUserTag, label: 'Quản lý vai trò' },
-    { href: '/quan-tri/cai-dat', icon: FaCog, label: 'Cài đặt' },
 ];
 
 const peripheralDevices = [
@@ -84,6 +83,14 @@ const Sidebar = () => {
                                     ))}
                                 </ul>
                             )}
+                        </li>
+                        <li>
+                            <Link href="/quan-tri/cai-dat"
+                                  className="flex items-center p-3 hover:bg-blue-500/50 rounded-lg transition-all duration-200 text-sm lg:text-base group"
+                                  onClick={() => setIsOpen(false)}>
+                                <FaCog className="w-5 h-5 mr-4 group-hover:scale-110 transition-transform"/>
+                                Cài đặt
+                            </Link>
                         </li>
                     </ul>
                 </nav>

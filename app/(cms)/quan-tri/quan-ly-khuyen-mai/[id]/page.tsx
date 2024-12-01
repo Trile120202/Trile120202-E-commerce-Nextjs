@@ -84,12 +84,16 @@ const Page = ({ params }: { params: { id: string } }) => {
                 }
 
                 setCoupon(data.data);
+                
+                const startDate = new Date(data.data.start_date).toISOString().split('T')[0];
+                const endDate = new Date(data.data.end_date).toISOString().split('T')[0];
+
                 form.reset({
                     code: data.data.code,
                     discount_type: data.data.discount_type,
                     discount_value: data.data.discount_value.toString(),
-                    start_date: data.data.start_date?.split(' ')[0] || '',
-                    end_date: data.data.end_date?.split(' ')[0] || '',
+                    start_date: startDate,
+                    end_date: endDate,
                     min_purchase_amount: data.data.min_purchase_amount.toString(),
                     max_usage: data.data.max_usage.toString(),
                     max_discount_value: data.data.max_discount_value.toString(),
