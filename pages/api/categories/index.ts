@@ -81,6 +81,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 }));
             }
 
+            const existingNameCategory = await db('categories')
+                .where({ name })
+                .first();
+
+            if(existingNameCategory){
+                return res.status(StatusCode.CONFLICT).json(transformResponse({
+                    data: null,
+                    message: 'Tên đã tồn tại.',
+                    statusCode: StatusCode.CONFLICT,
+                }));
+            }
+
             const existingCategory = await db('categories')
                 .where({ slug })
                 .first();

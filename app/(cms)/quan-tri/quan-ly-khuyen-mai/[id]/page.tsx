@@ -19,7 +19,6 @@ import {
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
 import {
     Select,
     SelectContent,
@@ -28,6 +27,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
+import {useToast} from "@/hooks/use-toast";
 
 const formSchema = z.object({
     code: z.string()
@@ -41,11 +41,12 @@ const formSchema = z.object({
         .min(1, 'Ngày bắt đầu không được để trống'),
     end_date: z.string()
         .min(1, 'Ngày kết thúc không được để trống')
-        .refine((end_date, ctx) => {
-            const start = new Date(ctx.parent.start_date);
-            const end = new Date(end_date);
-            return end > start;
-        }, "Ngày kết thúc phải sau ngày bắt đầu"),
+        // .refine((end_date, ctx) => {
+        //     const start = new Date(ctx.parent.start_date);
+        //     const end = new Date(end_date);
+        //     return end > start;
+        // }, "Ngày kết thúc phải sau ngày bắt đầu"),
+    ,
     min_purchase_amount: z.string()
         .min(1, 'Giá trị đơn hàng tối thiểu không được để trống')
         .refine((val) => !isNaN(Number(val)) && Number(val) > 0, 'Giá trị đơn hàng tối thiểu phải là số dương'),
@@ -129,6 +130,16 @@ const Page = ({ params }: { params: { id: string } }) => {
                 start_date: values.start_date + " 00:00:00",
                 end_date: values.end_date + " 00:00:00"
             };
+
+            if (processedData.discount_value > 100 && processedData.discount_type==="percentage")
+            {
+                toast({
+                    description: 'Giá trị phần trăm vượt quá 100%',
+                });
+
+                return;
+
+            }
 
             const response = await fetch(`/api/coupons/${params.id}`, {
                 method: 'PUT',
