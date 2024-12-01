@@ -155,7 +155,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                 body: JSON.stringify({
                     ...values,
                     avatar_id: avatarId,
-                    role_id: parseInt(values.role_id),
+                    role_id: values.role_id,
                     status: values.status ? 1 : 0
                 }),
             });

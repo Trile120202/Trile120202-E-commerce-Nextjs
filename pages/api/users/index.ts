@@ -122,7 +122,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 last_name,
                 phone,
                 address,
-                avatar_id,
+                avatar_id: avatar_id || null,
                 role_id,
                 status,
                 created_at: db.fn.now(),

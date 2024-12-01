@@ -119,7 +119,7 @@ const Page = () => {
                 },
                 body: JSON.stringify({
                     ...values,
-                    role_id: parseInt(values.role_id),
+                    role_id: values.role_id,
                     status: values.status ? 1 : 0,
                     avatar_id: selectedImage?.id
                 }),
